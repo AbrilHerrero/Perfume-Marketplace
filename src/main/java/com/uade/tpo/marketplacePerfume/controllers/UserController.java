@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.dto.UserDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.UserDuplicateException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
-import com.uade.tpo.marketplacePerfume.service.UserService;
+import com.uade.tpo.marketplacePerfume.service.IUserService;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.UpdatePasswordRequest;;
 
@@ -23,7 +23,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.UpdatePasswordRequest;;
 @RequestMapping ("user")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @PostMapping
     public ResponseEntity<Object> registerUser (@RequestBody UserDTO userDTO) throws UserDuplicateException{
