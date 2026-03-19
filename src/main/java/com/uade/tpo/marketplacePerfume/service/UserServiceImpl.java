@@ -10,7 +10,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
     private UserRepository userRepository;
     
     public UserServiceImpl (){
@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
     }*/
     @Override
     public boolean login(String email, String password) throws UserNonExistanceException {
-    
         ArrayList<User> users = userRepository.getAllUsers();
     
         User user = users.stream()
@@ -54,12 +53,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateProfile() {
-        
         throw new UnsupportedOperationException("Unimplemented method 'updateProfile'");
     }
 
     public void updatePassword(String email, String newPassword) throws UserNonExistanceException {
-
         boolean exists = userRepository.getAllUsers()
                 .stream()
                 .anyMatch(user -> user.getEmail().equals(email));

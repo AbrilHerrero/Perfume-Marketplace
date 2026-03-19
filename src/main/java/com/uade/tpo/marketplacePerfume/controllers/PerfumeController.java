@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
-import com.uade.tpo.marketplacePerfume.service.PefumeService;
+import com.uade.tpo.marketplacePerfume.service.IPerfumeService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("perfume")
 public class PerfumeController {
     @Autowired
-    private PefumeService perfumeService;
+    private IPerfumeService perfumeService;
 
-    @GetMapping()
-    public ResponseEntity<ArrayList<Perfume>> getPerfuemes() {
+    @GetMapping("/all")
+    public ResponseEntity<ArrayList<Perfume>> getPerfumes() {
         return ResponseEntity.ok(perfumeService.getPerfumes());
     }
     

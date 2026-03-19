@@ -9,7 +9,7 @@ import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 
 @Service
-public class PerfumeServiceImpl implements PefumeService   {
+public class PerfumeServiceImpl implements IPerfumeService   {
     private PerfumeRepository perfumeRepository;
    
     public PerfumeServiceImpl (){
