@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.marketplacePerfume.entity.Perfume;
+import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.service.IPerfumeService;
 
@@ -23,7 +23,7 @@ public class PerfumeController {
     private IPerfumeService perfumeService;
 
     @GetMapping("/all")
-    public ResponseEntity<ArrayList<Perfume>> getPerfumes() {
+    public ResponseEntity<ArrayList<PerfumeDTO>> getPerfumes() {
         return ResponseEntity.ok(perfumeService.getPerfumes());
     }
     
