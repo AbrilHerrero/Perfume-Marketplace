@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
-import com.uade.tpo.marketplacePerfume.entity.Perfume;
+import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeDTO;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
+import com.uade.tpo.marketplacePerfume.mapper.PerfumeMapper;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 
 @Service
@@ -17,8 +18,8 @@ public class PerfumeServiceImpl implements IPerfumeService   {
     }
 
     @Override
-    public ArrayList<Perfume> getPerfumes() {
-        return perfumeRepository.getPerfumes();
+    public ArrayList<PerfumeDTO> getPerfumes() {
+        return PerfumeMapper.toDtoList(perfumeRepository.getPerfumes());
     }
 
     @Override
@@ -31,20 +32,18 @@ public class PerfumeServiceImpl implements IPerfumeService   {
         }
     
         perfumeRepository.deletePerfume(id);
-        String message ="Borrado correctaente";
+        String message = "Borrado correctamente";
         return message;
     }
 
-    
-
     @Override
-    public Perfume addPerfume(int id, String name, String email, String password, String telephone) {
+    public PerfumeDTO addPerfume(int id, String name, String email, String password, String telephone) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addPerfume'");
     }
 
     @Override
-    public Perfume modifyPerfume() {
+    public PerfumeDTO modifyPerfume() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'modifyPerfume'");
     }
