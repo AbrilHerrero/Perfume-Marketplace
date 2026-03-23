@@ -17,8 +17,109 @@ The goal is to build an e-commerce platform focused on selling **perfume samples
 
 ## Tech Stack
 
-- **Java** with **Spring Boot** — REST API backend
+- **Java 21** with **Spring Boot 4** — REST API backend
+- **Spring Data JPA** — Database access layer
+- **MySQL 8.0** — Relational database
+- **Docker Compose** — Database containerization
 
-## Status
+---
 
-The project is currently in an early stage of development, with a simplified initial implementation that will evolve throughout the course.
+## Database Setup
+
+The project uses **MySQL 8.0** running in a Docker container, managed automatically by Spring Boot's Docker Compose integration.
+
+### Prerequisites
+
+- **Java 21** or later
+- **Maven** (or use the included `./mvnw` wrapper)
+- **Docker Desktop** installed and running — [Download here](https://www.docker.com/products/docker-desktop/)
+
+### Running the Application
+
+Simply start the Spring Boot application:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Spring Boot will automatically:
+1. Detect the `compose.yaml` file at the project root
+2. Run `docker compose up` to start the MySQL container
+3. Auto-configure the JDBC connection (no manual config needed)
+4. Create/update the database schema via Hibernate
+5. Run `docker compose stop` when the application shuts down (data is preserved)
+
+**No manual `docker compose up` needed** — it's all handled by the `spring-boot-docker-compose` dependency.
+
+### Testing the API
+
+Once the application is running, you can test the perfume endpoints:
+
+**Create a perfume:**
+```bash
+curl -X POST http://localhost:8080/perfume \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Sauvage", "brand": "Dior", "line": "Sauvage", "description": "Fragancia fresca y especiada", "releaseYear": 2015}'
+```
+
+**Get all perfumes:**
+```bash
+curl http://localhost:8080/perfume/all
+```
+
+**Update a perfume:**
+```bash
+curl -X PUT http://localhost:8080/perfume/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Sauvage Elixir", "brand": "Dior", "line": "Sauvage", "description": "Versión concentrada", "releaseYear": 2021}'
+```
+
+**Delete a perfume:**
+```bash
+curl -X DELETE http://localhost:8080/perfume/1
+```
+
+### Connecting to the Database Manually
+
+To inspect the database with a SQL client (e.g., MySQL Workbench, DBeaver):
+
+| Setting | Value |
+|---|---|
+| Host | `localhost` |
+| Port | `3306` |
+| Database | `marketplace_perfume` |
+| Username | `marketplace` |
+| Password | `marketplace123` |
+
+### Running Without Docker Compose Support
+
+If you prefer to run MySQL manually or connect to an external instance:
+
+1. Start the MySQL container yourself:
+   ```bash
+   docker compose up -d
+   ```
+
+2. Uncomment the datasource properties in `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/marketplace_perfume
+   spring.datasource.username=marketplace
+   spring.datasource.password=marketplace123
+   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+   ```
+
+3. Run the application:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+
+### Resetting the Database
+
+To completely reset the database and start fresh:
+
+```bash
+docker compose down -v
+```
+
+This removes the container and the data volume. The next time you start the app, a fresh database will be created.
+

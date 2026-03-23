@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PerfumeDTO {
-    private int id;
+    private Long id;
     private String name;
     private String brand;
     private String line;

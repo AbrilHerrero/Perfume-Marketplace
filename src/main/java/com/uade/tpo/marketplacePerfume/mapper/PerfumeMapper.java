@@ -41,8 +41,8 @@ public final class PerfumeMapper {
                 .build();
     }
 
-    public static ArrayList<PerfumeDTO> toDtoList(List<Perfume> entities) {
-        ArrayList<PerfumeDTO> dtos = new ArrayList<>();
+    public static List<PerfumeDTO> toDtoList(List<Perfume> entities) {
+        List<PerfumeDTO> dtos = new ArrayList<>();
         if (entities == null) {
             return dtos;
         }
