@@ -48,6 +48,21 @@ public class PerfumeServiceImpl implements IPerfumeService {
         existing.setLine(perfumeDTO.getLine());
         existing.setDescription(perfumeDTO.getDescription());
         existing.setReleaseYear(perfumeDTO.getReleaseYear());
+        existing.setRating(perfumeDTO.getRating());
+        existing.setCountry(perfumeDTO.getCountry());
+        existing.setPrice(perfumeDTO.getPrice());
+        existing.setImageUrl(perfumeDTO.getImageUrl());
+        existing.setGender(perfumeDTO.getGender());
+        existing.setLongevity(perfumeDTO.getLongevity());
+        existing.setSillage(perfumeDTO.getSillage());
+        existing.setPopularity(perfumeDTO.getPopularity());
+        existing.setPriceValue(perfumeDTO.getPriceValue());
+        existing.setConfidence(perfumeDTO.getConfidence());
+        existing.setOilType(perfumeDTO.getOilType());
+        existing.setPurchaseUrl(perfumeDTO.getPurchaseUrl());
+        existing.setGeneralNotes(perfumeDTO.getGeneralNotes());
+        existing.setMainAccords(perfumeDTO.getMainAccords());
+        existing.setImageFallbacks(perfumeDTO.getImageFallbacks());
         Perfume updated = perfumeRepository.save(existing);
         return PerfumeMapper.toDto(updated);
     }

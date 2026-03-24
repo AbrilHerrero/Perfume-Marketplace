@@ -51,6 +51,14 @@ Spring Boot will automatically:
 
 **No manual `docker compose up` needed** — it's all handled by the `spring-boot-docker-compose` dependency.
 
+### Automatic Data Seeding
+
+On first startup, the application automatically seeds the database with ~50 perfumes from the [Fragella API](https://api.fragella.com), fetching data for popular brands (Dior, Chanel, YSL, Tom Ford, Versace, Armani, Creed, Jean Paul Gaultier, Prada, Dolce & Gabbana).
+
+Each perfume includes detailed information: ratings, notes (top/middle/base), accords, season and occasion rankings, images, and more.
+
+The seeder only runs when the database is empty — on subsequent restarts it is skipped automatically. To re-seed, reset the database first (see [Resetting the Database](#resetting-the-database)).
+
 ### Testing the API
 
 Once the application is running, you can test the perfume endpoints:
