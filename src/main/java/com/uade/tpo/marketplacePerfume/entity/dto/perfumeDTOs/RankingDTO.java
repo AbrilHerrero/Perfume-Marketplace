@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.entity.dto;
+package com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs;
 
 import lombok.Builder;
 import lombok.Data;

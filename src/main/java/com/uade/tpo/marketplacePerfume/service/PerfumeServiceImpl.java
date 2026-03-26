@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
-import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.PerfumeMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
@@ -18,8 +20,8 @@ public class PerfumeServiceImpl implements IPerfumeService {
     private PerfumeRepository perfumeRepository;
 
     @Override
-    public List<PerfumeDTO> getPerfumes() {
-        return PerfumeMapper.toDtoList(perfumeRepository.findAll());
+    public List<PerfumeResponseDTO> getPerfumes() {
+        return PerfumeMapper.toResponseDtoList(perfumeRepository.findAll());
     }
 
     @Override
@@ -32,38 +34,18 @@ public class PerfumeServiceImpl implements IPerfumeService {
     }
 
     @Override
-    public PerfumeDTO addPerfume(PerfumeDTO perfumeDTO) {
-        Perfume perfume = PerfumeMapper.toEntity(perfumeDTO);
-        perfume.setId(null);
+    public PerfumeResponseDTO addPerfume(PerfumeCreateDTO perfumeCreateDTO) {
+        Perfume perfume = PerfumeMapper.toEntityFromCreate(perfumeCreateDTO);
         Perfume saved = perfumeRepository.save(perfume);
-        return PerfumeMapper.toDto(saved);
+        return PerfumeMapper.toResponseDto(saved);
     }
 
     @Override
-    public PerfumeDTO modifyPerfume(Long id, PerfumeDTO perfumeDTO) throws PerfumeNotFoundException {
+    public PerfumeResponseDTO modifyPerfume(Long id, PerfumeModifyDTO perfumeModifyDTO) throws PerfumeNotFoundException {
         Perfume existing = perfumeRepository.findById(id)
                 .orElseThrow(PerfumeNotFoundException::new);
-        existing.setName(perfumeDTO.getName());
-        existing.setBrand(perfumeDTO.getBrand());
-        existing.setLine(perfumeDTO.getLine());
-        existing.setDescription(perfumeDTO.getDescription());
-        existing.setReleaseYear(perfumeDTO.getReleaseYear());
-        existing.setRating(perfumeDTO.getRating());
-        existing.setCountry(perfumeDTO.getCountry());
-        existing.setPrice(perfumeDTO.getPrice());
-        existing.setImageUrl(perfumeDTO.getImageUrl());
-        existing.setGender(perfumeDTO.getGender());
-        existing.setLongevity(perfumeDTO.getLongevity());
-        existing.setSillage(perfumeDTO.getSillage());
-        existing.setPopularity(perfumeDTO.getPopularity());
-        existing.setPriceValue(perfumeDTO.getPriceValue());
-        existing.setConfidence(perfumeDTO.getConfidence());
-        existing.setOilType(perfumeDTO.getOilType());
-        existing.setPurchaseUrl(perfumeDTO.getPurchaseUrl());
-        existing.setGeneralNotes(perfumeDTO.getGeneralNotes());
-        existing.setMainAccords(perfumeDTO.getMainAccords());
-        existing.setImageFallbacks(perfumeDTO.getImageFallbacks());
+        PerfumeMapper.applyModify(perfumeModifyDTO, existing);
         Perfume updated = perfumeRepository.save(existing);
-        return PerfumeMapper.toDto(updated);
+        return PerfumeMapper.toResponseDto(updated);
     }
 }

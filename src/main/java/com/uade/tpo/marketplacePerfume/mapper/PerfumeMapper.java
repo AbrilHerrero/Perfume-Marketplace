@@ -12,22 +12,24 @@ import com.uade.tpo.marketplacePerfume.entity.OccasionRanking;
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.PerfumeNote;
 import com.uade.tpo.marketplacePerfume.entity.SeasonRanking;
-import com.uade.tpo.marketplacePerfume.entity.dto.AccordPercentageDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeNoteDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.RankingDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.AccordPercentageDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeNoteDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.RankingDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
 
 public final class PerfumeMapper {
 
     private PerfumeMapper() {
     }
 
-    public static PerfumeDTO toDto(Perfume entity) {
+    public static PerfumeResponseDTO toResponseDto(Perfume entity) {
         if (entity == null) {
             return null;
         }
 
-        PerfumeDTO dto = new PerfumeDTO();
+        PerfumeResponseDTO dto = new PerfumeResponseDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setBrand(entity.getBrand());
@@ -90,18 +92,17 @@ public final class PerfumeMapper {
         return dto;
     }
 
-    public static Perfume toEntity(PerfumeDTO dto) {
+    public static Perfume toEntityFromCreate(PerfumeCreateDTO dto) {
         if (dto == null) {
             return null;
         }
 
         return Perfume.builder()
-                .id(dto.getId())
                 .name(dto.getName())
                 .brand(dto.getBrand())
                 .line(dto.getLine())
                 .description(dto.getDescription())
-                .releaseYear(dto.getReleaseYear())
+                .releaseYear(dto.getReleaseYear() != null ? dto.getReleaseYear() : 0)
                 .rating(dto.getRating())
                 .country(dto.getCountry())
                 .price(dto.getPrice())
@@ -120,14 +121,37 @@ public final class PerfumeMapper {
                 .build();
     }
 
-    public static List<PerfumeDTO> toDtoList(List<Perfume> entities) {
-        List<PerfumeDTO> dtos = new ArrayList<>();
+    public static void applyModify(PerfumeModifyDTO dto, Perfume existing) {
+        if (dto.getName() != null) existing.setName(dto.getName());
+        if (dto.getBrand() != null) existing.setBrand(dto.getBrand());
+        if (dto.getLine() != null) existing.setLine(dto.getLine());
+        if (dto.getDescription() != null) existing.setDescription(dto.getDescription());
+        if (dto.getReleaseYear() != null) existing.setReleaseYear(dto.getReleaseYear());
+        if (dto.getRating() != null) existing.setRating(dto.getRating());
+        if (dto.getCountry() != null) existing.setCountry(dto.getCountry());
+        if (dto.getPrice() != null) existing.setPrice(dto.getPrice());
+        if (dto.getImageUrl() != null) existing.setImageUrl(dto.getImageUrl());
+        if (dto.getGender() != null) existing.setGender(dto.getGender());
+        if (dto.getLongevity() != null) existing.setLongevity(dto.getLongevity());
+        if (dto.getSillage() != null) existing.setSillage(dto.getSillage());
+        if (dto.getPopularity() != null) existing.setPopularity(dto.getPopularity());
+        if (dto.getPriceValue() != null) existing.setPriceValue(dto.getPriceValue());
+        if (dto.getConfidence() != null) existing.setConfidence(dto.getConfidence());
+        if (dto.getOilType() != null) existing.setOilType(dto.getOilType());
+        if (dto.getPurchaseUrl() != null) existing.setPurchaseUrl(dto.getPurchaseUrl());
+        if (dto.getGeneralNotes() != null) existing.setGeneralNotes(dto.getGeneralNotes());
+        if (dto.getMainAccords() != null) existing.setMainAccords(dto.getMainAccords());
+        if (dto.getImageFallbacks() != null) existing.setImageFallbacks(dto.getImageFallbacks());
+    }
+
+    public static List<PerfumeResponseDTO> toResponseDtoList(List<Perfume> entities) {
+        List<PerfumeResponseDTO> dtos = new ArrayList<>();
         if (entities == null) {
             return dtos;
         }
 
         for (Perfume entity : entities) {
-            dtos.add(toDto(entity));
+            dtos.add(toResponseDto(entity));
         }
         return dtos;
     }

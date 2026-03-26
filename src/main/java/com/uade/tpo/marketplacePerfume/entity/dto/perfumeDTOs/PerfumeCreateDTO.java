@@ -1,17 +1,23 @@
-package com.uade.tpo.marketplacePerfume.entity.dto;
+package com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs;
 
 import java.util.List;
 
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class PerfumeDTO {
-    private Long id;
+public class PerfumeCreateDTO {
+
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String brand;
+
     private String line;
     private String description;
-    private int releaseYear;
+    private Integer releaseYear;
     private String rating;
     private String country;
     private String price;
