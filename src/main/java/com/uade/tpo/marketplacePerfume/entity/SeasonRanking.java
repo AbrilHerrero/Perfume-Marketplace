@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -33,5 +34,6 @@ public class SeasonRanking {
     @ManyToOne
     @JoinColumn(name = "perfume_id")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Perfume perfume;
 }
