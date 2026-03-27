@@ -1,0 +1,263 @@
+{
+	"info": {
+		"name": "Perfume Marketplace",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register (BUYER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.test('Token saved', function () {",
+									"        pm.expect(json.access_token).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Buyer\",\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1122334455\",\n    \"role\": \"BUYER\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register (SELLER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.test('Token saved', function () {",
+									"        pm.expect(json.access_token).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Seller\",\n    \"email\": \"seller@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1155667788\",\n    \"role\": \"SELLER\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.test('Token saved', function () {",
+									"        pm.expect(json.access_token).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1199887766\",\n    \"role\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Authenticate (Login)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.test('Token saved', function () {",
+									"        pm.expect(json.access_token).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/authenticate",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "authenticate"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Perfume",
+			"item": [
+				{
+					"name": "Get All Perfumes",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/perfume/all",
+							"host": ["{{base_url}}"],
+							"path": ["perfume", "all"]
+						}
+					}
+				},
+				{
+					"name": "Create Perfume (ADMIN/SELLER only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sauvage\",\n    \"brand\": \"Dior\",\n    \"releaseYear\": 2015,\n    \"imageUrl\": \"https://example.com/sauvage.jpg\",\n    \"gender\": \"Male\",\n    \"sillage\": \"Strong\",\n    \"confidence\": \"High\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/perfume",
+							"host": ["{{base_url}}"],
+							"path": ["perfume"]
+						}
+					}
+				},
+				{
+					"name": "Modify Perfume (ADMIN/SELLER only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sauvage EDP\",\n    \"brand\": \"Dior\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/perfume/1",
+							"host": ["{{base_url}}"],
+							"path": ["perfume", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Perfume (ADMIN/SELLER only)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/perfume/1",
+							"host": ["{{base_url}}"],
+							"path": ["perfume", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Update Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"buyer@test.com\",\n    \"password\": \"newPassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user/password",
+							"host": ["{{base_url}}"],
+							"path": ["user", "password"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
