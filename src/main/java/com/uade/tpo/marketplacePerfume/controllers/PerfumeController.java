@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.service.IPerfumeService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("perfume")
@@ -26,7 +30,7 @@ public class PerfumeController {
     private IPerfumeService perfumeService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<PerfumeDTO>> getPerfumes() {
+    public ResponseEntity<List<PerfumeResponseDTO>> getPerfumes() {
         return ResponseEntity.ok(perfumeService.getPerfumes());
     }
 
@@ -36,13 +40,13 @@ public class PerfumeController {
     }
 
     @PostMapping
-    public ResponseEntity<PerfumeDTO> addPerfume(@RequestBody PerfumeDTO perfumeDTO) {
-        PerfumeDTO created = perfumeService.addPerfume(perfumeDTO);
+    public ResponseEntity<PerfumeResponseDTO> addPerfume(@Valid @RequestBody PerfumeCreateDTO perfumeCreateDTO) {
+        PerfumeResponseDTO created = perfumeService.addPerfume(perfumeCreateDTO);
         return ResponseEntity.created(URI.create("/perfume/" + created.getId())).body(created);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<PerfumeDTO> modifyPerfume(@PathVariable Long id, @RequestBody PerfumeDTO perfumeDTO) throws PerfumeNotFoundException {
-        return ResponseEntity.ok(perfumeService.modifyPerfume(id, perfumeDTO));
+    public ResponseEntity<PerfumeResponseDTO> modifyPerfume(@PathVariable Long id, @RequestBody PerfumeModifyDTO perfumeModifyDTO) throws PerfumeNotFoundException {
+        return ResponseEntity.ok(perfumeService.modifyPerfume(id, perfumeModifyDTO));
     }
 }

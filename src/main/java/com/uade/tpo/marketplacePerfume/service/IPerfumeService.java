@@ -2,12 +2,14 @@ package com.uade.tpo.marketplacePerfume.service;
 
 import java.util.List;
 
-import com.uade.tpo.marketplacePerfume.entity.dto.PerfumeDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 
 public interface IPerfumeService {
-    List<PerfumeDTO> getPerfumes();
+    List<PerfumeResponseDTO> getPerfumes();
     String deletePerfume(Long id) throws PerfumeNotFoundException;
-    PerfumeDTO addPerfume(PerfumeDTO perfumeDTO);
-    PerfumeDTO modifyPerfume(Long id, PerfumeDTO perfumeDTO) throws PerfumeNotFoundException;
+    PerfumeResponseDTO addPerfume(PerfumeCreateDTO perfumeCreateDTO);
+    PerfumeResponseDTO modifyPerfume(Long id, PerfumeModifyDTO perfumeModifyDTO) throws PerfumeNotFoundException;
 }
