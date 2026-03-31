@@ -21,8 +21,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Sample {
    
-    //public Sample(){}
-    //public Sample (int volume,double price, String description, String image_url, int stock )
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
