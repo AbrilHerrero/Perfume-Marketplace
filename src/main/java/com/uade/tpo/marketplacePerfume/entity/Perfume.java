@@ -1,10 +1,13 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +43,9 @@ public class Perfume {
     private String sillage;
 
     private String confidence;
+
+    @OneToMany (mappedBy = "perfume")
+    private List<Sample> samples;
 
 
 }
