@@ -81,4 +81,6 @@ public class User implements UserDetails {
 
     @OneToMany (mappedBy = "seller")
     private List<Sample> samples;
+    @OneToMany (mappedBy = "buyer")
+    private List<Review> reviews;
 }
