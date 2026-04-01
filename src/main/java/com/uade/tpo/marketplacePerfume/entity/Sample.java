@@ -1,7 +1,7 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
-import java.time.LocalDate;
-
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,11 +24,11 @@ public class Sample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int volume_ml;
-    private double price;
+    private int volumeMl;
+    private BigDecimal price;
     private String description;
-    private String image_url;
-    private LocalDate created_at;
+    private String imageUrl;
+    private LocalDateTime createdAt;
     private int stock;
 
     @ManyToOne
