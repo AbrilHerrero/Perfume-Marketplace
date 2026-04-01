@@ -3,49 +3,36 @@ package com.uade.tpo.marketplacePerfume.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import java.math.BigDecimal;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Sample {
-   
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int volumeMl;
-    private BigDecimal price;
-    private String description;
-    private String imageUrl;
+    @OneToOne
+    @JoinColumn(name="buyerId", referencedColumnName="id")
+    private User buyer;
+
     private LocalDateTime createdAt;
-    private int stock;
+    private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name="perfumeId", referencedColumnName = "id")
-    private Perfume perfume;
-    
-    @ManyToOne
-    @JoinColumn(name="sellerId", referencedColumnName = "id")
-    private User seller;
-
-    @OneToMany (mappedBy="sample")
+    @OneToMany(mappedBy = "cart")
     private List<CartItem> cartItems;
 
-
-
-
+    
 }
