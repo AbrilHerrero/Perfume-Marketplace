@@ -19,20 +19,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Review {
-    // id, reviewerId, sampleId, rating, comment, createdAt
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
-    private int rating;
+    private Float rating;
     private String comment;
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn (name = "buyerId",referencedColumnName = "id")
+    @JoinColumn (name = "buyer_id", referencedColumnName = "id")
     private User buyer;
 
     @ManyToOne
-    @JoinColumn (name = "sampleId", referencedColumnName = "id")
+    @JoinColumn (name = "sample_id", referencedColumnName = "id")
     private Sample sample;
 
 }

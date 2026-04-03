@@ -1,5 +1,6 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
+import java.time.Year;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -33,7 +34,7 @@ public class Perfume {
     private String brand;
 
     @Column(name = "release_year")
-    private int releaseYear;
+    private Year releaseYear;
 
     @Column(name = "image_url", length = 1024)
     private String imageUrl;
