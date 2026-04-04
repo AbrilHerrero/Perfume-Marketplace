@@ -1,8 +1,6 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,9 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,28 +19,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "orders")
-public class Order {
+public class Shipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id", referencedColumnName = "id")
-    private User buyer;
+    private LocalDateTime shippedAt;
 
-    private LocalDateTime createdAt;
-
-    private BigDecimal total;
+    private LocalDateTime deliveredAt;
 
     private String status;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems;
+    private String trackingNumber;
 
-    @OneToOne(mappedBy = "order")
-    private Payment payment;
+    @OneToOne
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private Order order;
 
-    @OneToOne(mappedBy = "order")
-    private Shipment shipment;
+    @ManyToOne
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
 }
