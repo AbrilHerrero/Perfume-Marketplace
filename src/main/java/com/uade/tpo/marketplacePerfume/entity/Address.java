@@ -29,7 +29,7 @@ public class Address {
 
     private String state;
 
-    private String postaCode;
+    private String postalCode;
 
     private String country;
 
