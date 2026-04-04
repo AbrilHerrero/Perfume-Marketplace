@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Sample {
-   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,10 +41,9 @@ public class Sample {
     @JoinColumn(name="sellerId", referencedColumnName = "id")
     private User seller;
 
+    @OneToMany (mappedBy = "sample")
+    private List<Review> reviews;
+
     @OneToMany (mappedBy="sample")
     private List<CartItem> cartItems;
-
-
-
-
 }

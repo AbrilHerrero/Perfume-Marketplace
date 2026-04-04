@@ -28,7 +28,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -83,7 +82,9 @@ public class User implements UserDetails {
     @OneToMany (mappedBy = "seller")
     private List<Sample> samples;
 
+    @OneToMany (mappedBy = "buyer")
+    private List<Review> reviews;
+
     @OneToOne (mappedBy = "buyer")
     private Cart cart;
-    
 }
