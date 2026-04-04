@@ -79,15 +79,18 @@ public class User implements UserDetails {
         return active;
     }
 
-    @OneToMany (mappedBy = "seller")
+    @OneToMany(mappedBy = "seller")
     private List<Sample> samples;
 
-    @OneToMany (mappedBy = "buyer")
+    @OneToMany(mappedBy = "buyer")
     private List<Review> reviews;
 
-    @OneToOne (mappedBy = "buyer")
+    @OneToOne(mappedBy = "buyer")
     private Cart cart;
 
-    @OneToMany (mappedBy = "buyer")
+    @OneToOne(mappedBy = "buyer")
+    private Address address;
+
+    @OneToMany(mappedBy = "buyer")
     private List<Order> orders;
 }
