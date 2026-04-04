@@ -23,7 +23,7 @@ public class Address {
 
     private String street;
 
-    private String numStreet;
+    private String streetNumber;
 
     private String city;
 
