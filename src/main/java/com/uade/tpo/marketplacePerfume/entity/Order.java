@@ -11,48 +11,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Sample {
+@Table(name = "orders")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int volumeMl;
-
-    private BigDecimal price;
-
-    private String description;
-
-    private String imageUrl;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User buyer;
 
     private LocalDateTime createdAt;
 
-    private int stock;
+    private BigDecimal total;
 
-    @ManyToOne
-    @JoinColumn(name="perfume_id", referencedColumnName = "id")
-    private Perfume perfume;
-    
-    @ManyToOne
-    @JoinColumn(name="seller_id", referencedColumnName = "id")
-    private User seller;
+    private String status;
 
-    @OneToMany (mappedBy = "sample")
-    private List<Review> reviews;
-
-    @OneToMany (mappedBy="sample")
-    private List<CartItem> cartItems;
-
-    @OneToMany (mappedBy = "sample")
+    @OneToMany (mappedBy = "order")
     private List<OrderItem> orderItems;
 }
