@@ -29,7 +29,7 @@ public class Order {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id")
     private User buyer;
 
     private LocalDateTime createdAt;
