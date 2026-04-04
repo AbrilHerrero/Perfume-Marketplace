@@ -20,7 +20,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Perfume {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -46,6 +45,4 @@ public class Perfume {
 
     @OneToMany (mappedBy = "perfume")
     private List<Sample> samples;
-
-
 }

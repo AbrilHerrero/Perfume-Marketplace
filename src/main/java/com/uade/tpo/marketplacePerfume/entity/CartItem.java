@@ -18,22 +18,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Review {
+public class CartItem {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Float rating;
+    private int amount;
 
-    private String comment;
+    private LocalDateTime addedAt;
 
-    private LocalDateTime createdAt;
-
-    @ManyToOne
-    @JoinColumn (name = "buyer_id", referencedColumnName = "id")
-    private User buyer;
+    @ManyToOne 
+    @JoinColumn(name = "cart_id", referencedColumnName= "id")
+    private Cart cart;
 
     @ManyToOne
-    @JoinColumn (name = "sample_id", referencedColumnName = "id")
+    @JoinColumn(name="sample_id", referencedColumnName = "id")
     private Sample sample;
 }
