@@ -26,12 +26,10 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
-    
+
     @ManyToOne
     @JoinColumn(name = "sample_id", referencedColumnName = "id")
     private Sample sample;
-
-    private BigDecimal price;
 
     private int quantity;
 }
