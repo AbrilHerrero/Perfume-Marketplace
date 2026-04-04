@@ -33,7 +33,7 @@ public class Shipment {
     private String trackingNumber;
 
     @OneToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JoinColumn(name = "order_id", referencedColumnName = "id", unique = true)
     private Order order;
 
     @ManyToOne
