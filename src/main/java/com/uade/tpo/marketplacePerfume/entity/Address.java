@@ -33,7 +33,7 @@ public class Address {
 
     private String country;
 
-    private String aparment;
+    private String apartment;
 
     @OneToOne
     @JoinColumn(name = "buyer_id", referencedColumnName = "id", unique = true)
