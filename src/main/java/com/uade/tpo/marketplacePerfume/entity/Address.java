@@ -36,7 +36,7 @@ public class Address {
     private String aparment;
 
     @OneToOne
-    @JoinColumn(name = "buyer_id", referencedColumnName = "id")
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id", unique = true)
     private User buyer;
 
 }
