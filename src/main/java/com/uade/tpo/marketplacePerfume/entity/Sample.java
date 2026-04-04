@@ -1,9 +1,9 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import java.math.BigDecimal;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,19 +26,25 @@ public class Sample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private int volumeMl;
+
     private BigDecimal price;
+
     private String description;
+
     private String imageUrl;
+
     private LocalDateTime createdAt;
+
     private int stock;
 
     @ManyToOne
-    @JoinColumn(name="perfumeId", referencedColumnName = "id")
+    @JoinColumn(name="perfume_id", referencedColumnName = "id")
     private Perfume perfume;
     
     @ManyToOne
-    @JoinColumn(name="sellerId", referencedColumnName = "id")
+    @JoinColumn(name="seller_id", referencedColumnName = "id")
     private User seller;
 
     @OneToMany (mappedBy = "sample")

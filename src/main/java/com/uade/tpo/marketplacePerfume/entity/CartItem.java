@@ -19,19 +19,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class CartItem {
-    // id, cart_id, sample_id, amount, added_at
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
+
     private int amount;
+
     private LocalDateTime addedAt;
-    
+
     @ManyToOne 
-    @JoinColumn(name = "cartId", referencedColumnName= "id")
+    @JoinColumn(name = "cart_id", referencedColumnName= "id")
     private Cart cart;
 
     @ManyToOne
-    @JoinColumn(name="sampleId", referencedColumnName = "id")
+    @JoinColumn(name="sample_id", referencedColumnName = "id")
     private Sample sample;
-    
 }

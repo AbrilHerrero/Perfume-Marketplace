@@ -22,8 +22,11 @@ public class Review {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Float rating;
+
     private String comment;
+
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -33,5 +36,4 @@ public class Review {
     @ManyToOne
     @JoinColumn (name = "sample_id", referencedColumnName = "id")
     private Sample sample;
-
 }

@@ -24,15 +24,15 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @OneToOne
-    @JoinColumn(name="buyerId", referencedColumnName="id")
+    @JoinColumn(name="buyer_id", referencedColumnName="id", unique = true)
     private User buyer;
 
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "cart")
     private List<CartItem> cartItems;
-
-    
 }
