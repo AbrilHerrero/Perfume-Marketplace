@@ -1,11 +1,14 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,5 +41,8 @@ public class Address {
     @OneToOne
     @JoinColumn(name = "buyer_id", referencedColumnName = "id", unique = true)
     private User buyer;
+
+    @OneToMany(mappedBy = "address")
+    private List<Shipment> shipments;
 
 }
