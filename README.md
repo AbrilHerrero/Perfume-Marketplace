@@ -22,9 +22,10 @@ The goal is to build an e-commerce platform focused on selling **perfume samples
 - **MySQL 8.0** — Relational database
 - **Docker Compose** — Database containerization
 
-## Data model (DER)
+## Data Entity-Relation (DER)
 
-![Diagrama entidad-relación](DER.jpg)
+![DER](https://github.com/user-attachments/assets/795dfd0c-76d7-43a7-9bb1-69406a09d09b)
+
 
 ---
 
