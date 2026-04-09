@@ -28,7 +28,7 @@ public class Payment {
     @JoinColumn(name = "order_id", referencedColumnName = "id", unique = true)
     private Order order;
 
-    private BigDecimal amount;
+    private BigDecimal total;
 
     private String methodName;
 
