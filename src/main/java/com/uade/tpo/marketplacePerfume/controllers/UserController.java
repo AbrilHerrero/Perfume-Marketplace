@@ -31,14 +31,14 @@ public class UserController {
         return ResponseEntity.ok("Password actualizado con exito");
     }
 
-    @PutMapping
+    @PutMapping("updateUser")
     public ResponseEntity<UserProfileResponse> updateUser(
             @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal User currentUser) throws UserNonExistanceException {
         return ResponseEntity.ok(userService.updateUser(request, currentUser));
     }
 
-    @DeleteMapping
+    @DeleteMapping ("deleteUser")
     public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User currentUser)
             throws UserNonExistanceException {
         userService.deleteUser(currentUser);
