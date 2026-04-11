@@ -43,21 +43,21 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCartItem(cartItemId));
     }
 
-    @PostMapping
+    @GetMapping("/stock-check")
+    public ResponseEntity<CartStockCheckResponseDTO> checkCartStock() {
+        return ResponseEntity.ok(cartService.checkCartStock());
+    }
+
+    @PostMapping("/items")
     public ResponseEntity<CartItemResponseDTO> addCartItem(@Valid @RequestBody CartItemAddDTO cartItemAddDTO) {
         CartItemResponseDTO created = cartService.addCartItem(cartItemAddDTO);
         return ResponseEntity.created(URI.create("/cart/items/" + created.getId())).body(created);
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/items/bulk")
     public ResponseEntity<List<CartItemResponseDTO>> addCartItems(@Valid @RequestBody CartBulkAddDTO cartBulkAddDTO) {
         List<CartItemResponseDTO> created = cartService.addCartItems(cartBulkAddDTO);
-        return ResponseEntity.created(URI.create("/cart/bulk")).body(created);
-    }
-
-    @GetMapping("/stock")
-    public ResponseEntity<CartStockCheckResponseDTO> checkCartStock() {
-        return ResponseEntity.ok(cartService.checkCartStock());
+        return ResponseEntity.ok(created);
     }
 
     @PostMapping("/checkout")
@@ -65,14 +65,14 @@ public class CartController {
         return ResponseEntity.ok(cartService.checkoutCart());
     }
 
-    @PutMapping("/{cartItemId}")
+    @PutMapping("/items/{cartItemId}")
     public ResponseEntity<Void> updateCartItemQuantity(@PathVariable Long cartItemId,
             @Valid @RequestBody CartItemQuantityUpdateDTO body) {
         cartService.updateCartItemQuantity(cartItemId, body.getQuantity());
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{cartItemId}")
+    @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<Void> removeCartItem(@PathVariable Long cartItemId) {
         cartService.removeCartItem(cartItemId);
         return ResponseEntity.noContent().build();

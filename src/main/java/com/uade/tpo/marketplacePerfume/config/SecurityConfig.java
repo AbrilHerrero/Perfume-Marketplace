@@ -28,19 +28,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/auth/**").permitAll()
+                        // Perfume
                         .requestMatchers(HttpMethod.GET, "/perfume/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(HttpMethod.PUT, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(HttpMethod.DELETE, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
-                        .requestMatchers(HttpMethod.GET, "/cart/**").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.POST, "/cart/**").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.POST, "/cart/bulk").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.GET, "/cart/items/**").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.GET, "/cart/stock").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.POST, "/cart/checkout").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.PUT, "/cart/{cartItemId}").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.DELETE, "/cart/{cartItemId}").hasRole("BUYER")
-                        .requestMatchers(HttpMethod.DELETE, "/cart/clear").hasRole("BUYER")
+                        // Cart (solo compradores; rutas bajo /cart e /cart/items/...)
+                        .requestMatchers("/cart/**").hasRole("BUYER")
+                        // User
                         .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
