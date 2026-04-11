@@ -7,7 +7,6 @@ import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartStockCheckResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemAddDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemResponseDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 
 public interface ICartService {
 
@@ -27,5 +26,6 @@ public interface ICartService {
 
     CartStockCheckResponseDTO checkCartStock();
 
-    OrderResponseDTO checkoutCart();
+    // Checkout: pendiente — exponer POST /cart/checkout (o POST /orders) al implementar Order
+    // y crear la orden desde el carrito del comprador actual.
 }

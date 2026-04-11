@@ -18,7 +18,6 @@ import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemQuantityU
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartBulkAddDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartStockCheckResponseDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.service.ICartService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,11 +57,6 @@ public class CartController {
     public ResponseEntity<List<CartItemResponseDTO>> addCartItems(@Valid @RequestBody CartBulkAddDTO cartBulkAddDTO) {
         List<CartItemResponseDTO> created = cartService.addCartItems(cartBulkAddDTO);
         return ResponseEntity.ok(created);
-    }
-
-    @PostMapping("/checkout")
-    public ResponseEntity<OrderResponseDTO> checkoutCart() {
-        return ResponseEntity.ok(cartService.checkoutCart());
     }
 
     @PutMapping("/items/{cartItemId}")

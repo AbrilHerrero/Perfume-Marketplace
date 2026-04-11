@@ -19,7 +19,6 @@ import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartStockCheckResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemAddDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemResponseDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.CartItemNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.CartMapper;
@@ -41,7 +40,8 @@ public class CartServiceImpl implements ICartService {
 
     private User currentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario autenticado no encontrado"));
     }
 
     private Cart getOrCreateCart(User user) {
@@ -127,6 +127,9 @@ public class CartServiceImpl implements ICartService {
     @Override
     @Transactional
     public void updateCartItemQuantity(Long cartItemId, int quantity) {
+        if (quantity < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La cantidad debe ser al menos 1");
+        }
         User user = currentUser();
         CartItem ci = requireOwnedItem(cartItemId, user);
         ci.setQuantity(quantity);
@@ -164,8 +167,4 @@ public class CartServiceImpl implements ICartService {
         return CartMapper.toCartStockCheckResponseDto(lines);
     }
 
-    @Override
-    public OrderResponseDTO checkoutCart() {
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "Checkout: implementar con Order");
-    }
 }
