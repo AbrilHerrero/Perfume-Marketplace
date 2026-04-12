@@ -237,6 +237,19 @@
 			]
 		},
 		{
+			"name": "Get current profile (me)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/me",
+					"host": ["{{base_url}}"],
+					"path": ["user", "me"]
+				},
+				"description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
+			}
+		},
+		{
 			"name": "User",
 			"item": [
 				{
@@ -290,6 +303,7 @@
 						"description": "No body. Requires Bearer token."
 					}
 				}
+				
 			]
 		}
 	]

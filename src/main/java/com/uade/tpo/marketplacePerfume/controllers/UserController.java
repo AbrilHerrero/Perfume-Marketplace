@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
@@ -32,7 +34,7 @@ public class UserController {
 
     @PutMapping("updatePassword")
     public ResponseEntity<Object> updatePassword(
-            @RequestBody UpdatePasswordRequest request,
+            @Valid @RequestBody UpdatePasswordRequest request,
             @AuthenticationPrincipal User currentUser) throws UserNonExistanceException {
         userService.updatePassword(request, currentUser);
         return ResponseEntity.ok("Password actualizado con exito");
