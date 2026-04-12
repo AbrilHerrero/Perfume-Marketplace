@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.entity.dto;
+package com.uade.tpo.marketplacePerfume.entity.dto.user;
 
 import lombok.Data;
 

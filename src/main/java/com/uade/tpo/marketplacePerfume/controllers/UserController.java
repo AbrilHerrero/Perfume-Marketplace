@@ -4,15 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.entity.dto.UpdatePasswordRequest;
-import com.uade.tpo.marketplacePerfume.entity.dto.UpdateUserRequest;
-import com.uade.tpo.marketplacePerfume.entity.dto.UserProfileResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
+import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
+import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.service.IUserService;
 
@@ -22,6 +23,12 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+
+    @GetMapping("me")
+    public ResponseEntity<UserProfileResponse> getCurrentUser(@AuthenticationPrincipal User currentUser)
+            throws UserNonExistanceException {
+        return ResponseEntity.ok(userService.getCurrentUserProfile(currentUser));
+    }
 
     @PutMapping("updatePassword")
     public ResponseEntity<Object> updatePassword(
@@ -38,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(request, currentUser));
     }
 
-    @DeleteMapping ("deleteUser")
+    @DeleteMapping ("deleteMyUser")
     public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User currentUser)
             throws UserNonExistanceException {
         userService.deleteUser(currentUser);

@@ -5,10 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.entity.dto.UpdatePasswordRequest;
-import com.uade.tpo.marketplacePerfume.entity.dto.UpdateUserRequest;
-import com.uade.tpo.marketplacePerfume.entity.dto.UserProfileResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
+import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
+import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
+import com.uade.tpo.marketplacePerfume.mapper.UserMapper;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,13 @@ public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserProfileResponse getCurrentUserProfile(User currentUser) throws UserNonExistanceException {
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(UserNonExistanceException::new);
+        return UserMapper.toProfileResponse(user);
+    }
 
     @Override
     public void updatePassword(UpdatePasswordRequest newPassword, User currentUser) throws UserNonExistanceException {
@@ -45,7 +53,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         userRepository.save(user);
-        return toProfileResponse(user);
+        return UserMapper.toProfileResponse(user);
     }
 
     @Override
@@ -56,16 +64,5 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
     }
 
-    private static UserProfileResponse toProfileResponse(User user) {
-        return UserProfileResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .surname(user.getSurname())
-                .email(user.getEmail())
-                .telephone(user.getTelephone())
-                .registerDate(user.getRegisterDate())
-                .active(user.isActive())
-                .role(user.getRole())
-                .build();
-    }
+  
 }
