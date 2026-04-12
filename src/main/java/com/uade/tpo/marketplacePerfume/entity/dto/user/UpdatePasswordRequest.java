@@ -8,6 +8,6 @@ import lombok.Data;
 public class UpdatePasswordRequest {
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(max = 128, message = "La contraseña no puede superar 128 caracteres")
+    @Size(min = 8, max = 30, message = "La contraseña debe tener minimo 8 caracteres y no puede superar 30 caracteres")
     private String password;
 }
