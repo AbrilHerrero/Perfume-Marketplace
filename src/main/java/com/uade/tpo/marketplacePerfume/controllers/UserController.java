@@ -33,11 +33,11 @@ public class UserController {
     }
 
     @PutMapping("updatePassword")
-    public ResponseEntity<Object> updatePassword(
+    public ResponseEntity<String> updatePassword(
             @Valid @RequestBody UpdatePasswordRequest request,
             @AuthenticationPrincipal User currentUser) throws UserNonExistanceException {
         userService.updatePassword(request, currentUser);
-        return ResponseEntity.ok("Password actualizado con exito");
+        return ResponseEntity.ok("Password successfully updated");
     }
 
     @PutMapping("updateUser")
@@ -51,6 +51,6 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User currentUser)
             throws UserNonExistanceException {
         userService.deleteUser(currentUser);
-        return ResponseEntity.ok("Usuario dado de baja con exito");
+        return ResponseEntity.ok("User successfully deactivated");
     }
 }

@@ -9,7 +9,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 public interface IUserService {
     UserProfileResponse getCurrentUserProfile(User currentUser) throws UserNonExistanceException;
 
-    void updatePassword(UpdatePasswordRequest newPassword, User currentUser) throws UserNonExistanceException;
+    void updatePassword(UpdatePasswordRequest request, User currentUser) throws UserNonExistanceException;
 
     UserProfileResponse updateUser(UpdateUserRequest request, User currentUser)
             throws UserNonExistanceException;

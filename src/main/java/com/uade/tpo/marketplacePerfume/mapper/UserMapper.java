@@ -3,7 +3,7 @@ package com.uade.tpo.marketplacePerfume.mapper;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
 
-public class UserMapper {
+public final class UserMapper {
     private UserMapper() {
     }
     public static UserProfileResponse toProfileResponse (User user) {

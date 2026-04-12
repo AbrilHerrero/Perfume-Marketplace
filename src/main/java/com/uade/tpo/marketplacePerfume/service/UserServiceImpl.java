@@ -29,10 +29,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void updatePassword(UpdatePasswordRequest newPassword, User currentUser) throws UserNonExistanceException {
+    public void updatePassword(UpdatePasswordRequest request, User currentUser) throws UserNonExistanceException {
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(UserNonExistanceException::new);
-        user.setPassword(passwordEncoder.encode(newPassword.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
     }
 
