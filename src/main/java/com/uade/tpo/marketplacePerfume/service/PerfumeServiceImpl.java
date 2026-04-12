@@ -25,7 +25,7 @@ public class PerfumeServiceImpl implements IPerfumeService {
     }
 
     @Override
-    public String deletePerfume(Long id) throws PerfumeNotFoundException {
+    public String deletePerfume(Long id) {
         if (!perfumeRepository.existsById(id)) {
             throw new PerfumeNotFoundException();
         }
@@ -41,7 +41,7 @@ public class PerfumeServiceImpl implements IPerfumeService {
     }
 
     @Override
-    public PerfumeResponseDTO modifyPerfume(Long id, PerfumeModifyDTO perfumeModifyDTO) throws PerfumeNotFoundException {
+    public PerfumeResponseDTO modifyPerfume(Long id, PerfumeModifyDTO perfumeModifyDTO) {
         Perfume existing = perfumeRepository.findById(id)
                 .orElseThrow(PerfumeNotFoundException::new);
         PerfumeMapper.applyModify(perfumeModifyDTO, existing);

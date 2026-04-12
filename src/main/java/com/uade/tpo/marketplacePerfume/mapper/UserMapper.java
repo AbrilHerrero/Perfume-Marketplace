@@ -1,26 +1,24 @@
 package com.uade.tpo.marketplacePerfume.mapper;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.entity.dto.userDTOs.UserResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.userDTOs.SellerSummaryDTO;
 
 public final class UserMapper {
 
     private UserMapper() {
     }
 
-    public static UserResponseDTO toResponseDto(User entity) {
+    public static SellerSummaryDTO toSellerSummary(User entity) {
         if (entity == null) {
             return null;
         }
-        UserResponseDTO dto = new UserResponseDTO();
+        SellerSummaryDTO dto = new SellerSummaryDTO();
         dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setSurname(entity.getSurname());
-        dto.setEmail(entity.getEmail());
-        dto.setTelephone(entity.getTelephone());
-        dto.setRegisterDate(entity.getRegisterDate());
-        dto.setActive(entity.isActive());
-        dto.setRole(entity.getRole());
+        String display = entity.getName();
+        if (entity.getSurname() != null && !entity.getSurname().isBlank()) {
+            display = display == null ? entity.getSurname() : display + " " + entity.getSurname();
+        }
+        dto.setName(display);
         return dto;
     }
 }

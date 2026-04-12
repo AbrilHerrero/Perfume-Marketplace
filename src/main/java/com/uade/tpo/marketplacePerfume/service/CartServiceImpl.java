@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,7 +24,6 @@ import com.uade.tpo.marketplacePerfume.mapper.CartMapper;
 import com.uade.tpo.marketplacePerfume.repository.CartItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.CartRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
-import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,13 +34,6 @@ public class CartServiceImpl implements ICartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final SampleRepository sampleRepository;
-    private final UserRepository userRepository;
-
-    private User currentUser() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario autenticado no encontrado"));
-    }
 
     private Cart getOrCreateCart(User user) {
         return cartRepository.findByBuyer_Id(user.getId()).orElseGet(() -> {
@@ -75,31 +66,43 @@ public class CartServiceImpl implements ICartService {
         cartRepository.save(cart);
     }
 
+    private void requireCartQuantityAtLeastOne(int quantity) {
+        if (quantity < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantity must be at least 1");
+        }
+    }
+
     @Override
     @Transactional(readOnly = true)
-    public CartResponseDTO getCart() {
-        User user = currentUser();
+    public CartResponseDTO getCart(User user) {
         return cartRepository.findByBuyer_Id(user.getId())
                 .map(c -> CartMapper.toCartResponseDto(c, loadLines(c.getId())))
-                .orElseGet(() -> CartMapper.toEmptyCartResponse(user));
+                .orElseGet(CartMapper::toEmptyCartResponse);
     }
 
     @Override
     @Transactional
-    public CartItemResponseDTO addCartItem(CartItemAddDTO request) {
-        User user = currentUser();
+    public CartItemResponseDTO addCartItem(User user, CartItemAddDTO request) {
+        int quantity = request.getQuantity();
+        requireCartQuantityAtLeastOne(quantity);
+
         Cart cart = getOrCreateCart(user);
         Sample sample = sampleRepository.findById(request.getSampleId()).orElseThrow(SampleNotFoundException::new);
 
         CartItem saved = cartItemRepository.findByCart_IdAndSample_Id(cart.getId(), sample.getId())
                 .map(existing -> {
-                    existing.setQuantity(existing.getQuantity() + request.getQuantity());
+                    try {
+                        existing.setQuantity(Math.addExact(existing.getQuantity(), quantity));
+                    } catch (ArithmeticException e) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Cart line quantity exceeds maximum");
+                    }
                     return cartItemRepository.save(existing);
                 })
                 .orElseGet(() -> cartItemRepository.save(CartItem.builder()
                         .cart(cart)
                         .sample(sample)
-                        .quantity(request.getQuantity())
+                        .quantity(quantity)
                         .addedAt(LocalDateTime.now())
                         .build()));
 
@@ -110,27 +113,24 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public List<CartItemResponseDTO> addCartItems(CartBulkAddDTO request) {
+    public List<CartItemResponseDTO> addCartItems(User user, CartBulkAddDTO request) {
         List<CartItemResponseDTO> out = new ArrayList<>();
         for (CartItemAddDTO line : request.getItems()) {
-            out.add(addCartItem(line));
+            out.add(addCartItem(user, line));
         }
         return out;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CartItemResponseDTO getCartItem(Long cartItemId) {
-        return CartMapper.toCartItemResponseDto(requireOwnedItem(cartItemId, currentUser()));
+    public CartItemResponseDTO getCartItem(User user, Long cartItemId) {
+        return CartMapper.toCartItemResponseDto(requireOwnedItem(cartItemId, user));
     }
 
     @Override
     @Transactional
-    public void updateCartItemQuantity(Long cartItemId, int quantity) {
-        if (quantity < 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La cantidad debe ser al menos 1");
-        }
-        User user = currentUser();
+    public void updateCartItemQuantity(User user, Long cartItemId, int quantity) {
+        requireCartQuantityAtLeastOne(quantity);
         CartItem ci = requireOwnedItem(cartItemId, user);
         ci.setQuantity(quantity);
         cartItemRepository.save(ci);
@@ -139,8 +139,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public void removeCartItem(Long cartItemId) {
-        User user = currentUser();
+    public void removeCartItem(User user, Long cartItemId) {
         CartItem ci = requireOwnedItem(cartItemId, user);
         Cart cart = ci.getCart();
         cartItemRepository.delete(ci);
@@ -149,8 +148,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public void clearCart() {
-        User user = currentUser();
+    public void clearCart(User user) {
         cartRepository.findByBuyer_Id(user.getId()).ifPresent(c -> {
             cartItemRepository.deleteByCart_Id(c.getId());
             touchCart(c);
@@ -159,8 +157,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional(readOnly = true)
-    public CartStockCheckResponseDTO checkCartStock() {
-        User user = currentUser();
+    public CartStockCheckResponseDTO checkCartStock(User user) {
         List<CartItem> lines = cartRepository.findByBuyer_Id(user.getId())
                 .map(c -> loadLines(c.getId()))
                 .orElse(List.of());

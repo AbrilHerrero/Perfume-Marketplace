@@ -8,7 +8,6 @@ import java.util.List;
 import com.uade.tpo.marketplacePerfume.entity.Cart;
 import com.uade.tpo.marketplacePerfume.entity.CartItem;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
-import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartStockCheckResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartStockLineResultDTO;
@@ -27,7 +26,7 @@ public final class CartMapper {
         dto.setId(item.getId());
         dto.setQuantity(item.getQuantity());
         dto.setAddedAt(item.getAddedAt());
-        dto.setSample(SampleMapper.toResponseDto(item.getSample()));
+        dto.setSample(SampleMapper.toCartSampleSummaryDto(item.getSample()));
         return dto;
     }
 
@@ -48,16 +47,14 @@ public final class CartMapper {
             dto.setId(cart.getId());
             dto.setCreatedAt(cart.getCreatedAt());
             dto.setUpdatedAt(cart.getUpdatedAt());
-            dto.setBuyer(UserMapper.toResponseDto(cart.getBuyer()));
         }
         dto.setItems(toCartItemResponseDtoList(lineItems));
         dto.setTotalPrice(computeTotal(lineItems));
         return dto;
     }
 
-    public static CartResponseDTO toEmptyCartResponse(User user) {
+    public static CartResponseDTO toEmptyCartResponse() {
         CartResponseDTO dto = new CartResponseDTO();
-        dto.setBuyer(UserMapper.toResponseDto(user));
         dto.setItems(Collections.emptyList());
         dto.setTotalPrice(BigDecimal.ZERO);
         return dto;

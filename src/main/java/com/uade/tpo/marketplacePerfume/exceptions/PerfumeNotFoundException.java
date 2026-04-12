@@ -3,7 +3,6 @@ package com.uade.tpo.marketplacePerfume.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "El perfume no existe")
-public class PerfumeNotFoundException extends Exception {
-    
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Perfume not found")
+public class PerfumeNotFoundException extends RuntimeException {
 }

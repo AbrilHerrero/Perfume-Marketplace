@@ -2,6 +2,7 @@ package com.uade.tpo.marketplacePerfume.service;
 
 import java.util.List;
 
+import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartBulkAddDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartDTOs.CartStockCheckResponseDTO;
@@ -10,21 +11,21 @@ import com.uade.tpo.marketplacePerfume.entity.dto.cartItemDTOs.CartItemResponseD
 
 public interface ICartService {
 
-    CartResponseDTO getCart();
+    CartResponseDTO getCart(User user);
 
-    CartItemResponseDTO addCartItem(CartItemAddDTO request);
+    CartItemResponseDTO addCartItem(User user, CartItemAddDTO request);
 
-    List<CartItemResponseDTO> addCartItems(CartBulkAddDTO request);
+    List<CartItemResponseDTO> addCartItems(User user, CartBulkAddDTO request);
 
-    CartItemResponseDTO getCartItem(Long cartItemId);
-    
-    void updateCartItemQuantity(Long cartItemId, int quantity);
+    CartItemResponseDTO getCartItem(User user, Long cartItemId);
 
-    void removeCartItem(Long cartItemId);
+    void updateCartItemQuantity(User user, Long cartItemId, int quantity);
 
-    void clearCart();
+    void removeCartItem(User user, Long cartItemId);
 
-    CartStockCheckResponseDTO checkCartStock();
+    void clearCart(User user);
+
+    CartStockCheckResponseDTO checkCartStock(User user);
 
     // Checkout: pendiente — exponer POST /cart/checkout (o POST /orders) al implementar Order
     // y crear la orden desde el carrito del comprador actual.

@@ -17,7 +17,7 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void updatePassword(String email, String newPassword) throws UserNonExistanceException {
+    public void updatePassword(String email, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNonExistanceException::new);
         user.setPassword(passwordEncoder.encode(newPassword));

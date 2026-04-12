@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
-import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.service.IPerfumeService;
 
 import jakarta.validation.Valid;
@@ -35,7 +34,7 @@ public class PerfumeController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deletePerfume(@PathVariable Long id) throws PerfumeNotFoundException {
+    public ResponseEntity<String> deletePerfume(@PathVariable Long id) {
         return ResponseEntity.ok(perfumeService.deletePerfume(id));
     }
 
@@ -46,7 +45,7 @@ public class PerfumeController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<PerfumeResponseDTO> modifyPerfume(@PathVariable Long id, @RequestBody PerfumeModifyDTO perfumeModifyDTO) throws PerfumeNotFoundException {
+    public ResponseEntity<PerfumeResponseDTO> modifyPerfume(@PathVariable Long id, @RequestBody PerfumeModifyDTO perfumeModifyDTO) {
         return ResponseEntity.ok(perfumeService.modifyPerfume(id, perfumeModifyDTO));
     }
 }
