@@ -23,15 +23,13 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserProfileResponse getCurrentUserProfile(User currentUser) throws UserNonExistanceException {
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(UserNonExistanceException::new);
+        User user = getCurrentManagedUser(currentUser);
         return UserMapper.toProfileResponse(user);
     }
 
     @Override
     public void updatePassword(UpdatePasswordRequest request, User currentUser) throws UserNonExistanceException {
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(UserNonExistanceException::new);
+        User user = getCurrentManagedUser(currentUser);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
     }
@@ -39,8 +37,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserProfileResponse updateUser(UpdateUserRequest request, User currentUser)
             throws UserNonExistanceException {
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(UserNonExistanceException::new);
+        User user = getCurrentManagedUser(currentUser);
 
         if (StringUtils.hasText(request.getName())) {
             user.setName(request.getName());
@@ -58,11 +55,13 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void deleteUser(User currentUser) throws UserNonExistanceException {
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(UserNonExistanceException::new);
+        User user = getCurrentManagedUser(currentUser);
         user.setActive(false);
         userRepository.save(user);
     }
 
-  
+    private User getCurrentManagedUser(User currentUser) throws UserNonExistanceException {
+        return userRepository.findById(currentUser.getId())
+                .orElseThrow(UserNonExistanceException::new);
+    }
 }
