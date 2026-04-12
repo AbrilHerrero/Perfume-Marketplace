@@ -72,24 +72,11 @@ public class CartServiceImpl implements ICartService {
         }
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public CartResponseDTO getCart(User user) {
-        return cartRepository.findByBuyer_Id(user.getId())
-                .map(c -> CartMapper.toCartResponseDto(c, loadLines(c.getId())))
-                .orElseGet(CartMapper::toEmptyCartResponse);
-    }
-
-    @Override
-    @Transactional
-    public CartItemResponseDTO addCartItem(User user, CartItemAddDTO request) {
+    private CartItem persistCartLine(Cart cart, CartItemAddDTO request) {
         int quantity = request.getQuantity();
         requireCartQuantityAtLeastOne(quantity);
-
-        Cart cart = getOrCreateCart(user);
         Sample sample = sampleRepository.findById(request.getSampleId()).orElseThrow(SampleNotFoundException::new);
-
-        CartItem saved = cartItemRepository.findByCart_IdAndSample_Id(cart.getId(), sample.getId())
+        return cartItemRepository.findByCart_IdAndSample_Id(cart.getId(), sample.getId())
                 .map(existing -> {
                     try {
                         existing.setQuantity(Math.addExact(existing.getQuantity(), quantity));
@@ -105,19 +92,39 @@ public class CartServiceImpl implements ICartService {
                         .quantity(quantity)
                         .addedAt(LocalDateTime.now())
                         .build()));
+    }
 
-        touchCart(cart);
+    private CartItemResponseDTO toCartItemResponseWithDetails(CartItem saved) {
         return CartMapper.toCartItemResponseDto(
                 cartItemRepository.findWithDetailsById(saved.getId()).orElse(saved));
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public CartResponseDTO getCart(User user) {
+        return cartRepository.findByBuyer_Id(user.getId())
+                .map(c -> CartMapper.toCartResponseDto(c, loadLines(c.getId())))
+                .orElseGet(CartMapper::toEmptyCartResponse);
+    }
+
+    @Override
+    @Transactional
+    public CartItemResponseDTO addCartItem(User user, CartItemAddDTO request) {
+        Cart cart = getOrCreateCart(user);
+        CartItem saved = persistCartLine(cart, request);
+        touchCart(cart);
+        return toCartItemResponseWithDetails(saved);
+    }
+
+    @Override
     @Transactional
     public List<CartItemResponseDTO> addCartItems(User user, CartBulkAddDTO request) {
-        List<CartItemResponseDTO> out = new ArrayList<>();
+        Cart cart = getOrCreateCart(user);
+        List<CartItemResponseDTO> out = new ArrayList<>(request.getItems().size());
         for (CartItemAddDTO line : request.getItems()) {
-            out.add(addCartItem(user, line));
+            out.add(toCartItemResponseWithDetails(persistCartLine(cart, line)));
         }
+        touchCart(cart);
         return out;
     }
 
