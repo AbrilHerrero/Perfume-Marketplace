@@ -16,6 +16,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
+import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.service.IUserService;
 
@@ -49,7 +50,7 @@ public class UserController {
 
     @DeleteMapping("deleteUser")
     public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User currentUser)
-            throws UserNonExistanceException {
+            throws UserNonExistanceException, AdminUserCannotBeDeletedException {
         userService.deleteUser(currentUser);
         return ResponseEntity.ok("User successfully deactivated");
     }

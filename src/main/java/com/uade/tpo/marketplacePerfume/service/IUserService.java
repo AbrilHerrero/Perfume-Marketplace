@@ -20,7 +20,7 @@ public interface IUserService {
     UserProfileResponse updateUser(UpdateUserRequest request, User currentUser)
             throws UserNonExistanceException;
 
-    void deleteUser(User currentUser) throws UserNonExistanceException;
+    void deleteUser(User currentUser) throws UserNonExistanceException, AdminUserCannotBeDeletedException;
 
     List<UserProfileResponse> getUsers();
 

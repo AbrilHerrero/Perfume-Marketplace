@@ -60,8 +60,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void deleteUser(User currentUser) throws UserNonExistanceException {
+    public void deleteUser(User currentUser) throws UserNonExistanceException, AdminUserCannotBeDeletedException {
         User user = getCurrentManagedUser(currentUser);
+        if (user.getRole() == Role.ADMIN) {
+            throw new AdminUserCannotBeDeletedException();
+        }
         user.setActive(false);
         userRepository.save(user);
     }

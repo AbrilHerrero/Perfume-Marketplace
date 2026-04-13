@@ -21,6 +21,10 @@
 		{
 			"key": "access_token",
 			"value": ""
+		},
+		{
+			"key": "admin_user_id",
+			"value": "1"
 		}
 	],
 	"item": [

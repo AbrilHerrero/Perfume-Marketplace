@@ -70,7 +70,7 @@ public class AdminController {
     @PutMapping("users/{id}")
     public ResponseEntity<String> reactivateUserById(@PathVariable Long id)
             throws UserNonExistanceException, UserAlreadyActivatedException {
-                userService.reactivateUserById(id);
+            userService.reactivateUserById(id);
         return ResponseEntity.ok("User successfully reactivated");
     }
 }
