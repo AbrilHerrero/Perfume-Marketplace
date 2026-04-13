@@ -237,6 +237,19 @@
 			]
 		},
 		{
+			"name": "Get current profile (me)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/me",
+					"host": ["{{base_url}}"],
+					"path": ["user", "me"]
+				},
+				"description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
+			}
+		},
+		{
 			"name": "User",
 			"item": [
 				{
@@ -248,15 +261,49 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"buyer@test.com\",\n    \"password\": \"newPassword123\"\n}"
+							"raw": "{\n    \"password\": \"newPassword123\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/user/password",
+							"raw": "{{base_url}}/user/updatePassword",
 							"host": ["{{base_url}}"],
-							"path": ["user", "password"]
-						}
+							"path": ["user", "updatePassword"]
+						},
+						"description": "Authenticated user only. JWT identifies the account; body is only the new password."
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Juan\",\n    \"surname\": \"Pérez\",\n    \"telephone\": \"1122334455\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user/updateUser",
+							"host": ["{{base_url}}"],
+							"path": ["user", "updateUser"]
+						},
+						"description": "All fields optional in the API (partial update); send only what you want to change."
+					}
+				},
+				{
+					"name": "Delete User (soft delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user/deleteUser",
+							"host": ["{{base_url}}"],
+							"path": ["user", "deleteUser"]
+						},
+						"description": "No body. Requires Bearer token."
 					}
 				}
+				
 			]
 		}
 	]

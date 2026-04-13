@@ -16,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,12 +28,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
+
+    private String surname;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -79,6 +81,18 @@ public class User implements UserDetails {
         return active;
     }
 
-    @OneToMany (mappedBy = "seller")
+    @OneToMany(mappedBy = "seller")
     private List<Sample> samples;
+
+    @OneToMany(mappedBy = "buyer")
+    private List<Review> reviews;
+
+    @OneToOne(mappedBy = "buyer")
+    private Cart cart;
+
+    @OneToOne(mappedBy = "buyer")
+    private Address address;
+
+    @OneToMany(mappedBy = "buyer")
+    private List<Order> orders;
 }
