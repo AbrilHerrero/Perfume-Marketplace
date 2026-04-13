@@ -12,6 +12,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
 import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
+import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyActivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyDeactivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.mapper.UserMapper;
@@ -112,11 +113,11 @@ public class UserServiceImpl implements IUserService {
             throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNonExistanceException::new);
-        if (user.getRole() == Role.ADMIN) {
-            throw new AdminUserCannotBeDeletedException();
-        }
         if (!user.isActive()) {
             throw new UserAlreadyDeactivatedException();
+        }
+        if (user.getRole() == Role.ADMIN) {
+            throw new AdminUserCannotBeDeletedException();
         }
         user.setActive(false);
         userRepository.save(user);
@@ -126,4 +127,16 @@ public class UserServiceImpl implements IUserService {
         return userRepository.findById(currentUser.getId())
                 .orElseThrow(UserNonExistanceException::new);
     }
+
+    @Override
+    public void reactivateUserById(Long id) throws UserNonExistanceException, UserAlreadyActivatedException {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNonExistanceException::new);
+        if (user.isActive()) {
+            throw new UserAlreadyActivatedException();
+        }
+        user.setActive(true);
+        userRepository.save(user);
+    }
+    
 }

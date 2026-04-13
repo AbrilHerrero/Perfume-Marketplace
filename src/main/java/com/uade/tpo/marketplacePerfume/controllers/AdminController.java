@@ -8,12 +8,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
 import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
+import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyActivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyDeactivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.service.IUserService;
@@ -63,5 +65,12 @@ public class AdminController {
             throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException {
         userService.deleteUserById(id);
         return ResponseEntity.ok("User successfully deactivated");
+    }
+
+    @PutMapping("users/{id}")
+    public ResponseEntity<String> reactivateUserById(@PathVariable Long id)
+            throws UserNonExistanceException, UserAlreadyActivatedException {
+                userService.reactivateUserById(id);
+        return ResponseEntity.ok("User successfully reactivated");
     }
 }

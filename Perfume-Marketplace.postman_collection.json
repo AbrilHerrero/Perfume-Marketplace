@@ -175,7 +175,7 @@
 		},
 		{
 			"name": "Admin",
-			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or login as admin so `access_token` is set. No JSON body for these requests—only the token. Change `admin_user_id` for get/delete by id. Filtered user lists: active, inactive, active buyers, active sellers.",
+			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or login as admin so `access_token` is set. Most calls need no body. Change `admin_user_id` for get/delete/reactivate by id. Filtered user lists: active, inactive, active buyers, active sellers.",
 			"item": [
 				{
 					"name": "Hi",
@@ -269,6 +269,28 @@
 							"path": ["admin", "users", "{{admin_user_id}}"]
 						},
 						"description": "No body. Sets user `active` to false. Edit `admin_user_id` in collection variables (not the admin’s own id if you still need that session)."
+					}
+				},
+				{
+					"name": "Reactivate user by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"url": {
+							"raw": "{{base_url}}/admin/users/{{admin_user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "{{admin_user_id}}"]
+						},
+						"description": "No body. Sets user `active` to true. May return error if user is already active (`UserAlreadyActivatedException`). Uses Bearer token explicitly (same as collection auth)."
 					}
 				}
 			]

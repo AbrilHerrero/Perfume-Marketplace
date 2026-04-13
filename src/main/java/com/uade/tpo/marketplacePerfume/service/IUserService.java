@@ -7,6 +7,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
 import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
+import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyActivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyDeactivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 
@@ -35,4 +36,7 @@ public interface IUserService {
 
     void deleteUserById(Long id)
             throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException;
+
+    void reactivateUserById(Long id)
+            throws UserNonExistanceException, UserAlreadyActivatedException;
 }
