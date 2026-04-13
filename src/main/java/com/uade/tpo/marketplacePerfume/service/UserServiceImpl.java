@@ -28,21 +28,20 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserProfileResponse getCurrentUserProfile(User currentUser) throws UserNonExistanceException {
+    public UserProfileResponse getCurrentUserProfile(User currentUser) {
         User user = getCurrentManagedUser(currentUser);
         return UserMapper.toProfileResponse(user);
     }
 
     @Override
-    public void updatePassword(UpdatePasswordRequest request, User currentUser) throws UserNonExistanceException {
+    public void updatePassword(UpdatePasswordRequest request, User currentUser) {
         User user = getCurrentManagedUser(currentUser);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
     }
 
     @Override
-    public UserProfileResponse updateUser(UpdateUserRequest request, User currentUser)
-            throws UserNonExistanceException {
+    public UserProfileResponse updateUser(UpdateUserRequest request, User currentUser) {
         User user = getCurrentManagedUser(currentUser);
 
         if (StringUtils.hasText(request.getName())) {
@@ -60,7 +59,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void deleteUser(User currentUser) throws UserNonExistanceException, AdminUserCannotBeDeletedException {
+    public void deleteUser(User currentUser) {
         User user = getCurrentManagedUser(currentUser);
         if (user.getRole() == Role.ADMIN) {
             throw new AdminUserCannotBeDeletedException();
@@ -105,15 +104,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserProfileResponse getUserById(Long id) throws UserNonExistanceException {
+    public UserProfileResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNonExistanceException::new);
         return UserMapper.toProfileResponse(user);
     }
 
     @Override
-    public void deleteUserById(Long id)
-            throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException {
+    public void deleteUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNonExistanceException::new);
         if (user.getRole() == Role.ADMIN) {
@@ -126,13 +124,13 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
     }
 
-    private User getCurrentManagedUser(User currentUser) throws UserNonExistanceException {
+    private User getCurrentManagedUser(User currentUser) {
         return userRepository.findById(currentUser.getId())
                 .orElseThrow(UserNonExistanceException::new);
     }
 
     @Override
-    public void reactivateUserById(Long id) throws UserNonExistanceException, UserAlreadyActivatedException {
+    public void reactivateUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNonExistanceException::new);
         if (user.isActive()) {

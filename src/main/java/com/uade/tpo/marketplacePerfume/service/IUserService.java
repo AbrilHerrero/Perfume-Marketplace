@@ -6,21 +6,16 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
-import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyActivatedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyDeactivatedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 
 public interface IUserService {
 
-    UserProfileResponse getCurrentUserProfile(User currentUser) throws UserNonExistanceException;
+    UserProfileResponse getCurrentUserProfile(User currentUser);
 
-    void updatePassword(UpdatePasswordRequest request, User currentUser) throws UserNonExistanceException;
+    void updatePassword(UpdatePasswordRequest request, User currentUser);
 
-    UserProfileResponse updateUser(UpdateUserRequest request, User currentUser)
-            throws UserNonExistanceException;
+    UserProfileResponse updateUser(UpdateUserRequest request, User currentUser);
 
-    void deleteUser(User currentUser) throws UserNonExistanceException, AdminUserCannotBeDeletedException;
+    void deleteUser(User currentUser);
 
     List<UserProfileResponse> getUsers();
 
@@ -32,11 +27,9 @@ public interface IUserService {
 
     List<UserProfileResponse> getActiveSellers();
 
-    UserProfileResponse getUserById(Long id) throws UserNonExistanceException;
+    UserProfileResponse getUserById(Long id);
 
-    void deleteUserById(Long id)
-            throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException;
+    void deleteUserById(Long id);
 
-    void reactivateUserById(Long id)
-            throws UserNonExistanceException, UserAlreadyActivatedException;
+    void reactivateUserById(Long id);
 }

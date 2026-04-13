@@ -16,8 +16,6 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
-import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.service.IUserService;
 
 @RestController
@@ -28,15 +26,14 @@ public class UserController {
     private IUserService userService;
 
     @GetMapping("me")
-    public ResponseEntity<UserProfileResponse> getCurrentUser(@AuthenticationPrincipal User currentUser)
-            throws UserNonExistanceException {
+    public ResponseEntity<UserProfileResponse> getCurrentUser(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userService.getCurrentUserProfile(currentUser));
     }
 
     @PutMapping("updatePassword")
     public ResponseEntity<String> updatePassword(
             @Valid @RequestBody UpdatePasswordRequest request,
-            @AuthenticationPrincipal User currentUser) throws UserNonExistanceException {
+            @AuthenticationPrincipal User currentUser) {
         userService.updatePassword(request, currentUser);
         return ResponseEntity.ok("Password successfully updated");
     }
@@ -44,13 +41,12 @@ public class UserController {
     @PutMapping("updateUser")
     public ResponseEntity<UserProfileResponse> updateUser(
             @RequestBody UpdateUserRequest request,
-            @AuthenticationPrincipal User currentUser) throws UserNonExistanceException {
+            @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userService.updateUser(request, currentUser));
     }
 
     @DeleteMapping("deleteUser")
-    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User currentUser)
-            throws UserNonExistanceException, AdminUserCannotBeDeletedException {
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User currentUser) {
         userService.deleteUser(currentUser);
         return ResponseEntity.ok("User successfully deactivated");
     }
