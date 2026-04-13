@@ -116,11 +116,11 @@ public class UserServiceImpl implements IUserService {
             throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNonExistanceException::new);
-        if (!user.isActive()) {
-            throw new UserAlreadyDeactivatedException();
-        }
         if (user.getRole() == Role.ADMIN) {
             throw new AdminUserCannotBeDeletedException();
+        }
+        if (!user.isActive()) {
+            throw new UserAlreadyDeactivatedException();
         }
         user.setActive(false);
         userRepository.save(user);
