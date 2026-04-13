@@ -31,33 +31,33 @@ public class AdminController {
         return "Hi, " + user.getName();
     }
     @GetMapping("users")
-    public List<UserProfileResponse> getUsers() {
-        return userService.getUsers();
+    public ResponseEntity<List<UserProfileResponse>> getUsers() {
+        return ResponseEntity.ok(userService.getUsers());
     }
 
     @GetMapping("users/active")
-    public List<UserProfileResponse> getActiveUsers() {
-        return userService.getActiveUsers();
+    public ResponseEntity<List<UserProfileResponse>> getActiveUsers() {
+        return ResponseEntity.ok(userService.getActiveUsers());
     }
 
     @GetMapping("users/inactive")
-    public List<UserProfileResponse> getInactiveUsers() {
-        return userService.getInactiveUsers();
+    public ResponseEntity<List<UserProfileResponse>> getInactiveUsers() {
+        return ResponseEntity.ok(userService.getInactiveUsers());
     }
 
     @GetMapping("users/buyers/active")
-    public List<UserProfileResponse> getActiveBuyers() {
-        return userService.getActiveBuyers();
+    public ResponseEntity<List<UserProfileResponse>> getActiveBuyers() {
+        return ResponseEntity.ok(userService.getActiveBuyers());
     }
 
     @GetMapping("users/sellers/active")
-    public List<UserProfileResponse> getActiveSellers() {
-        return userService.getActiveSellers();
+    public ResponseEntity<List<UserProfileResponse>> getActiveSellers() {
+        return ResponseEntity.ok(userService.getActiveSellers());
     }
 
     @GetMapping("users/{id}")
-    public UserProfileResponse getUserById(@PathVariable Long id) throws UserNonExistanceException {
-        return userService.getUserById(id);
+    public ResponseEntity<UserProfileResponse> getUserById(@PathVariable Long id) throws UserNonExistanceException {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @DeleteMapping("users/{id}")
