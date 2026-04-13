@@ -1,13 +1,18 @@
 package com.uade.tpo.marketplacePerfume.service;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.uade.tpo.marketplacePerfume.entity.Role;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
+import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
+import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyDeactivatedException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.mapper.UserMapper;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
@@ -56,6 +61,63 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void deleteUser(User currentUser) throws UserNonExistanceException {
         User user = getCurrentManagedUser(currentUser);
+        user.setActive(false);
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<UserProfileResponse> getUsers() {
+        return userRepository.findAll().stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    public List<UserProfileResponse> getActiveUsers() {
+        return userRepository.findByActiveTrue().stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    public List<UserProfileResponse> getInactiveUsers() {
+        return userRepository.findByActiveFalse().stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    public List<UserProfileResponse> getActiveBuyers() {
+        return userRepository.findByRoleAndActiveTrue(Role.BUYER).stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    public List<UserProfileResponse> getActiveSellers() {
+        return userRepository.findByRoleAndActiveTrue(Role.SELLER).stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    public UserProfileResponse getUserById(Long id) throws UserNonExistanceException {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNonExistanceException::new);
+        return UserMapper.toProfileResponse(user);
+    }
+
+    @Override
+    public void deleteUserById(Long id)
+            throws UserNonExistanceException, UserAlreadyDeactivatedException, AdminUserCannotBeDeletedException {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNonExistanceException::new);
+        if (user.getRole() == Role.ADMIN) {
+            throw new AdminUserCannotBeDeletedException();
+        }
+        if (!user.isActive()) {
+            throw new UserAlreadyDeactivatedException();
+        }
         user.setActive(false);
         userRepository.save(user);
     }

@@ -174,6 +174,106 @@
 			]
 		},
 		{
+			"name": "Admin",
+			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or login as admin so `access_token` is set. No JSON body for these requests—only the token. Change `admin_user_id` for get/delete by id. Filtered user lists: active, inactive, active buyers, active sellers.",
+			"item": [
+				{
+					"name": "Hi",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/hi",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "hi"]
+						},
+						"description": "Smoke test. Response: plain text, e.g. `Hi, Test Admin`."
+					}
+				},
+				{
+					"name": "List all users",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/users",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users"]
+						}
+					}
+				},
+				{
+					"name": "List active users",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/users/active",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "active"]
+						},
+						"description": "All users with `active: true` (any role)."
+					}
+				},
+				{
+					"name": "List inactive users",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/users/inactive",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "inactive"]
+						},
+						"description": "All users with `active: false`."
+					}
+				},
+				{
+					"name": "List active buyers",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/users/buyers/active",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "buyers", "active"]
+						},
+						"description": "Users with role BUYER and `active: true`."
+					}
+				},
+				{
+					"name": "List active sellers",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/users/sellers/active",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "sellers", "active"]
+						},
+						"description": "Users with role SELLER and `active: true`."
+					}
+				},
+				{
+					"name": "Get user by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/users/{{admin_user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "{{admin_user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete user by id (soft delete)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/admin/users/{{admin_user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "users", "{{admin_user_id}}"]
+						},
+						"description": "No body. Sets user `active` to false. Edit `admin_user_id` in collection variables (not the admin’s own id if you still need that session)."
+					}
+				}
+			]
+		},
+		{
 			"name": "Perfume",
 			"item": [
 				{
@@ -237,19 +337,6 @@
 			]
 		},
 		{
-			"name": "Get current profile (me)",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/user/me",
-					"host": ["{{base_url}}"],
-					"path": ["user", "me"]
-				},
-				"description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
-			}
-		},
-		{
 			"name": "User",
 			"item": [
 				{
@@ -269,6 +356,18 @@
 							"path": ["user", "updatePassword"]
 						},
 						"description": "Authenticated user only. JWT identifies the account; body is only the new password."
+					}
+				},		{
+					"name": "Get current profile (me)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user/me",
+							"host": ["{{base_url}}"],
+							"path": ["user", "me"]
+						},
+						"description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
 					}
 				},
 				{
