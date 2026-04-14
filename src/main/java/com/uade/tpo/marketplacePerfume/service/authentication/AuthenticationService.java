@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.service;
+package com.uade.tpo.marketplacePerfume.service.authentication;
 
 import java.time.LocalDate;
 
@@ -12,7 +12,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.RegisterRequest;
-import com.uade.tpo.marketplacePerfume.exceptions.UserDuplicateException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.UserDuplicateException;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

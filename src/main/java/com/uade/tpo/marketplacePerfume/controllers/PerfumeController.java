@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
-import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
-import com.uade.tpo.marketplacePerfume.service.IPerfumeService;
+import com.uade.tpo.marketplacePerfume.exceptions.perfume.PerfumeNotFoundException;
+import com.uade.tpo.marketplacePerfume.service.perfume.IPerfumeService;
 
 import jakarta.validation.Valid;
 

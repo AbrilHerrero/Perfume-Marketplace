@@ -428,7 +428,63 @@
 						"description": "No body. Requires Bearer token."
 					}
 				}
-				
+			]
+		},
+		{
+			"name": "Address",
+			"description": "Authenticated routes (`/address/**`). JWT identifies the user. Each user may have at most one address: second **Add address** returns 409 conflict. **Modify** / **Delete** return 404 if no address exists.",
+			"item": [
+				{
+					"name": "Add address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"street\": \"Av. Corrientes\",\n    \"streetNumber\": \"1234\",\n    \"city\": \"CABA\",\n    \"state\": \"CABA\",\n    \"postalCode\": \"C1043AAZ\",\n    \"country\": \"Argentina\",\n    \"apartment\": \"3B\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/address/addAddress",
+							"host": ["{{base_url}}"],
+							"path": ["address", "addAddress"]
+						},
+						"description": "Creates the user's single address. **201** + `InfoAddress` body on success. Use **Auth → Register (BUYER)** or login as buyer so the token matches a user without an address yet."
+					}
+				},
+				{
+					"name": "Modify address",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"street\": \"Av. Santa Fe\",\n    \"streetNumber\": \"5000\",\n    \"city\": \"CABA\",\n    \"state\": \"CABA\",\n    \"postalCode\": \"C1425BHN\",\n    \"country\": \"Argentina\",\n    \"apartment\": \"12A\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/address/modifyAddress",
+							"host": ["{{base_url}}"],
+							"path": ["address", "modifyAddress"]
+						},
+						"description": "Updates the authenticated user's address. **200** + `InfoAddress` body. **404** if the user has no address yet."
+					}
+				},
+				{
+					"name": "Delete address",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/address/deleteAddress",
+							"host": ["{{base_url}}"],
+							"path": ["address", "deleteAddress"]
+						},
+						"description": "No body. **200** with plain text confirmation. **404** if there is no address."
+					}
+				}
 			]
 		}
 	]

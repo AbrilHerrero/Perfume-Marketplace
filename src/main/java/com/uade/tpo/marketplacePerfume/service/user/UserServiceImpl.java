@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.service;
+package com.uade.tpo.marketplacePerfume.service.user;
 
 import java.util.List;
 
@@ -11,10 +11,10 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdatePasswordRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UpdateUserRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
-import com.uade.tpo.marketplacePerfume.exceptions.AdminUserCannotBeDeletedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyActivatedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserAlreadyDeactivatedException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.AdminUserCannotBeDeletedException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.UserAlreadyActivatedException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.UserAlreadyDeactivatedException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.mapper.UserMapper;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
