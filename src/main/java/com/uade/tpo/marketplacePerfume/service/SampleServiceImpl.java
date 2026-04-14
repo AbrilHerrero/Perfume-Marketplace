@@ -1,59 +1,80 @@
 package com.uade.tpo.marketplacePerfume.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplacePerfume.entity.Sample;
+import com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs.SampleRequestDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs.SampleResponseDTO;
+import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 
-@Service // Indica a Spring que esta clase contiene la lógica de negocio (Service Layer)
+@Service
 public class SampleServiceImpl implements ISampleService {
 
-    @Autowired // Inyección de dependencia: Spring nos da una instancia del repositorio automáticamente
+    @Autowired
     private SampleRepository sampleRepository;
 
     @Override
-    public List<Sample> getAllSamples() {
-        // Retorna todas las muestras almacenadas en la base de datos
-        return sampleRepository.findAll();
+    public List<SampleResponseDTO> getAllSamples() {
+        return sampleRepository.findAll().stream()
+                .filter(Sample::isActive)
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public SampleResponseDTO getSampleByIdDTO(Long id) {
+        return mapToResponseDTO(getSampleById(id));
     }
 
     @Override
     public Sample getSampleById(Long id) {
-        // Intenta buscar la muestra por ID. Si no existe, lanza una excepción de error.
         return sampleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró la muestra con ID: " + id));
+                .orElseThrow(() -> new SampleNotFoundException(id));
     }
 
     @Override
-    public Sample createSample(Sample sample) {
-        // Guarda la nueva muestra recibida en la BD
-        return sampleRepository.save(sample);
+    public SampleResponseDTO createSample(SampleRequestDTO dto) {
+        Sample sample = new Sample();
+        sample.setPrice(dto.getPrice());
+        sample.setStock(dto.getStock());
+        sample.setVolumeMl(dto.getVolumeMl());
+        sample.setDescription(dto.getDescription());
+        sample.setImageUrl(dto.getImageUrl());
+        Sample savedSample = sampleRepository.save(sample);
+        return mapToResponseDTO(savedSample);
     }
 
     @Override
-    public Sample updateSample(Long id, Sample sampleDetails) {
-        // 1. Buscamos la muestra que queremos editar para asegurarnos de que existe
-        Sample sample = getSampleById(id); 
-        
-        // 2. Actualizamos los atributos con los datos nuevos que vienen en 'sampleDetails'
-        // Usamos los nombres exactos de tu clase Sample.java
-        sample.setPrice(sampleDetails.getPrice()); // BigDecimal
-        sample.setVolumeMl(sampleDetails.getVolumeMl()); // int
-        sample.setStock(sampleDetails.getStock()); // int
-        sample.setDescription(sampleDetails.getDescription()); // String
-        sample.setImageUrl(sampleDetails.getImageUrl()); // String
-        
-        // 3. Guardamos la entidad actualizada en la base de datos
-        return sampleRepository.save(sample);
+    public SampleResponseDTO updateSample(Long id, SampleRequestDTO dto) {
+        Sample existing = getSampleById(id);
+        if (dto.getPrice() != null) existing.setPrice(dto.getPrice());
+        if (dto.getStock() != null) existing.setStock(dto.getStock());
+        if (dto.getVolumeMl() != null) existing.setVolumeMl(dto.getVolumeMl());
+        if (dto.getDescription() != null) existing.setDescription(dto.getDescription());
+        if (dto.getImageUrl() != null) existing.setImageUrl(dto.getImageUrl());
+        return mapToResponseDTO(sampleRepository.save(existing));
     }
 
     @Override
     public void deleteSample(Long id) {
-        // Verificamos existencia y luego eliminamos el registro de la BD
         Sample sample = getSampleById(id);
-        sampleRepository.delete(sample);
+        sample.setActive(false);
+        sampleRepository.save(sample);
+    }
+
+    private SampleResponseDTO mapToResponseDTO(Sample sample) {
+        SampleResponseDTO response = new SampleResponseDTO();
+        response.setId(sample.getId());
+        response.setPrice(sample.getPrice());
+        response.setStock(sample.getStock());
+        response.setVolumeMl(sample.getVolumeMl());
+        response.setDescription(sample.getDescription());
+        response.setImageUrl(sample.getImageUrl());
+        return response;
     }
 }

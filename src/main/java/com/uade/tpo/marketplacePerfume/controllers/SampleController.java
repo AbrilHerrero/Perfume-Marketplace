@@ -13,52 +13,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.marketplacePerfume.entity.Sample;
+import com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs.SampleRequestDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.service.ISampleService;
 
-@RestController // Define que esta clase es un controlador API Rest
-@RequestMapping("/api/samples") // Ruta base para los endpoints de muestras
+@RestController
+@RequestMapping("sample")
 public class SampleController {
 
-    @Autowired // Inyecta el servicio para usar la lógica de negocio
+    @Autowired
     private ISampleService sampleService;
 
-    // 1. OBTENER TODAS LAS MUESTRAS (READ)
-    // Acceso: GET http://localhost:8080/api/samples
     @GetMapping
-    public List<Sample> getAll() {
-        return sampleService.getAllSamples();
+    public ResponseEntity<List<SampleResponseDTO>> getAll() {
+        return ResponseEntity.ok(sampleService.getAllSamples());
     }
 
-    // 2. OBTENER UNA MUESTRA POR ID (READ)
-    // Acceso: GET http://localhost:8080/api/samples/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Sample> getById(@PathVariable Long id) {
-        // ResponseEntity ayuda a devolver códigos de estado HTTP (200 OK, 404 Not Found, etc.)
-        return ResponseEntity.ok(sampleService.getSampleById(id));
+    public ResponseEntity<SampleResponseDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(sampleService.getSampleByIdDTO(id));
     }
 
-    // 3. CREAR UNA NUEVA MUESTRA (CREATE)
-    // Acceso: POST http://localhost:8080/api/samples
     @PostMapping
-    public ResponseEntity<Sample> create(@RequestBody Sample sample) {
-        // @RequestBody convierte el JSON que viene del Front-end en un objeto Sample
-        return ResponseEntity.ok(sampleService.createSample(sample));
+    public ResponseEntity<SampleResponseDTO> create(@RequestBody SampleRequestDTO sampleDto) {
+        return ResponseEntity.ok(sampleService.createSample(sampleDto));
     }
 
-    // 4. ACTUALIZAR UNA MUESTRA (UPDATE)
-    // Acceso: PUT http://localhost:8080/api/samples/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Sample> update(@PathVariable Long id, @RequestBody Sample sample) {
-        return ResponseEntity.ok(sampleService.updateSample(id, sample));
+    public ResponseEntity<SampleResponseDTO> update(@PathVariable Long id, @RequestBody SampleRequestDTO sampleDto) {
+        return ResponseEntity.ok(sampleService.updateSample(id, sampleDto));
     }
 
-    // 5. ELIMINAR UNA MUESTRA (DELETE)
-    // Acceso: DELETE http://localhost:8080/api/samples/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         sampleService.deleteSample(id);
-        // Devolvemos 204 No Content para indicar que se borró con éxito y no hay nada más que mostrar
         return ResponseEntity.noContent().build();
     }
 }

@@ -6,11 +6,11 @@ import lombok.Data;
 
 @Data
 public class SampleRequestDTO {
-    private int volumeMl;
-    private BigDecimal price;
+    private BigDecimal price; 
+    private Integer stock;
+    private Integer volumeMl;
     private String description;
     private String imageUrl;
-    private int stock;
-    private Long perfumeId; // Recibimos el ID
-    private Long sellerId;  // Recibimos el ID
+    private Long perfumeId; // Lo volvemos a agregar porque lo necesitas para crear la Sample
+    private Long sellerId;  // Lo mismo para el vendedor
 }

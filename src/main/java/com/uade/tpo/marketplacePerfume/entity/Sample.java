@@ -27,18 +27,19 @@ public class Sample {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // --- Datos del Producto ---
     private int volumeMl;
-
     private BigDecimal price;
-
+    private int stock;
     private String description;
-
     private String imageUrl;
 
+    // --- Metadatos y Control ---
+    @Builder.Default
+    private boolean active = true; 
+
     private LocalDateTime createdAt;
-
-    private int stock;
-
+    
     @ManyToOne
     @JoinColumn(name="perfume_id", referencedColumnName = "id")
     private Perfume perfume;
