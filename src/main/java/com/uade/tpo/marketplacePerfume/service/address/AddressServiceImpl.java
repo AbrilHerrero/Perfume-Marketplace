@@ -1,12 +1,14 @@
 package com.uade.tpo.marketplacePerfume.service.address;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplacePerfume.entity.Address;
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.entity.dto.address.InfoAddress;
-import com.uade.tpo.marketplacePerfume.exceptions.address.AddressAlreadyExistsException;
+import com.uade.tpo.marketplacePerfume.entity.dto.address.AddressResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.user.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.mapper.AddressMapper;
@@ -24,32 +26,44 @@ public class AddressServiceImpl implements IAddressService {
     private UserRepository userRepository;
 
     @Override
-    public InfoAddress addAddress(InfoAddress dto, User currentUser) {
+    public AddressResponse addAddress(CreateAddressRequest request, User currentUser) {
         User user = getManagedUser(currentUser);
-        if (addressRepository.findByBuyerId(user.getId()).isPresent()) {
-            throw new AddressAlreadyExistsException();
+        Address address = AddressMapper.toNewEntity(request, user);
+        Address saved = addressRepository.save(address);
+        return AddressMapper.toResponse(saved);
+    }
+
+    @Override
+    public List<AddressResponse> listAddresses(User currentUser) {
+        User user = getManagedUser(currentUser);
+        return addressRepository.findAllByBuyer_IdAndActiveTrueOrderByIdAsc(user.getId()).stream()
+                .map(AddressMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public AddressResponse modifyAddress(Long addressId, CreateAddressRequest request, User currentUser) {
+        User user = getManagedUser(currentUser);
+        Address address = addressRepository.findByIdAndBuyer_Id(addressId, user.getId())
+                .orElseThrow(AddressNotFoundException::new);
+        if (!address.isActive()) {
+            throw new AddressNotFoundException();
         }
-        Address address = AddressMapper.toNewEntity(dto, user);
+        AddressMapper.apply(request, address);
         Address saved = addressRepository.save(address);
-        return AddressMapper.toDto(saved);
+        return AddressMapper.toResponse(saved);
     }
 
     @Override
-    public InfoAddress modifyAddress(InfoAddress dto, User currentUser) {
+    public void deleteAddress(Long addressId, User currentUser) {
         User user = getManagedUser(currentUser);
-        Address address = addressRepository.findByBuyerId(user.getId())
+        Address address = addressRepository.findByIdAndBuyer_Id(addressId, user.getId())
                 .orElseThrow(AddressNotFoundException::new);
-        AddressMapper.apply(dto, address);
-        Address saved = addressRepository.save(address);
-        return AddressMapper.toDto(saved);
-    }
-
-    @Override
-    public void deleteAddress(User currentUser) {
-        User user = getManagedUser(currentUser);
-        Address address = addressRepository.findByBuyerId(user.getId())
-                .orElseThrow(AddressNotFoundException::new);
-        addressRepository.delete(address);
+        if (!address.isActive()) {
+            return;
+        }
+        address.setActive(false);
+        addressRepository.save(address);
     }
 
     private User getManagedUser(User currentUser) {

@@ -2,13 +2,14 @@ package com.uade.tpo.marketplacePerfume.mapper;
 
 import com.uade.tpo.marketplacePerfume.entity.Address;
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.entity.dto.address.InfoAddress;
+import com.uade.tpo.marketplacePerfume.entity.dto.address.AddressResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
 
 public final class AddressMapper {
     private AddressMapper() {
     }
 
-    public static Address toNewEntity(InfoAddress dto, User buyer) {
+    public static Address toNewEntity(CreateAddressRequest dto, User buyer) {
         return Address.builder()
                 .street(dto.getStreet())
                 .streetNumber(dto.getStreetNumber())
@@ -18,10 +19,11 @@ public final class AddressMapper {
                 .country(dto.getCountry())
                 .apartment(dto.getApartment())
                 .buyer(buyer)
+                .active(true)
                 .build();
     }
 
-    public static void apply(InfoAddress dto, Address address) {
+    public static void apply(CreateAddressRequest dto, Address address) {
         address.setStreet(dto.getStreet());
         address.setStreetNumber(dto.getStreetNumber());
         address.setCity(dto.getCity());
@@ -31,15 +33,17 @@ public final class AddressMapper {
         address.setApartment(dto.getApartment());
     }
 
-    public static InfoAddress toDto(Address address) {
-        InfoAddress dto = new InfoAddress();
-        dto.setStreet(address.getStreet());
-        dto.setStreetNumber(address.getStreetNumber());
-        dto.setCity(address.getCity());
-        dto.setState(address.getState());
-        dto.setPostalCode(address.getPostalCode());
-        dto.setCountry(address.getCountry());
-        dto.setApartment(address.getApartment());
-        return dto;
+    public static AddressResponse toResponse(Address address) {
+        AddressResponse response = new AddressResponse();
+        response.setId(address.getId());
+        response.setActive(address.isActive());
+        response.setStreet(address.getStreet());
+        response.setStreetNumber(address.getStreetNumber());
+        response.setCity(address.getCity());
+        response.setState(address.getState());
+        response.setPostalCode(address.getPostalCode());
+        response.setCountry(address.getCountry());
+        response.setApartment(address.getApartment());
+        return response;
     }
 }

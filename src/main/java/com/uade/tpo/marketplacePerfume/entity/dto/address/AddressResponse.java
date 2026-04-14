@@ -3,7 +3,9 @@ package com.uade.tpo.marketplacePerfume.entity.dto.address;
 import lombok.Data;
 
 @Data
-public class InfoAddress {
+public class AddressResponse {
+    private Long id;
+    private boolean active;
     private String street;
     private String streetNumber;
     private String city;
