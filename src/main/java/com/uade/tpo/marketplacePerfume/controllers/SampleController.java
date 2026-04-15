@@ -24,7 +24,7 @@ public class SampleController {
     @Autowired
     private ISampleService sampleService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<SampleResponseDTO>> getAll() {
         return ResponseEntity.ok(sampleService.getAllSamples());
     }

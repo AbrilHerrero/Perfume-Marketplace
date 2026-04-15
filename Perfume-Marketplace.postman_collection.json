@@ -1,310 +1,722 @@
 {
-	"info": {
-		"name": "Perfume Marketplace",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{access_token}}",
-				"type": "string"
-			}
-		]
-	},
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:8080"
-		},
-		{
-			"key": "access_token",
-			"value": ""
-		}
-	],
-	"item": [
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "Register (BUYER)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.access_token);",
-									"    pm.test('Token saved', function () {",
-									"        pm.expect(json.access_token).to.be.a('string');",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "noauth" },
-						"method": "POST",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Test Buyer\",\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1122334455\",\n    \"role\": \"BUYER\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "register"]
-						}
-					}
-				},
-				{
-					"name": "Register (SELLER)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.access_token);",
-									"    pm.test('Token saved', function () {",
-									"        pm.expect(json.access_token).to.be.a('string');",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "noauth" },
-						"method": "POST",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Test Seller\",\n    \"email\": \"seller@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1155667788\",\n    \"role\": \"SELLER\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "register"]
-						}
-					}
-				},
-				{
-					"name": "Register (ADMIN)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.access_token);",
-									"    pm.test('Token saved', function () {",
-									"        pm.expect(json.access_token).to.be.a('string');",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "noauth" },
-						"method": "POST",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Test Admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1199887766\",\n    \"role\": \"ADMIN\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "register"]
-						}
-					}
-				},
-				{
-					"name": "Authenticate (Login)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.access_token);",
-									"    pm.test('Token saved', function () {",
-									"        pm.expect(json.access_token).to.be.a('string');",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "noauth" },
-						"method": "POST",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/authenticate",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "authenticate"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Perfume",
-			"item": [
-				{
-					"name": "Get All Perfumes",
-					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{base_url}}/perfume/all",
-							"host": ["{{base_url}}"],
-							"path": ["perfume", "all"]
-						}
-					}
-				},
-				{
-					"name": "Create Perfume (ADMIN/SELLER only)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Sauvage\",\n    \"brand\": \"Dior\",\n    \"releaseYear\": 2015,\n    \"imageUrl\": \"https://example.com/sauvage.jpg\",\n    \"gender\": \"Male\",\n    \"sillage\": \"Strong\",\n    \"confidence\": \"High\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/perfume",
-							"host": ["{{base_url}}"],
-							"path": ["perfume"]
-						}
-					}
-				},
-				{
-					"name": "Modify Perfume (ADMIN/SELLER only)",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Sauvage EDP\",\n    \"brand\": \"Dior\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/perfume/1",
-							"host": ["{{base_url}}"],
-							"path": ["perfume", "1"]
-						}
-					}
-				},
-				{
-					"name": "Delete Perfume (ADMIN/SELLER only)",
-					"request": {
-						"method": "DELETE",
-						"url": {
-							"raw": "{{base_url}}/perfume/1",
-							"host": ["{{base_url}}"],
-							"path": ["perfume", "1"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Get current profile (me)",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/user/me",
-					"host": ["{{base_url}}"],
-					"path": ["user", "me"]
-				},
-				"description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
-			}
-		},
-		{
-			"name": "User",
-			"item": [
-				{
-					"name": "Update Password",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"password\": \"newPassword123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/user/updatePassword",
-							"host": ["{{base_url}}"],
-							"path": ["user", "updatePassword"]
-						},
-						"description": "Authenticated user only. JWT identifies the account; body is only the new password."
-					}
-				},
-				{
-					"name": "Update Profile",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Juan\",\n    \"surname\": \"Pérez\",\n    \"telephone\": \"1122334455\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/user/updateUser",
-							"host": ["{{base_url}}"],
-							"path": ["user", "updateUser"]
-						},
-						"description": "All fields optional in the API (partial update); send only what you want to change."
-					}
-				},
-				{
-					"name": "Delete User (soft delete)",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/user/deleteUser",
-							"host": ["{{base_url}}"],
-							"path": ["user", "deleteUser"]
-						},
-						"description": "No body. Requires Bearer token."
-					}
-				}
-				
-			]
-		}
-	]
+  "info": {
+    "_postman_id": "8beb5ae5-ea1b-4751-9bf4-73bfe385e01f",
+    "name": "Perfume Marketplace",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52141170"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (BUYER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.access_token);",
+                  "    pm.test('Token saved', function () {",
+                  "        pm.expect(json.access_token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Buyer\",\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1122334455\",\n    \"role\": \"BUYER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register (SELLER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.access_token);",
+                  "    pm.test('Token saved', function () {",
+                  "        pm.expect(json.access_token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Seller\",\n    \"email\": \"seller@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1155667788\",\n    \"role\": \"SELLER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.access_token);",
+                  "    pm.test('Token saved', function () {",
+                  "        pm.expect(json.access_token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1199887766\",\n    \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authenticate (Login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.access_token);",
+                  "    pm.test('Token saved', function () {",
+                  "        pm.expect(json.access_token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/authenticate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "authenticate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Hi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/hi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "hi"
+              ]
+            },
+            "description": "Smoke test. Response: plain text, e.g. `Hi, Test Admin`."
+          },
+          "response": []
+        },
+        {
+          "name": "List all users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List active users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/active",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "active"
+              ]
+            },
+            "description": "All users with `active: true` (any role)."
+          },
+          "response": []
+        },
+        {
+          "name": "List inactive users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/inactive",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "inactive"
+              ]
+            },
+            "description": "All users with `active: false`."
+          },
+          "response": []
+        },
+        {
+          "name": "List active buyers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/buyers/active",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "buyers",
+                "active"
+              ]
+            },
+            "description": "Users with role BUYER and `active: true`."
+          },
+          "response": []
+        },
+        {
+          "name": "List active sellers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/sellers/active",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "sellers",
+                "active"
+              ]
+            },
+            "description": "Users with role SELLER and `active: true`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get user by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{admin_user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{admin_user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete user by id (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{admin_user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{admin_user_id}}"
+              ]
+            },
+            "description": "No body. Sets user `active` to false. Edit `admin_user_id` in collection variables (not the admin’s own id if you still need that session)."
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivate user by id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{admin_user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{admin_user_id}}"
+              ]
+            },
+            "description": "No body. Sets user `active` to true. May return error if user is already active (`UserAlreadyActivatedException`). Uses Bearer token explicitly (same as collection auth)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or login as admin so `access_token` is set. Most calls need no body. Change `admin_user_id` for get/delete/reactivate by id. Filtered user lists: active, inactive, active buyers, active sellers."
+    },
+    {
+      "name": "Perfume",
+      "item": [
+        {
+          "name": "Get All Perfumes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/perfume/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "perfume",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Perfume (ADMIN/SELLER only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sauvage\",\n    \"brand\": \"Dior\",\n    \"releaseYear\": 2015,\n    \"imageUrl\": \"https://example.com/sauvage.jpg\",\n    \"gender\": \"Male\",\n    \"sillage\": \"Strong\",\n    \"confidence\": \"High\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/perfume",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "perfume"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modify Perfume (ADMIN/SELLER only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sauvage EDP\",\n    \"brand\": \"Dior\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/perfume/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "perfume",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Perfume (ADMIN/SELLER only)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/perfume/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "perfume",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"password\": \"newPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/updatePassword",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "updatePassword"
+              ]
+            },
+            "description": "Authenticated user only. JWT identifies the account; body is only the new password."
+          },
+          "response": []
+        },
+        {
+          "name": "Get current profile (me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            },
+            "description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Juan\",\n    \"surname\": \"Pérez\",\n    \"telephone\": \"1122334455\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/updateUser",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "updateUser"
+              ]
+            },
+            "description": "All fields optional in the API (partial update); send only what you want to change."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/deleteUser",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "deleteUser"
+              ]
+            },
+            "description": "No body. Requires Bearer token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sample",
+      "item": [
+        {
+          "name": "Get All Samples",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sample/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sample",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sample(ADMIN/SELLER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"volumeMl\": 100,\n    \"price\": 8500.50,\n    \"stock\": 20,\n    \"description\": \"Muestra de fragancia floral con notas de jazmín\",\n    \"imageUrl\": \"https://url-de-tu-imagen.com/perfume.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sample",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sample"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modify Sample(ADMIN/SELLER)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"volumeMl\": 50,\n    \"price\": 13500.00,\n    \"stock\": 15,\n    \"description\": \"Muestra de perfume premium - Fragancia actualizada\",\n    \"imageUrl\": \"http://imagen.com/nueva-foto.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/sample/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sample",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sample (ADMIN/SELLER)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/sample/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sample",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "admin_user_id",
+      "value": "1"
+    }
+  ]
 }
