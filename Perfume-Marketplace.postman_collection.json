@@ -45,6 +45,10 @@
 		{
 			"key": "cart_item_id",
 			"value": "1"
+		},
+		{
+			"key": "order_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -576,7 +580,7 @@
 		},
 		{
 			"name": "Cart",
-			"description": "Base **`/cart`**. **Bearer required.** All routes require **`ROLE_BUYER`** (use **Auth → Register (BUYER)** or login as buyer). Use **`{{sample_id}}`** for an existing active sample when adding lines. Set **`{{cart_item_id}}`** from **Add cart item** (test script saves `id` on 201) or from **Get cart** → `items[].id`.",
+			"description": "Base **`/cart`**. **Bearer required.** All routes require **`ROLE_BUYER`** (use **Auth → Register (BUYER)** or login as buyer). Use **`{{sample_id}}`** for an existing active sample when adding lines. Set **`{{cart_item_id}}`** from **Add cart item** (test script saves `id` on 201) or from **Get cart** -> `items[].id`.",
 			"item": [
 				{
 					"name": "Get cart",
@@ -637,7 +641,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "items"]
 						},
-						"description": "**201 Created** + `CartItemResponse`; `Location: /cart/items/{id}`. Body: `sampleId` (required), `quantity` (required, ≥ 1). Duplicate `sampleId` merges quantities on the server."
+						"description": "**201 Created** + `CartItemResponse`; `Location: /cart/items/{id}`. Body: `sampleId` (required), `quantity` (required, >= 1). Duplicate `sampleId` merges quantities on the server."
 					}
 				},
 				{
@@ -656,7 +660,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "items", "{{cart_item_id}}"]
 						},
-						"description": "**200 OK** + `CartItemResponse` with the updated line (`id`, `quantity`, `addedAt`, `sampleId`). Body: `quantity` (required, ≥ 1). **404** `CartItemNotFoundException` if the line is not yours. **404** `SampleNotFoundException` if the linked sample was **soft-deleted / inactive** after it was added (same rule as add: you cannot change quantity for inactive samples)."
+						"description": "**200 OK** + `CartItemResponse` with the updated line (`id`, `quantity`, `addedAt`, `sampleId`). Body: `quantity` (required, >= 1). **404** `CartItemNotFoundException` if the line is not yours. **404** `SampleNotFoundException` if the linked sample was **soft-deleted / inactive** after it was added (same rule as add: you cannot change quantity for inactive samples)."
 					}
 				},
 				{
@@ -668,7 +672,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "items", "{{cart_item_id}}"]
 						},
-						"description": "**204 No Content**. Deletes the line from your cart. If it was the **last** line, the cart row is also deleted (keeps the invariant `cart exists ⇔ has items`). The next **GET /cart** will return the synthetic empty response; the next **POST /cart/items** lazily creates a fresh cart."
+						"description": "**204 No Content**. Deletes the line from your cart. If it was the **last** line, the cart row is also deleted (keeps the invariant `cart exists iff has items`). The next **GET /cart** will return the synthetic empty response; the next **POST /cart/items** lazily creates a fresh cart."
 					}
 				},
 				{
@@ -680,7 +684,80 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "clear"]
 						},
-						"description": "**204 No Content** — idempotent. Deletes all `CartItem` rows **and the `Cart` row itself**, so the post-state is identical to a buyer that never added anything (next **GET /cart** returns the synthetic empty response, next **POST /cart/items** lazily creates a fresh cart). If the buyer has no cart yet, this call is a no-op and still returns **204**."
+						"description": "**204 No Content** - idempotent. Deletes all `CartItem` rows **and the `Cart` row itself**, so the post-state is identical to a buyer that never added anything (next **GET /cart** returns the synthetic empty response, next **POST /cart/items** lazily creates a fresh cart). If the buyer has no cart yet, this call is a no-op and still returns **204**."
+					}
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"description": "Order CRUD. Order **creation** is not exposed here - it is handled by the future `CartController#/cart/checkout`, which calls `OrderService#createOrder` internally. This folder only covers reads, admin status transitions, and buyer cancellation. Set `order_id` in collection variables before calling single-order endpoints.",
+			"item": [
+				{
+					"name": "Get All Orders (ADMIN only)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/order/all",
+							"host": ["{{base_url}}"],
+							"path": ["order", "all"]
+						},
+						"description": "Returns every order in the system. Requires ROLE_ADMIN. Log in as admin first via **Auth -> Register (ADMIN)** or **Authenticate (Login)** so `access_token` belongs to an admin."
+					}
+				},
+				{
+					"name": "Get My Orders",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/order/me",
+							"host": ["{{base_url}}"],
+							"path": ["order", "me"]
+						},
+						"description": "Returns all orders belonging to the authenticated buyer (JWT subject). Any authenticated user can call this; admins see only their own orders via this endpoint - use **Get All Orders** for a full list."
+					}
+				},
+				{
+					"name": "Get Order By Id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/order/{{order_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["order", "{{order_id}}"]
+						},
+						"description": "Returns a single order. The service enforces ownership: a buyer can only read their own orders, while admins can read any. A non-owner buyer gets 403 `OrderAccessDeniedException`; a missing id gets 400 `OrderNotFoundException`. Edit `order_id` in collection variables."
+					}
+				},
+				{
+					"name": "Update Order Status (ADMIN only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"PAID\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/order/{{order_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["order", "{{order_id}}", "status"]
+						},
+						"description": "Admin-only status transition. Allowed values: `PENDING`, `PAID`, `SHIPPED`, `DELIVERED`, `CANCELLED`. Anything else returns 400 `InvalidOrderStatusException`. Non-admins get 403 from SecurityConfig before reaching the controller.\n\nNote: calling this with `CANCELLED` does NOT restore stock - use **Cancel Order** for proper cancellation of pending orders."
+					}
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "PUT",
+						"url": {
+							"raw": "{{base_url}}/order/{{order_id}}/cancel",
+							"host": ["{{base_url}}"],
+							"path": ["order", "{{order_id}}", "cancel"]
+						},
+						"description": "Cancels a PENDING order and restores each item's `Sample.stock`. No body. Buyer can only cancel their own order; admin can cancel any. Rules: order must exist (else 400 `OrderNotFoundException`), caller must own it or be admin (else 403 `OrderAccessDeniedException`), current status must be `PENDING` (else 400 `InvalidOrderStatusException`)."
 					}
 				}
 			]
