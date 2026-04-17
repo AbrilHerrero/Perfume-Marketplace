@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs;
+package com.uade.tpo.marketplacePerfume.entity.dto.Sample;
 
 import java.math.BigDecimal;
 
@@ -11,6 +11,6 @@ public class SampleRequestDTO {
     private Integer volumeMl;
     private String description;
     private String imageUrl;
-    private Long perfumeId; // Lo volvemos a agregar porque lo necesitas para crear la Sample
-    private Long sellerId;  // Lo mismo para el vendedor
+    private Long perfumeId; 
+    private Long sellerId;
 }

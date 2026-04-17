@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,14 +26,12 @@ public class Sample {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- Datos del Producto ---
     private int volumeMl;
     private BigDecimal price;
     private int stock;
     private String description;
     private String imageUrl;
 
-    // --- Metadatos y Control ---
     @Builder.Default
     private boolean active = true; 
 
@@ -48,12 +45,12 @@ public class Sample {
     @JoinColumn(name="seller_id", referencedColumnName = "id")
     private User seller;
 
-    @OneToMany (mappedBy = "sample")
+    @OneToMany(mappedBy = "sample")
     private List<Review> reviews;
 
-    @OneToMany (mappedBy="sample")
+    @OneToMany(mappedBy="sample")
     private List<CartItem> cartItems;
 
-    @OneToMany (mappedBy = "sample")
+    @OneToMany(mappedBy = "sample")
     private List<OrderItem> orderItems;
 }

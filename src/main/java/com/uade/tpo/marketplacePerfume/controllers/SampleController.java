@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs.SampleRequestDTO;
-import com.uade.tpo.marketplacePerfume.entity.dto.sampleDTOs.SampleResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleRequestDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.service.ISampleService;
 
 @RestController
@@ -28,8 +28,16 @@ public class SampleController {
     public ResponseEntity<List<SampleResponseDTO>> getAll() {
         return ResponseEntity.ok(sampleService.getAllSamples());
     }
+   @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<SampleResponseDTO>> getSamplesBySellerId(@PathVariable Long sellerId) {
+        List<SampleResponseDTO> samples = sampleService.getSamplesBySellerId(sellerId);
+        if (samples.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(samples);
+    }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<SampleResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(sampleService.getSampleByIdDTO(id));
     }
@@ -39,12 +47,12 @@ public class SampleController {
         return ResponseEntity.ok(sampleService.createSample(sampleDto));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<SampleResponseDTO> update(@PathVariable Long id, @RequestBody SampleRequestDTO sampleDto) {
         return ResponseEntity.ok(sampleService.updateSample(id, sampleDto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         sampleService.deleteSample(id);
         return ResponseEntity.noContent().build();
