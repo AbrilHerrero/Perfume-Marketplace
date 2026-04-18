@@ -12,7 +12,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressAlreadyInactiveException;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressInvalidFieldException;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.user.UserNonExistanceException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.UserNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.AddressMapper;
 import com.uade.tpo.marketplacePerfume.repository.AddressRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
@@ -91,6 +91,6 @@ public class AddressServiceImpl implements IAddressService {
 
     private User getManagedUser(User currentUser) {
         return userRepository.findById(currentUser.getId())
-                .orElseThrow(UserNonExistanceException::new);
+                .orElseThrow(UserNotFoundException::new);
     }
 }

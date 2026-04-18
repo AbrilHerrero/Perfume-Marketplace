@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.RegisterRequest;
-import com.uade.tpo.marketplacePerfume.exceptions.user.UserDuplicateException;
 import com.uade.tpo.marketplacePerfume.service.authentication.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +21,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request)
-            throws UserDuplicateException {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 

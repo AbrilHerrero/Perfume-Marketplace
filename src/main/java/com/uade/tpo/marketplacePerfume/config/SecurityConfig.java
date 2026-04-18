@@ -1,7 +1,5 @@
 package com.uade.tpo.marketplacePerfume.config;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -32,6 +31,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(HttpMethod.PUT, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(HttpMethod.DELETE, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
+                        .requestMatchers(HttpMethod.GET, "/sample/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/sample/**").hasAnyRole("SELLER")
+                        .requestMatchers(HttpMethod.PUT, "/sample/**").hasAnyRole("SELLER")
+                        .requestMatchers(HttpMethod.PATCH, "/sample/**").hasAnyRole("SELLER")
+                        .requestMatchers(HttpMethod.DELETE, "/sample/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers("/user/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/address/**").hasAnyRole("ADMIN", "BUYER")
                         .requestMatchers(HttpMethod.POST, "/address/**").hasRole("BUYER")

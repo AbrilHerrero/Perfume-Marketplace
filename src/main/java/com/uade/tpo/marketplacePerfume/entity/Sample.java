@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,17 +27,16 @@ public class Sample {
     private Long id;
 
     private int volumeMl;
-
     private BigDecimal price;
-
+    private int stock;
     private String description;
-
     private String imageUrl;
 
+    @Builder.Default
+    private boolean active = true; 
+
     private LocalDateTime createdAt;
-
-    private int stock;
-
+    
     @ManyToOne
     @JoinColumn(name="perfume_id", referencedColumnName = "id")
     private Perfume perfume;
@@ -47,12 +45,12 @@ public class Sample {
     @JoinColumn(name="seller_id", referencedColumnName = "id")
     private User seller;
 
-    @OneToMany (mappedBy = "sample")
+    @OneToMany(mappedBy = "sample")
     private List<Review> reviews;
 
-    @OneToMany (mappedBy="sample")
+    @OneToMany(mappedBy="sample")
     private List<CartItem> cartItems;
 
-    @OneToMany (mappedBy = "sample")
+    @OneToMany(mappedBy = "sample")
     private List<OrderItem> orderItems;
 }
