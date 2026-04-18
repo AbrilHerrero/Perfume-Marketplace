@@ -436,7 +436,7 @@
 		},
 		{
 			"name": "Address",
-			"description": "Base **`/address`**. Bearer token required; roles **BUYER** / **ADMIN**. A buyer can have **many** addresses (`User` 1—N `Address`). **Delete** is a **soft delete** (`active = false`): the row stays so **Shipment** and other FKs are not broken. Attempting to delete an already-inactive address returns **409 Conflict**.\n\nUse collection variable **`{{address_id}}`** (set it from **Add address** or **List addresses** response `id`).",
+			"description": "Base **`/address`**. Bearer token required. **GET** (`/address/...`): **BUYER** or **ADMIN**. **POST** / **PUT** / **DELETE**: **BUYER** only. A buyer can have **many** addresses (`User` 1—N `Address`). **Delete** is a **soft delete** (`active = false`): the row stays so **Shipment** and other FKs are not broken. Attempting to delete an already-inactive address returns **409 Conflict**.\n\nUse collection variable **`{{address_id}}`** (set it from **Add address** or **List addresses** response `id`).",
 			"item": [
 				{
 					"name": "Add address",
@@ -468,6 +468,19 @@
 							"path": ["address", "addresses"]
 						},
 						"description": "`GET /address/addresses`. **200** + JSON array of **active** `AddressResponse` (empty array if none)."
+					}
+				},
+				{
+					"name": "Get address by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/address/{{address_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["address", "{{address_id}}"]
+						},
+						"description": "`GET /address/{addressId}`. **200** + single `AddressResponse` (active or inactive) for the authenticated buyer. **404** (`AddressNotFoundException`) if the id does not exist or does not belong to you."
 					}
 				},
 				{

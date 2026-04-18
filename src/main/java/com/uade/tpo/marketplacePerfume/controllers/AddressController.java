@@ -20,8 +20,6 @@ import com.uade.tpo.marketplacePerfume.entity.dto.address.AddressResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
 import com.uade.tpo.marketplacePerfume.service.address.IAddressService;
 
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("address")
 public class AddressController {
@@ -39,6 +37,13 @@ public class AddressController {
     @GetMapping("addresses")
     public ResponseEntity<List<AddressResponse>> listAddresses(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(addressService.listAddresses(currentUser));
+    }
+
+    @GetMapping("{addressId}")
+    public ResponseEntity<AddressResponse> getAddressById(
+            @PathVariable Long addressId,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(addressService.getAddressById(addressId, currentUser));
     }
 
     @PutMapping("modifyAddress/{addressId}")

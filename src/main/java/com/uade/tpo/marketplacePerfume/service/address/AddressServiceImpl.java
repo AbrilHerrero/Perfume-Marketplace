@@ -44,6 +44,14 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
+    public AddressResponse getAddressById(Long addressId, User currentUser) {
+        User user = getManagedUser(currentUser);
+        Address address = addressRepository.findByIdAndBuyer_Id(addressId, user.getId())
+                .orElseThrow(AddressNotFoundException::new);
+        return AddressMapper.toResponse(address);
+    }
+
+    @Override
     public AddressResponse modifyAddress(Long addressId, CreateAddressRequest request, User currentUser) {
         validateFields(request);
         User user = getManagedUser(currentUser);
