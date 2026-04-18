@@ -530,7 +530,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["sample", "{{sample_id}}"]
 						},
-						"description": "Sets sample inactive. 204 No Content on success."
+						"description": "Sets sample inactive. 204 No Content on success. SELLER may only delete their own samples; ADMIN may delete any."
 					}
 				}
 			]

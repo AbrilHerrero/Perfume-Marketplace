@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class PerfumeNotFoundException extends RuntimeException {
+public class UserNotFoundException extends RuntimeException {
 
-    public PerfumeNotFoundException() {
-        super("Perfume not found");
+    public UserNotFoundException() {
+        super("User not found");
     }
 }
