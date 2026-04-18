@@ -43,7 +43,7 @@ public class Address {
     private boolean active;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "buyer_id", referencedColumnName = "id")
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id", unique = false)
     private User buyer;
 
     @OneToMany(mappedBy = "address")

@@ -9,6 +9,8 @@ import com.uade.tpo.marketplacePerfume.entity.Address;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.address.AddressResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
+import com.uade.tpo.marketplacePerfume.exceptions.address.AddressAlreadyInactiveException;
+import com.uade.tpo.marketplacePerfume.exceptions.address.AddressInvalidFieldException;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.user.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.mapper.AddressMapper;
@@ -27,6 +29,7 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public AddressResponse addAddress(CreateAddressRequest request, User currentUser) {
+        validateFields(request);
         User user = getManagedUser(currentUser);
         Address address = AddressMapper.toNewEntity(request, user);
         Address saved = addressRepository.save(address);
@@ -43,6 +46,7 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public AddressResponse modifyAddress(Long addressId, CreateAddressRequest request, User currentUser) {
+        validateFields(request);
         User user = getManagedUser(currentUser);
         Address address = addressRepository.findByIdAndBuyer_Id(addressId, user.getId())
                 .orElseThrow(AddressNotFoundException::new);
@@ -60,10 +64,25 @@ public class AddressServiceImpl implements IAddressService {
         Address address = addressRepository.findByIdAndBuyer_Id(addressId, user.getId())
                 .orElseThrow(AddressNotFoundException::new);
         if (!address.isActive()) {
-            return;
+            throw new AddressAlreadyInactiveException();
         }
         address.setActive(false);
         addressRepository.save(address);
+    }
+
+    private void validateFields(CreateAddressRequest request) {
+        if (isBlank(request.getStreet()) ||
+                isBlank(request.getStreetNumber()) ||
+                isBlank(request.getCity()) ||
+                isBlank(request.getState()) ||
+                isBlank(request.getPostalCode()) ||
+                isBlank(request.getCountry())) {
+            throw new AddressInvalidFieldException();
+        }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private User getManagedUser(User currentUser) {
