@@ -13,4 +13,6 @@ public interface SampleRepository extends JpaRepository<Sample, Long> {
     List<Sample> findByActiveTrue();
 
     List<Sample> findBySeller_IdAndActiveTrue(Long sellerId);
+
+    List<Sample> findByPerfume_IdAndActiveTrue(Long perfumeId);
 }

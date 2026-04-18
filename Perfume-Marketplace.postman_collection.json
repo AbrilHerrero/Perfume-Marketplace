@@ -445,7 +445,7 @@
 		},
 		{
 			"name": "Sample",
-			"description": "All routes require authentication (Bearer). GET: any authenticated user. POST/PUT: SELLER (POST and PUT require the full sample body: price, stock, volumeMl, description, imageUrl, perfumeId). DELETE: ADMIN or SELLER. Set `seller_id` and `perfume_id` to existing user/perfume IDs in your DB.",
+			"description": "All routes require authentication (Bearer). GET: any authenticated user. POST/PUT/PATCH: SELLER (POST and PUT require the full sample body: price, stock, volumeMl, description, imageUrl, perfumeId; PATCH /{id}/stock updates only stock). DELETE: ADMIN or SELLER. Set `seller_id` and `perfume_id` to existing user/perfume IDs in your DB.",
 			"item": [
 				{
 					"name": "Get all samples",
@@ -469,6 +469,18 @@
 							"path": ["sample", "seller", "{{seller_id}}"]
 						},
 						"description": "Active samples for the given seller. May return 204 No Content if empty."
+					}
+				},
+				{
+					"name": "Get samples by perfume id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sample/perfume/{{perfume_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "perfume", "{{perfume_id}}"]
+						},
+						"description": "Active samples for the given perfume. 204 No Content if empty. 404 if the perfume does not exist."
 					}
 				},
 				{
@@ -519,6 +531,25 @@
 							"path": ["sample", "{{sample_id}}"]
 						},
 						"description": "PUT replaces the sample with a full resource: send price, stock, volumeMl, description, imageUrl, and perfumeId (all required). 400 if any field is missing or blank. Requires Bearer (SELLER). You can only update samples you own (403 otherwise)."
+					}
+				},
+				{
+					"name": "Update sample stock (SELLER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock\": 15\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sample/{{sample_id}}/stock",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "{{sample_id}}", "stock"]
+						},
+						"description": "Updates only the stock of a sample. Requires Bearer (SELLER) and ownership (403 otherwise). Body: { \"stock\": >= 0 }. 400 if missing or negative."
 					}
 				},
 				{

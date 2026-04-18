@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.Role;
@@ -17,6 +15,8 @@ import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleIncompleteRequestException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForDeleteException;
+import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForUpdateException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.SampleMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
@@ -43,6 +43,14 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public List<SampleResponseDTO> getSamplesBySellerId(Long sellerId) {
         return SampleMapper.toResponseDtoList(sampleRepository.findBySeller_IdAndActiveTrue(sellerId));
+    }
+
+    @Override
+    public List<SampleResponseDTO> getSamplesByPerfumeId(Long perfumeId) {
+        if (!perfumeRepository.existsById(perfumeId)) {
+            throw new PerfumeNotFoundException();
+        }
+        return SampleMapper.toResponseDtoList(sampleRepository.findByPerfume_IdAndActiveTrue(perfumeId));
     }
 
     @Override
@@ -77,7 +85,7 @@ public class SampleServiceImpl implements ISampleService {
 
         Sample existing = findActiveByIdOrThrow(id);
         if (existing.getSeller() == null || !existing.getSeller().getId().equals(sellerPrincipal.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own samples");
+            throw new SampleNotOwnedForUpdateException();
         }
 
         SampleMapper.applyFullUpdate(dto, existing);
@@ -89,11 +97,21 @@ public class SampleServiceImpl implements ISampleService {
     }
 
     @Override
+    public SampleResponseDTO updateSampleStock(Long id, Integer newStock, User sellerPrincipal) {
+        Sample existing = findActiveByIdOrThrow(id);
+        if (existing.getSeller() == null || !existing.getSeller().getId().equals(sellerPrincipal.getId())) {
+            throw new SampleNotOwnedForUpdateException();
+        }
+        existing.setStock(newStock);
+        return SampleMapper.toResponseDto(sampleRepository.save(existing));
+    }
+
+    @Override
     public void deleteSample(Long id, User principal) {
-        Sample sample = sampleRepository.findById(id).orElseThrow(() -> new SampleNotFoundException(id));
+        Sample sample = sampleRepository.findById(id).orElseThrow(SampleNotFoundException::new);
         if (principal.getRole() == Role.SELLER) {
             if (sample.getSeller() == null || !sample.getSeller().getId().equals(principal.getId())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own samples");
+                throw new SampleNotOwnedForDeleteException();
             }
         }
         if (!sample.isActive()) {
@@ -119,9 +137,9 @@ public class SampleServiceImpl implements ISampleService {
     }
 
     private Sample findActiveByIdOrThrow(Long id) {
-        Sample sample = sampleRepository.findById(id).orElseThrow(() -> new SampleNotFoundException(id));
+        Sample sample = sampleRepository.findById(id).orElseThrow(SampleNotFoundException::new);
         if (!sample.isActive()) {
-            throw new SampleNotFoundException(id);
+            throw new SampleNotFoundException();
         }
         return sample;
     }

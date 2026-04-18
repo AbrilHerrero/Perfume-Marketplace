@@ -13,6 +13,8 @@ public interface ISampleService {
     Sample getSampleById(Long id);
     SampleResponseDTO createSample(SampleRequestDTO dto, User seller);
     SampleResponseDTO updateSample(Long id, SampleRequestDTO dto, User seller);
+    SampleResponseDTO updateSampleStock(Long id, Integer newStock, User sellerPrincipal);
     void deleteSample(Long id, User principal);
     List<SampleResponseDTO> getSamplesBySellerId(Long sellerId);
+    List<SampleResponseDTO> getSamplesByPerfumeId(Long perfumeId);
 }
