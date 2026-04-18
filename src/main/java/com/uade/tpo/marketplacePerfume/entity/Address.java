@@ -39,8 +39,9 @@ public class Address {
 
     private String apartment;
 
-    @Column(nullable = false)
-    private boolean active;
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "buyer_id", referencedColumnName = "id")

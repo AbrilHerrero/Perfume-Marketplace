@@ -44,7 +44,7 @@ public class AddressController {
     @PutMapping("modifyAddress/{addressId}")
     public ResponseEntity<AddressResponse> modifyAddress(
             @PathVariable Long addressId,
-            @Valid @RequestBody CreateAddressRequest request,
+            @RequestBody CreateAddressRequest request,
             @AuthenticationPrincipal User currentUser) {
         AddressResponse updated = addressService.modifyAddress(addressId, request, currentUser);
         return ResponseEntity.ok(updated);
