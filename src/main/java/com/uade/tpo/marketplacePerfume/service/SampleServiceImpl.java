@@ -1,17 +1,22 @@
 package com.uade.tpo.marketplacePerfume.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
+import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNonExistanceException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.UserNonExistanceException;
 import com.uade.tpo.marketplacePerfume.mapper.SampleMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
@@ -43,43 +48,45 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public SampleResponseDTO getSampleByIdDTO(Long id) {
-        return SampleMapper.toResponseDto(getSampleById(id));
+        return SampleMapper.toResponseDto(findActiveByIdOrThrow(id));
     }
 
     @Override
     public Sample getSampleById(Long id) {
-        return sampleRepository.findById(id).orElseThrow(() -> new SampleNotFoundException(id));
+        return findActiveByIdOrThrow(id);
     }
 
     @Override
-    public SampleResponseDTO createSample(SampleRequestDTO dto) {
-        Sample sample = SampleMapper.toEntityFromRequest(dto);
+    public SampleResponseDTO createSample(SampleRequestDTO dto, User sellerPrincipal) {
+        if (dto.getPerfumeId() == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "perfumeId is required when creating a sample");
+        }
 
-        User seller = userRepository.findById(dto.getSellerId())
-            .orElseThrow(() -> new RuntimeException("Seller no encontrado con id: " + dto.getSellerId()));
+        Sample sample = SampleMapper.toEntityFromRequest(dto);
+        sample.setCreatedAt(LocalDateTime.now());
+
+        User seller = userRepository.findById(sellerPrincipal.getId()).orElseThrow(UserNonExistanceException::new);
         sample.setSeller(seller);
 
-        Perfume perfume = perfumeRepository.findById(dto.getPerfumeId())
-            .orElseThrow(() -> new RuntimeException("Perfume no encontrado con id: " + dto.getPerfumeId()));
+        Perfume perfume = perfumeRepository.findById(dto.getPerfumeId()).orElseThrow(PerfumeNonExistanceException::new);
         sample.setPerfume(perfume);
 
         return SampleMapper.toResponseDto(sampleRepository.save(sample));
     }
 
     @Override
-    public SampleResponseDTO updateSample(Long id, SampleRequestDTO dto) {
-        Sample existing = getSampleById(id);
-        SampleMapper.applyModify(dto, existing);
-
-        if (dto.getSellerId() != null) {
-            User seller = userRepository.findById(dto.getSellerId())
-                .orElseThrow(() -> new RuntimeException("Seller no encontrado con id: " + dto.getSellerId()));
-            existing.setSeller(seller);
+    public SampleResponseDTO updateSample(Long id, SampleRequestDTO dto, User sellerPrincipal) {
+        Sample existing = findActiveByIdOrThrow(id);
+        if (existing.getSeller() == null || !existing.getSeller().getId().equals(sellerPrincipal.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own samples");
         }
 
+        SampleMapper.applyModify(dto, existing);
+
         if (dto.getPerfumeId() != null) {
-            Perfume perfume = perfumeRepository.findById(dto.getPerfumeId())
-                .orElseThrow(() -> new RuntimeException("Perfume no encontrado con id: " + dto.getPerfumeId()));
+            Perfume perfume = perfumeRepository.findById(dto.getPerfumeId()).orElseThrow(PerfumeNonExistanceException::new);
             existing.setPerfume(perfume);
         }
 
@@ -88,8 +95,19 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public void deleteSample(Long id) {
-        Sample sample = getSampleById(id);
+        Sample sample = sampleRepository.findById(id).orElseThrow(() -> new SampleNotFoundException(id));
+        if (!sample.isActive()) {
+            return;
+        }
         sample.setActive(false);
         sampleRepository.save(sample);
+    }
+
+    private Sample findActiveByIdOrThrow(Long id) {
+        Sample sample = sampleRepository.findById(id).orElseThrow(() -> new SampleNotFoundException(id));
+        if (!sample.isActive()) {
+            throw new SampleNotFoundException(id);
+        }
+        return sample;
     }
 }

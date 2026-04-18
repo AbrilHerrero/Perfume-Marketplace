@@ -25,6 +25,18 @@
 		{
 			"key": "admin_user_id",
 			"value": "1"
+		},
+		{
+			"key": "sample_id",
+			"value": "1"
+		},
+		{
+			"key": "seller_id",
+			"value": "1"
+		},
+		{
+			"key": "perfume_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -383,7 +395,8 @@
 						},
 						"description": "Authenticated user only. JWT identifies the account; body is only the new password."
 					}
-				},		{
+				},
+				{
 					"name": "Get current profile (me)",
 					"request": {
 						"method": "GET",
@@ -428,7 +441,98 @@
 						"description": "No body. Requires Bearer token."
 					}
 				}
-				
+			]
+		},
+		{
+			"name": "Sample",
+			"description": "All routes require authentication (Bearer). GET: any authenticated user. POST/PUT: SELLER. DELETE: ADMIN or SELLER. Set `seller_id` and `perfume_id` to existing user/perfume IDs in your DB.",
+			"item": [
+				{
+					"name": "Get all samples",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sample/all",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "all"]
+						},
+						"description": "Returns active samples only."
+					}
+				},
+				{
+					"name": "Get samples by seller id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sample/seller/{{seller_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "seller", "{{seller_id}}"]
+						},
+						"description": "Active samples for the given seller. May return 204 No Content if empty."
+					}
+				},
+				{
+					"name": "Get sample by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sample/{{sample_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "{{sample_id}}"]
+						},
+						"description": "404 if not found or soft-deleted (inactive)."
+					}
+				},
+				{
+					"name": "Create sample (SELLER)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"volumeMl\": 5,\n    \"price\": 9.99,\n    \"stock\": 10,\n    \"description\": \"5ml sample\",\n    \"imageUrl\": \"https://example.com/sample.jpg\",\n    \"perfumeId\": {{perfume_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sample",
+							"host": ["{{base_url}}"],
+							"path": ["sample"]
+						},
+						"description": "Returns 201 Created with Location header. `perfumeId` is required. Seller is taken from the JWT (Bearer); do not send sellerId in the body."
+					}
+				},
+				{
+					"name": "Update sample (SELLER)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 12.50,\n    \"stock\": 8,\n    \"description\": \"Updated description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sample/{{sample_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "{{sample_id}}"]
+						},
+						"description": "Requires Bearer (SELLER). Partial update; only send fields to change. Optional: perfumeId. You can only update samples you own (403 otherwise)."
+					}
+				},
+				{
+					"name": "Delete sample — soft delete (ADMIN/SELLER)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/sample/{{sample_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["sample", "{{sample_id}}"]
+						},
+						"description": "Sets sample inactive. 204 No Content on success."
+					}
+				}
 			]
 		}
 	]

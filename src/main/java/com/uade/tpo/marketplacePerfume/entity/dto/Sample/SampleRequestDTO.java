@@ -11,6 +11,5 @@ public class SampleRequestDTO {
     private Integer volumeMl;
     private String description;
     private String imageUrl;
-    private Long perfumeId; 
-    private Long sellerId;
+    private Long perfumeId;
 }
