@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.service;
+package com.uade.tpo.marketplacePerfume.service.sample;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,14 +12,14 @@ import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
-import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.SampleAlreadyInactiveException;
-import com.uade.tpo.marketplacePerfume.exceptions.SampleIncompleteRequestException;
-import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForDeleteException;
-import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForUpdateException;
-import com.uade.tpo.marketplacePerfume.exceptions.StockUpdateInvalidException;
-import com.uade.tpo.marketplacePerfume.exceptions.UserNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.perfume.PerfumeNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleAlreadyInactiveException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleIncompleteRequestException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotOwnedForDeleteException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotOwnedForUpdateException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.StockUpdateInvalidException;
+import com.uade.tpo.marketplacePerfume.exceptions.user.UserNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.SampleMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
-import com.uade.tpo.marketplacePerfume.service.IUserService;
+import com.uade.tpo.marketplacePerfume.service.user.IUserService;
 
 @RestController
 @RequestMapping("admin")

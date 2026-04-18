@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.RegisterRequest;
-import com.uade.tpo.marketplacePerfume.service.AuthenticationService;
+import com.uade.tpo.marketplacePerfume.service.authentication.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
 
