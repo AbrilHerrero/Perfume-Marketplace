@@ -21,7 +21,6 @@ import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
 import com.uade.tpo.marketplacePerfume.service.address.IAddressService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("address")

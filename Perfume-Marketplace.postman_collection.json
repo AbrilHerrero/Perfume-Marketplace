@@ -436,7 +436,7 @@
 		},
 		{
 			"name": "Address",
-			"description": "Base **`/address`**. Bearer token required; roles **BUYER** / **ADMIN**. A buyer can have **many** addresses (`User` 1—N `Address`). **Delete** is a **soft delete** (`active = false`): the row stays so **Shipment** and other FKs are not broken.\n\nUse collection variable **`{{address_id}}`** (set it from **Add address** or **List addresses** response `id`).",
+			"description": "Base **`/address`**. Bearer token required; roles **BUYER** / **ADMIN**. A buyer can have **many** addresses (`User` 1—N `Address`). **Delete** is a **soft delete** (`active = false`): the row stays so **Shipment** and other FKs are not broken. Attempting to delete an already-inactive address returns **409 Conflict**.\n\nUse collection variable **`{{address_id}}`** (set it from **Add address** or **List addresses** response `id`).",
 			"item": [
 				{
 					"name": "Add address",
@@ -499,7 +499,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["address", "deleteAddress", "{{address_id}}"]
 						},
-						"description": "`DELETE /address/deleteAddress/{addressId}`. **Soft delete** only (`active` → false); row remains for FK integrity. **200** + `Address successfully deleted`. **404** if id missing or not owned by you. Second delete is a no-op (**200**)."
+						"description": "`DELETE /address/deleteAddress/{addressId}`. **Soft delete** only (`active` → false); row remains for FK integrity. **200** + `Address successfully deleted`. **404** if id missing or not owned by you. **409 Conflict** (`AddressAlreadyInactiveException`) if the address is already inactive — a second delete is **not** a no-op."
 					}
 				}
 			]
