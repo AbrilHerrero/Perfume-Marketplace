@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.service;
+package com.uade.tpo.marketplacePerfume.service.sample;
 
 import java.util.List;
 

@@ -21,7 +21,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.StockUpdateDTO;
-import com.uade.tpo.marketplacePerfume.service.ISampleService;
+import com.uade.tpo.marketplacePerfume.service.sample.ISampleService;
 
 @RestController
 @RequestMapping("sample")
