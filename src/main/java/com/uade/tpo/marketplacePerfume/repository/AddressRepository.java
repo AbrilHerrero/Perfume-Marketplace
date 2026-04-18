@@ -14,4 +14,6 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     List<Address> findAllByBuyer_IdAndActiveTrueOrderByIdAsc(Long buyerId);
 
     Optional<Address> findByIdAndBuyer_Id(Long addressId, Long buyerId);
+
+    Optional<Address> findByIdAndBuyer_IdAndActiveTrue(Long addressId, Long buyerId);
 }

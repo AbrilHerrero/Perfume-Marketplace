@@ -55,11 +55,8 @@ public class AddressServiceImpl implements IAddressService {
     public AddressResponse modifyAddress(Long addressId, CreateAddressRequest request, User currentUser) {
         validateFields(request);
         User user = getManagedUser(currentUser);
-        Address address = addressRepository.findByIdAndBuyer_Id(addressId, user.getId())
+        Address address = addressRepository.findByIdAndBuyer_IdAndActiveTrue(addressId, user.getId())
                 .orElseThrow(AddressNotFoundException::new);
-        if (!address.isActive()) {
-            throw new AddressNotFoundException();
-        }
         AddressMapper.apply(request, address);
         Address saved = addressRepository.save(address);
         return AddressMapper.toResponse(saved);
