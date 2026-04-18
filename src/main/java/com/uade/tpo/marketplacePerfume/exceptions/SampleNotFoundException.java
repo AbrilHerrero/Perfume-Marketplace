@@ -1,8 +1,8 @@
 package com.uade.tpo.marketplacePerfume.exceptions;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "No se ha encontrado el usuario")
-public class UserNonExistanceException extends RuntimeException {
-    
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Sample not found")
+public class SampleNotFoundException extends RuntimeException {
 }
