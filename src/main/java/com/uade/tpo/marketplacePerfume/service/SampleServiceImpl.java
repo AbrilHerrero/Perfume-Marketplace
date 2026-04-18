@@ -80,7 +80,7 @@ public class SampleServiceImpl implements ISampleService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own samples");
         }
 
-        SampleMapper.applyModify(dto, existing);
+        SampleMapper.applyFullUpdate(dto, existing);
 
         Perfume perfume = perfumeRepository.findById(dto.getPerfumeId()).orElseThrow(PerfumeNotFoundException::new);
         existing.setPerfume(perfume);

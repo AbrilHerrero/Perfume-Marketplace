@@ -39,13 +39,13 @@ public final class SampleMapper {
                 .build();
     }
 
-    public static void applyModify(SampleRequestDTO dto, Sample existing) {
+    public static void applyFullUpdate(SampleRequestDTO dto, Sample existing) {
         if (dto == null) return;
-        if (dto.getPrice() != null) existing.setPrice(dto.getPrice());
-        if (dto.getStock() != null) existing.setStock(dto.getStock());
-        if (dto.getVolumeMl() != null) existing.setVolumeMl(dto.getVolumeMl());
-        if (dto.getDescription() != null) existing.setDescription(dto.getDescription());
-        if (dto.getImageUrl() != null) existing.setImageUrl(dto.getImageUrl());
+        existing.setPrice(dto.getPrice());
+        existing.setStock(dto.getStock());
+        existing.setVolumeMl(dto.getVolumeMl());
+        existing.setDescription(dto.getDescription());
+        existing.setImageUrl(dto.getImageUrl());
     }
 
     public static List<SampleResponseDTO> toResponseDtoList(List<Sample> entities) {

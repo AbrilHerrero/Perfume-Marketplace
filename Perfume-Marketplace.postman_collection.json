@@ -445,7 +445,7 @@
 		},
 		{
 			"name": "Sample",
-			"description": "All routes require authentication (Bearer). GET: any authenticated user. POST/PUT: SELLER. DELETE: ADMIN or SELLER. Set `seller_id` and `perfume_id` to existing user/perfume IDs in your DB.",
+			"description": "All routes require authentication (Bearer). GET: any authenticated user. POST/PUT: SELLER (POST and PUT require the full sample body: price, stock, volumeMl, description, imageUrl, perfumeId). DELETE: ADMIN or SELLER. Set `seller_id` and `perfume_id` to existing user/perfume IDs in your DB.",
 			"item": [
 				{
 					"name": "Get all samples",
@@ -499,7 +499,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["sample"]
 						},
-						"description": "Returns 201 Created with Location header. `perfumeId` is required. Seller is taken from the JWT (Bearer); do not send sellerId in the body."
+						"description": "Returns 201 Created with Location header. Body must include all fields: price, stock, volumeMl, description, imageUrl, perfumeId (400 if incomplete). Seller is taken from the JWT (Bearer); do not send sellerId in the body."
 					}
 				},
 				{
@@ -511,14 +511,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"price\": 12.50,\n    \"stock\": 8,\n    \"description\": \"Updated description\"\n}"
+							"raw": "{\n    \"volumeMl\": 5,\n    \"price\": 12.50,\n    \"stock\": 8,\n    \"description\": \"Updated description\",\n    \"imageUrl\": \"https://example.com/sample.jpg\",\n    \"perfumeId\": {{perfume_id}}\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/sample/{{sample_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["sample", "{{sample_id}}"]
 						},
-						"description": "Requires Bearer (SELLER). Partial update; only send fields to change. Optional: perfumeId. You can only update samples you own (403 otherwise)."
+						"description": "PUT replaces the sample with a full resource: send price, stock, volumeMl, description, imageUrl, and perfumeId (all required). 400 if any field is missing or blank. Requires Bearer (SELLER). You can only update samples you own (403 otherwise)."
 					}
 				},
 				{
