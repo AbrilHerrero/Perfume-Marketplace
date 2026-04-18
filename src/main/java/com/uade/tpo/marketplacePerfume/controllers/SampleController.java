@@ -83,10 +83,10 @@ public class SampleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<String> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal User principal) {
         sampleService.deleteSample(id, principal);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Sample successfully deleted");
     }
 }

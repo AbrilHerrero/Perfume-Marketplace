@@ -13,6 +13,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.PerfumeNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.SampleAlreadyInactiveException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleIncompleteRequestException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForDeleteException;
@@ -117,7 +118,7 @@ public class SampleServiceImpl implements ISampleService {
             }
         }
         if (!sample.isActive()) {
-            return;
+            throw new SampleAlreadyInactiveException();
         }
         sample.setActive(false);
         sampleRepository.save(sample);
