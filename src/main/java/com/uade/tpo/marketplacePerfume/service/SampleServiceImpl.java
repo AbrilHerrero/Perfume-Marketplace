@@ -17,6 +17,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.SampleIncompleteRequestExcepti
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForDeleteException;
 import com.uade.tpo.marketplacePerfume.exceptions.SampleNotOwnedForUpdateException;
+import com.uade.tpo.marketplacePerfume.exceptions.StockUpdateInvalidException;
 import com.uade.tpo.marketplacePerfume.exceptions.UserNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.SampleMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
@@ -98,6 +99,7 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public SampleResponseDTO updateSampleStock(Long id, Integer newStock, User sellerPrincipal) {
+        validateNewStock(newStock);
         Sample existing = findActiveByIdOrThrow(id);
         if (existing.getSeller() == null || !existing.getSeller().getId().equals(sellerPrincipal.getId())) {
             throw new SampleNotOwnedForUpdateException();
@@ -142,5 +144,11 @@ public class SampleServiceImpl implements ISampleService {
             throw new SampleNotFoundException();
         }
         return sample;
+    }
+
+    private void validateNewStock(Integer newStock) {
+        if (newStock == null || newStock < 0) {
+            throw new StockUpdateInvalidException();
+        }
     }
 }
