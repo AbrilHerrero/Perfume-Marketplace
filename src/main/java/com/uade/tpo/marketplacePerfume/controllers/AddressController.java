@@ -21,6 +21,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.address.CreateAddressRequest;
 import com.uade.tpo.marketplacePerfume.service.address.IAddressService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("address")
@@ -30,7 +31,7 @@ public class AddressController {
 
     @PostMapping("addAddress")
     public ResponseEntity<AddressResponse> addAddress(
-            @Valid @RequestBody CreateAddressRequest request,
+            @RequestBody CreateAddressRequest request,
             @AuthenticationPrincipal User currentUser) {
         AddressResponse created = addressService.addAddress(request, currentUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

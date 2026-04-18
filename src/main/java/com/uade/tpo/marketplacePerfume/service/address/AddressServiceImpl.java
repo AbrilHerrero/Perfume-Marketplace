@@ -17,10 +17,9 @@ import com.uade.tpo.marketplacePerfume.mapper.AddressMapper;
 import com.uade.tpo.marketplacePerfume.repository.AddressRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
+
 
 @Service
-@RequiredArgsConstructor
 public class AddressServiceImpl implements IAddressService {
     @Autowired
     private AddressRepository addressRepository;
