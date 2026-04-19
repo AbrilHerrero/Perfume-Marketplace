@@ -90,8 +90,8 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "buyer")
     private Cart cart;
 
-    @OneToOne(mappedBy = "buyer")
-    private Address address;
+    @OneToMany(mappedBy = "buyer")
+    private List<Address> addresses;
 
     @OneToMany(mappedBy = "buyer")
     private List<Order> orders;
