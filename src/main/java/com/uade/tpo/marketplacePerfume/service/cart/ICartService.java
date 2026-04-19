@@ -13,7 +13,7 @@ public interface ICartService {
     CartItemResponse getCartItem(User user, Long cartItemId);
     CartItemResponse addCartItem(User user, CartItemAdd cartItemAdd);
     List<CartItemResponse> addCartItems(User user, CartBulkAdd cartBulkAdd);
-    void updateCartItemQuantity(User user, Long cartItemId, int quantity);
+    void updateCartItemQuantity(User user, Long cartItemId, Integer quantity);
     void removeCartItem(User user, Long cartItemId);
     void clearCart(User user);
 }

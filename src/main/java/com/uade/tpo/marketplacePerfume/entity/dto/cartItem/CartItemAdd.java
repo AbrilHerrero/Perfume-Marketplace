@@ -11,5 +11,5 @@ public class CartItemAdd {
 
     @NotNull(message = "quantity is required")
     @Min(value = 1, message = "quantity must be greater than 0")
-    private int quantity;
+    private Integer quantity;
 }

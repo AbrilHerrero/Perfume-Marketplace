@@ -17,6 +17,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartBulkAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
+import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemInvalidQuantityException;
 import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemInsufficientStockException;
 import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.cart.CartNotFoundException;
@@ -63,7 +64,7 @@ public class CartServiceImpl implements ICartService {
     @Transactional
     public CartItemResponse addCartItem(User user, CartItemAdd cartItemAdd) {
         Cart cart = getOrCreateCart(user);
-        CartItem saved = addOrMergeItem(cart, cartItemAdd.getSampleId(), cartItemAdd.getQuantity());
+        CartItem saved = addOrMergeItem(cart, cartItemAdd.getSampleId(), requireOrderedQuantity(cartItemAdd.getQuantity()));
         touchCart(cart);
         return CartItemMapper.toResponse(saved);
     }
@@ -74,7 +75,7 @@ public class CartServiceImpl implements ICartService {
         Cart cart = getOrCreateCart(user);
         List<CartItemResponse> responses = new ArrayList<>();
         for (CartItemAdd itemAdd : cartBulkAdd.getItems()) {
-            CartItem saved = addOrMergeItem(cart, itemAdd.getSampleId(), itemAdd.getQuantity());
+            CartItem saved = addOrMergeItem(cart, itemAdd.getSampleId(), requireOrderedQuantity(itemAdd.getQuantity()));
             responses.add(CartItemMapper.toResponse(saved));
         }
         touchCart(cart);
@@ -83,11 +84,12 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public void updateCartItemQuantity(User user, Long cartItemId, int quantity) {
+    public void updateCartItemQuantity(User user, Long cartItemId, Integer quantity) {
+        int q = requireOrderedQuantity(quantity);
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
-        validateStock(item.getSample(), quantity);
-        item.setQuantity(quantity);
+        validateStock(item.getSample(), q);
+        item.setQuantity(q);
         cartItemRepository.save(item);
         touchCart(cart);
     }
@@ -168,7 +170,17 @@ public class CartServiceImpl implements ICartService {
                 });
     }
 
+    private int requireOrderedQuantity(Integer quantity) {
+        if (quantity == null || quantity < 1) {
+            throw new CartItemInvalidQuantityException();
+        }
+        return quantity;
+    }
+
     private void validateStock(Sample sample, int quantity) {
+        if (quantity < 1) {
+            throw new CartItemInvalidQuantityException();
+        }
         if (sample == null || sample.getStock() < quantity) {
             throw new CartItemInsufficientStockException();
         }

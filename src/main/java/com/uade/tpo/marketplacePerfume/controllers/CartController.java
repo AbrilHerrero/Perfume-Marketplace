@@ -26,7 +26,7 @@ import com.uade.tpo.marketplacePerfume.service.cart.ICartService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("cart")
 public class CartController {
 
     @Autowired
