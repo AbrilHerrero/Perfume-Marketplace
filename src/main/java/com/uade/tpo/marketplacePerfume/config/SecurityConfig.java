@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/address/**").hasRole("BUYER")
                         .requestMatchers(HttpMethod.DELETE, "/address/**").hasRole("BUYER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/cart/**").hasRole("BUYER")
                         .requestMatchers("/error/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
