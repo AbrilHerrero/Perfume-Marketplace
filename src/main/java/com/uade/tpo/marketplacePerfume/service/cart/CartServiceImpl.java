@@ -16,10 +16,9 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
-import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemInvalidQuantityException;
-import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemInsufficientStockException;
-import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.cart.CartNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemInsufficientStockException;
+import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemInvalidQuantityException;
+import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.CartItemMapper;
 import com.uade.tpo.marketplacePerfume.mapper.CartMapper;
@@ -101,9 +100,10 @@ public class CartServiceImpl implements ICartService {
     @Override
     @Transactional
     public void clearCart(User user) {
-        Cart cart = findCart(user, CartNotFoundException::new);
-        cartItemRepository.deleteAllByCart_Id(cart.getId());
-        touchCart(cart);
+        cartRepository.findByBuyer_Id(user.getId()).ifPresent(cart -> {
+            cartItemRepository.deleteAllByCart_Id(cart.getId());
+            cartRepository.delete(cart);
+        });
     }
 
     private Cart getOrCreateCart(User user) {

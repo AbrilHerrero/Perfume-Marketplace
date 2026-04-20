@@ -680,7 +680,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "clear"]
 						},
-						"description": "**204 No Content** when the cart exists (including an **empty** cart, e.g. after removing all lines). **404** `CartNotFoundException` if the buyer has **no cart row yet** (first add never happened). **GET /cart** does **not** create the row, so calling **DELETE /clear** before any **POST /cart/items** will legitimately return 404."
+						"description": "**204 No Content** — idempotent. Deletes all `CartItem` rows **and the `Cart` row itself**, so the post-state is identical to a buyer that never added anything (next **GET /cart** returns the synthetic empty response, next **POST /cart/items** lazily creates a fresh cart). If the buyer has no cart yet, this call is a no-op and still returns **204**."
 					}
 				}
 			]
