@@ -2,7 +2,10 @@ package com.uade.tpo.marketplacePerfume.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +31,10 @@ public class Shipment {
 
     private LocalDateTime deliveredAt;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ShipmentStatus status = ShipmentStatus.PENDING;
 
     private String trackingNumber;
 

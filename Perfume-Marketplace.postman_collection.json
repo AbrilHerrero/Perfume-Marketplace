@@ -41,6 +41,14 @@
 		{
 			"key": "address_id",
 			"value": "1"
+		},
+		{
+			"key": "order_id",
+			"value": "1"
+		},
+		{
+			"key": "shipment_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -649,6 +657,109 @@
 							"path": ["address", "deleteAddress", "{{address_id}}"]
 						},
 						"description": "`DELETE /address/deleteAddress/{addressId}`. **Soft delete** only (`active` → false); row remains for FK integrity. **200** + `Address successfully deleted`. **404** if id missing or not owned by you. **409 Conflict** (`AddressAlreadyInactiveException`) if the address is already inactive — a second delete is **not** a no-op."
+					}
+				}
+			]
+		},
+		{
+			"name": "Shipments",
+			"description": "Base **`/api/shipments`**. Bearer **`{{access_token}}`** (collection auth). **GET**: **ADMIN**, **BUYER** (order buyer), or **SELLER** (all order line samples belong to that seller). **POST** / **PATCH**: **ADMIN** or **SELLER** (same seller rule). `status` in JSON is a string enum: `PENDING`, `SHIPPED`, `DELIVERED`, `CANCELLED`. Set **`{{order_id}}`**, **`{{address_id}}`**, and **`{{shipment_id}}`** from your DB or from create/list responses.",
+			"item": [
+				{
+					"name": "Get shipment by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/shipments/{{shipment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "shipments", "{{shipment_id}}"]
+						},
+						"description": "`GET /api/shipments/{id}`. **200** + `ShipmentResponse` (`id`, `shippedAt`, `deliveredAt`, `status`, `trackingNumber`, `orderId`, `addressId`). **404** if no shipment. **403** if the token user may not view this shipment."
+					}
+				},
+				{
+					"name": "Get shipment by order id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/shipments/order/{{order_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "shipments", "order", "{{order_id}}"]
+						},
+						"description": "`GET /api/shipments/order/{orderId}`. **200** + `ShipmentResponse` for that order. **404** if the order has no shipment yet. **403** if not allowed to view."
+					}
+				},
+				{
+					"name": "Create shipment (ADMIN/SELLER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('shipment_id', String(json.id));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": {{order_id}},\n    \"addressId\": {{address_id}},\n    \"status\": \"PENDING\",\n    \"trackingNumber\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/shipments",
+							"host": ["{{base_url}}"],
+							"path": ["api", "shipments"]
+						},
+						"description": "`POST /api/shipments`. Body: `orderId`, `addressId` (required). Optional: `status` (defaults to **PENDING** if omitted), `trackingNumber`. Address must belong to the order’s buyer and be **active**. **201 Created** + body + `Location: /api/shipments/{id}`. **404** order/address, **409** if the order already has a shipment, **403** if SELLER does not own all samples in the order."
+					}
+				},
+				{
+					"name": "Update shipment status (ADMIN/SELLER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"SHIPPED\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/shipments/{{shipment_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "shipments", "{{shipment_id}}", "status"]
+						},
+						"description": "`PATCH /api/shipments/{id}/status`. Body: `{ \"status\": \"PENDING\" | \"SHIPPED\" | \"DELIVERED\" | \"CANCELLED\" }`. **200** + updated `ShipmentResponse`. **404** / **403** as in service rules."
+					}
+				},
+				{
+					"name": "Update shipment tracking (ADMIN/SELLER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"trackingNumber\": \"AR123456789AR\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/shipments/{{shipment_id}}/tracking",
+							"host": ["{{base_url}}"],
+							"path": ["api", "shipments", "{{shipment_id}}", "tracking"]
+						},
+						"description": "`PATCH /api/shipments/{id}/tracking`. Body: `{ \"trackingNumber\": \"...\" }` (non-blank). **200** + updated `ShipmentResponse`."
 					}
 				}
 			]
