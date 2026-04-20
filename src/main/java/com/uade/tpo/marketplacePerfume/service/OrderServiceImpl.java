@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplacePerfume.entity.Order;
 import com.uade.tpo.marketplacePerfume.entity.OrderItem;
+import com.uade.tpo.marketplacePerfume.entity.OrderStatus;
 import com.uade.tpo.marketplacePerfume.entity.Role;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
@@ -31,11 +31,6 @@ import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 
 @Service
 public class OrderServiceImpl implements IOrderService {
-
-    private static final String STATUS_PENDING = "PENDING";
-    private static final String STATUS_CANCELLED = "CANCELLED";
-    private static final Set<String> ALLOWED_STATUSES = Set.of(
-            STATUS_PENDING, "PAID", "SHIPPED", "DELIVERED", STATUS_CANCELLED);
 
     @Autowired
     private OrderRepository orderRepository;
@@ -73,7 +68,7 @@ public class OrderServiceImpl implements IOrderService {
         Order order = Order.builder()
                 .buyer(buyer)
                 .createdAt(LocalDateTime.now())
-                .status(STATUS_PENDING)
+                .status(OrderStatus.PENDING)
                 .total(BigDecimal.ZERO)
                 .orderItems(new ArrayList<>())
                 .build();
@@ -113,11 +108,12 @@ public class OrderServiceImpl implements IOrderService {
     @Transactional
     public OrderResponseDTO updateStatus(Long id, OrderStatusUpdateDTO dto) {
         Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
-        String newStatus = dto.getStatus();
-        if (newStatus == null || !ALLOWED_STATUSES.contains(newStatus)) {
+        try {
+            OrderStatus newStatus = OrderStatus.valueOf(dto.getStatus().toUpperCase());
+            order.setStatus(newStatus);
+        } catch (IllegalArgumentException | NullPointerException e) {
             throw new InvalidOrderStatusException();
         }
-        order.setStatus(newStatus);
         return OrderMapper.toResponseDto(orderRepository.save(order));
     }
 
@@ -127,7 +123,7 @@ public class OrderServiceImpl implements IOrderService {
         Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
         assertCanAccess(order, currentUser);
 
-        if (!STATUS_PENDING.equals(order.getStatus())) {
+        if (order.getStatus() != OrderStatus.PENDING) {
             throw new InvalidOrderStatusException();
         }
 
@@ -139,7 +135,7 @@ public class OrderServiceImpl implements IOrderService {
             }
         }
 
-        order.setStatus(STATUS_CANCELLED);
+        order.setStatus(OrderStatus.CANCELLED);
         return OrderMapper.toResponseDto(orderRepository.save(order));
     }
 
