@@ -1,9 +1,9 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
-public enum ShipmentStatus {
+public enum OrderStatus {
     PENDING,
+    PAID,
     SHIPPED,
-    IN_TRANSIT,
     DELIVERED,
-    RETURNED
+    CANCELLED
 }
