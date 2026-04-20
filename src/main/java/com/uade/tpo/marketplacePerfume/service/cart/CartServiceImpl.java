@@ -1,8 +1,8 @@
 package com.uade.tpo.marketplacePerfume.service.cart;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import com.uade.tpo.marketplacePerfume.entity.Cart;
 import com.uade.tpo.marketplacePerfume.entity.CartItem;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartBulkAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
@@ -22,7 +21,6 @@ import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemInsufficientStock
 import com.uade.tpo.marketplacePerfume.exceptions.cart.CartItemNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.cart.CartNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.user.UserNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.CartItemMapper;
 import com.uade.tpo.marketplacePerfume.mapper.CartMapper;
 import com.uade.tpo.marketplacePerfume.repository.CartItemRepository;
@@ -46,10 +44,18 @@ public class CartServiceImpl implements ICartService {
     private UserRepository userRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public CartResponse getCart(User user) {
-        Cart cart = getOrCreateCart(user);
-        return CartMapper.toResponse(cart);
+        return cartRepository.findByBuyer_Id(user.getId())
+                .map(CartMapper::toResponse)
+                .orElseGet(CartServiceImpl::emptyCartResponse);
+    }
+
+    private static CartResponse emptyCartResponse() {
+        CartResponse dto = new CartResponse();
+        dto.setItems(Collections.emptyList());
+        dto.setTotalPrice(BigDecimal.ZERO);
+        return dto;
     }
 
     @Override
@@ -71,20 +77,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public List<CartItemResponse> addCartItems(User user, CartBulkAdd cartBulkAdd) {
-        Cart cart = getOrCreateCart(user);
-        List<CartItemResponse> responses = new ArrayList<>();
-        for (CartItemAdd itemAdd : cartBulkAdd.getItems()) {
-            CartItem saved = addOrMergeItem(cart, itemAdd.getSampleId(), requireOrderedQuantity(itemAdd.getQuantity()));
-            responses.add(CartItemMapper.toResponse(saved));
-        }
-        touchCart(cart);
-        return responses;
-    }
-
-    @Override
-    @Transactional
-    public void updateCartItemQuantity(User user, Long cartItemId, Integer quantity) {
+    public CartItemResponse updateCartItemQuantity(User user, Long cartItemId, Integer quantity) {
         int q = requireOrderedQuantity(quantity);
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
@@ -92,8 +85,8 @@ public class CartServiceImpl implements ICartService {
         requireActiveSample(sample);
         validateStock(sample, q);
         item.setQuantity(q);
-        cartItemRepository.save(item);
         touchCart(cart);
+        return CartItemMapper.toResponse(item);
     }
 
     @Override
@@ -114,23 +107,19 @@ public class CartServiceImpl implements ICartService {
     }
 
     private Cart getOrCreateCart(User user) {
-        User managedUser = userRepository.findById(user.getId())
-                .orElseThrow(UserNotFoundException::new);
-        return cartRepository.findByBuyer_Id(managedUser.getId())
-                .orElseGet(() -> createCartFor(managedUser));
+        return cartRepository.findByBuyer_Id(user.getId())
+                .orElseGet(() -> createCartFor(user.getId()));
     }
 
     private Cart findCart(User user, Supplier<? extends RuntimeException> notFoundSupplier) {
-        User managedUser = userRepository.findById(user.getId())
-                .orElseThrow(UserNotFoundException::new);
-        return cartRepository.findByBuyer_Id(managedUser.getId())
+        return cartRepository.findByBuyer_Id(user.getId())
                 .orElseThrow(notFoundSupplier);
     }
 
-    private Cart createCartFor(User buyer) {
+    private Cart createCartFor(Long buyerId) {
         LocalDateTime now = LocalDateTime.now();
         Cart cart = Cart.builder()
-                .buyer(buyer)
+                .buyer(userRepository.getReferenceById(buyerId))
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -138,12 +127,8 @@ public class CartServiceImpl implements ICartService {
     }
 
     private CartItem findOwnedCartItem(Cart cart, Long cartItemId) {
-        CartItem item = cartItemRepository.findById(cartItemId)
+        return cartItemRepository.findByIdAndCart_Id(cartItemId, cart.getId())
                 .orElseThrow(CartItemNotFoundException::new);
-        if (item.getCart() == null || !item.getCart().getId().equals(cart.getId())) {
-            throw new CartItemNotFoundException();
-        }
-        return item;
     }
 
     private CartItem addOrMergeItem(Cart cart, Long sampleId, int quantity) {
@@ -156,7 +141,7 @@ public class CartServiceImpl implements ICartService {
                     int newQuantity = existing.getQuantity() + quantity;
                     validateStock(sample, newQuantity);
                     existing.setQuantity(newQuantity);
-                    return cartItemRepository.save(existing);
+                    return existing;
                 })
                 .orElseGet(() -> {
                     validateStock(sample, quantity);
@@ -194,6 +179,5 @@ public class CartServiceImpl implements ICartService {
 
     private void touchCart(Cart cart) {
         cart.setUpdatedAt(LocalDateTime.now());
-        cartRepository.save(cart);
     }
 }

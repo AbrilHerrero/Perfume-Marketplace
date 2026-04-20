@@ -1,7 +1,6 @@
 package com.uade.tpo.marketplacePerfume.controllers;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
-import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartBulkAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemUpdate;
 import com.uade.tpo.marketplacePerfume.service.cart.ICartService;
@@ -50,19 +48,11 @@ public class CartController {
         return ResponseEntity.created(URI.create("/cart/items/" + created.getId())).body(created);
     }
 
-    @PostMapping("/items/bulk")
-    public ResponseEntity<List<CartItemResponse>> addCartItems(@AuthenticationPrincipal User user,
-            @Valid @RequestBody CartBulkAdd cartBulkAdd) {
-        List<CartItemResponse> created = cartService.addCartItems(user, cartBulkAdd);
-        return ResponseEntity.ok(created);
-    }
-
     @PutMapping("/items/{cartItemId}")
-    public ResponseEntity<Void> updateCartItemQuantity(@AuthenticationPrincipal User user,
+    public ResponseEntity<CartItemResponse> updateCartItemQuantity(@AuthenticationPrincipal User user,
             @PathVariable Long cartItemId,
             @Valid @RequestBody CartItemUpdate body) {
-        cartService.updateCartItemQuantity(user, cartItemId, body.getQuantity());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(cartService.updateCartItemQuantity(user, cartItemId, body.getQuantity()));
     }
 
     @DeleteMapping("/items/{cartItemId}")

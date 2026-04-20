@@ -9,6 +9,8 @@ import com.uade.tpo.marketplacePerfume.entity.CartItem;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+    Optional<CartItem> findByIdAndCart_Id(Long id, Long cartId);
+
     Optional<CartItem> findByCart_IdAndSample_Id(Long cartId, Long sampleId);
 
     void deleteAllByCart_Id(Long cartId);

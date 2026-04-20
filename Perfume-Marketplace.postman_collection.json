@@ -587,7 +587,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart"]
 						},
-						"description": "**200** + `CartResponse` (`id`, `items`, `totalPrice`, `createdAt`, `updatedAt`). If the buyer has no cart yet, one is **created** on this request (same as first **POST** add) — empty cart is persisted."
+						"description": "**200** + `CartResponse` (`id`, `items`, `totalPrice`, `createdAt`, `updatedAt`). Pure read: if the buyer has **no cart row yet**, a synthetic empty response is returned (`items: []`, `totalPrice: 0`, without `id`/`createdAt`/`updatedAt`) and **nothing is persisted**. The cart row is created lazily on the first **POST /cart/items**."
 					}
 				},
 				{
@@ -641,25 +641,6 @@
 					}
 				},
 				{
-					"name": "Add cart items (bulk)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"items\": [\n        { \"sampleId\": {{sample_id}}, \"quantity\": 1 },\n        { \"sampleId\": {{sample_id}}, \"quantity\": 2 }\n    ]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/cart/items/bulk",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "items", "bulk"]
-						},
-						"description": "**200** + JSON array of `CartItemResponse` (one per request entry; same `sampleId` rows are merged server-side). Body: `{ \"items\": [ { \"sampleId\", \"quantity\" }, ... ] }` — `items` must be non-empty. Use different `sampleId` values for multiple products."
-					}
-				},
-				{
 					"name": "Update cart item quantity",
 					"request": {
 						"method": "PUT",
@@ -675,7 +656,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "items", "{{cart_item_id}}"]
 						},
-						"description": "**204 No Content**. Body: `quantity` (required, ≥ 1). **404** `CartItemNotFoundException` if the line is not yours. **404** `SampleNotFoundException` if the linked sample was **soft-deleted / inactive** after it was added (same rule as add: you cannot change quantity for inactive samples)."
+						"description": "**200 OK** + `CartItemResponse` with the updated line (`id`, `quantity`, `addedAt`, `sampleId`). Body: `quantity` (required, ≥ 1). **404** `CartItemNotFoundException` if the line is not yours. **404** `SampleNotFoundException` if the linked sample was **soft-deleted / inactive** after it was added (same rule as add: you cannot change quantity for inactive samples)."
 					}
 				},
 				{
@@ -699,7 +680,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "clear"]
 						},
-						"description": "**204 No Content** when the cart exists, including an **empty** cart (e.g. after **GET /cart** created a row with no lines, or after removing all items). **404** `CartNotFoundException` only if the buyer has **no cart row** yet (e.g. first cart call is **DELETE /clear** without a prior **GET /cart** or add)."
+						"description": "**204 No Content** when the cart exists (including an **empty** cart, e.g. after removing all lines). **404** `CartNotFoundException` if the buyer has **no cart row yet** (first add never happened). **GET /cart** does **not** create the row, so calling **DELETE /clear** before any **POST /cart/items** will legitimately return 404."
 					}
 				}
 			]
