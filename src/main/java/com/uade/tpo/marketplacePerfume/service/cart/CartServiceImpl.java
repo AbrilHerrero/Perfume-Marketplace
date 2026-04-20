@@ -94,7 +94,11 @@ public class CartServiceImpl implements ICartService {
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
         cartItemRepository.delete(item);
-        touchCart(cart);
+        if (cartItemRepository.existsByCart_Id(cart.getId())) {
+            touchCart(cart);
+        } else {
+            cartRepository.delete(cart);
+        }
     }
 
     @Override

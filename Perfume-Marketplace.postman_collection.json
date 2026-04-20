@@ -668,7 +668,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "items", "{{cart_item_id}}"]
 						},
-						"description": "**204 No Content**. Deletes the line from your cart."
+						"description": "**204 No Content**. Deletes the line from your cart. If it was the **last** line, the cart row is also deleted (keeps the invariant `cart exists ⇔ has items`). The next **GET /cart** will return the synthetic empty response; the next **POST /cart/items** lazily creates a fresh cart."
 					}
 				},
 				{
