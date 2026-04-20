@@ -58,7 +58,7 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public CartItemResponse getCartItem(User user, Long cartItemId) {
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
