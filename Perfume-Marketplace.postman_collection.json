@@ -587,7 +587,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart"]
 						},
-						"description": "**200** + `CartResponse` (`id`, `items`, `totalPrice`, `createdAt`, `updatedAt`). Cart is created on first add if missing."
+						"description": "**200** + `CartResponse` (`id`, `items`, `totalPrice`, `createdAt`, `updatedAt`). If the buyer has no cart yet, one is **created** on this request (same as first **POST** add) — empty cart is persisted."
 					}
 				},
 				{
@@ -675,7 +675,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "items", "{{cart_item_id}}"]
 						},
-						"description": "**204 No Content**. Body: `quantity` (required, ≥ 1). **404** if the line is not yours."
+						"description": "**204 No Content**. Body: `quantity` (required, ≥ 1). **404** `CartItemNotFoundException` if the line is not yours. **404** `SampleNotFoundException` if the linked sample was **soft-deleted / inactive** after it was added (same rule as add: you cannot change quantity for inactive samples)."
 					}
 				},
 				{
@@ -699,7 +699,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["cart", "clear"]
 						},
-						"description": "**204 No Content**. Removes all items. Requires an existing cart (**404** `CartNotFoundException` if you never added anything)."
+						"description": "**204 No Content** when the cart exists, including an **empty** cart (e.g. after **GET /cart** created a row with no lines, or after removing all items). **404** `CartNotFoundException` only if the buyer has **no cart row** yet (e.g. first cart call is **DELETE /clear** without a prior **GET /cart** or add)."
 					}
 				}
 			]

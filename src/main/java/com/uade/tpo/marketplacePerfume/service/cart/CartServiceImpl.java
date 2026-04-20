@@ -88,7 +88,9 @@ public class CartServiceImpl implements ICartService {
         int q = requireOrderedQuantity(quantity);
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
-        validateStock(item.getSample(), q);
+        Sample sample = item.getSample();
+        requireActiveSample(sample);
+        validateStock(sample, q);
         item.setQuantity(q);
         cartItemRepository.save(item);
         touchCart(cart);
@@ -147,9 +149,7 @@ public class CartServiceImpl implements ICartService {
     private CartItem addOrMergeItem(Cart cart, Long sampleId, int quantity) {
         Sample sample = sampleRepository.findById(sampleId)
                 .orElseThrow(SampleNotFoundException::new);
-        if (!sample.isActive()) {
-            throw new SampleNotFoundException();
-        }
+        requireActiveSample(sample);
 
         return cartItemRepository.findByCart_IdAndSample_Id(cart.getId(), sampleId)
                 .map(existing -> {
@@ -168,6 +168,12 @@ public class CartServiceImpl implements ICartService {
                             .build();
                     return cartItemRepository.save(newItem);
                 });
+    }
+
+    private void requireActiveSample(Sample sample) {
+        if (sample == null || !sample.isActive()) {
+            throw new SampleNotFoundException();
+        }
     }
 
     private int requireOrderedQuantity(Integer quantity) {
