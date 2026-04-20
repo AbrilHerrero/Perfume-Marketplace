@@ -68,15 +68,18 @@ public class CartServiceImpl implements ICartService {
     @Override
     @Transactional
     public CartItemResponse addCartItem(User user, CartItemAdd cartItemAdd) {
-        Cart cart = getOrCreateCart(user);
-        CartItem saved = addOrMergeItem(cart, cartItemAdd.getSampleId(), requireOrderedQuantity(cartItemAdd.getQuantity()));
-        touchCart(cart);
+        LocalDateTime now = LocalDateTime.now();
+        Cart cart = getOrCreateCart(user, now);
+        CartItem saved = addOrMergeItem(cart, cartItemAdd.getSampleId(),
+                requireOrderedQuantity(cartItemAdd.getQuantity()), now);
+        touchCart(cart, now);
         return CartItemMapper.toResponse(saved);
     }
 
     @Override
     @Transactional
     public CartItemResponse updateCartItemQuantity(User user, Long cartItemId, Integer quantity) {
+        LocalDateTime now = LocalDateTime.now();
         int q = requireOrderedQuantity(quantity);
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
@@ -84,20 +87,21 @@ public class CartServiceImpl implements ICartService {
         requireActiveSample(sample);
         validateStock(sample, q);
         item.setQuantity(q);
-        touchCart(cart);
+        touchCart(cart, now);
         return CartItemMapper.toResponse(item);
     }
 
     @Override
     @Transactional
     public void removeCartItem(User user, Long cartItemId) {
+        LocalDateTime now = LocalDateTime.now();
         Cart cart = findCart(user, CartItemNotFoundException::new);
         CartItem item = findOwnedCartItem(cart, cartItemId);
         cartItemRepository.delete(item);
         if (cartItemRepository.existsByCart_Id(cart.getId())) {
-            touchCart(cart);
+            touchCart(cart, now);
         } else {
-            cartRepository.delete(cart);
+            deleteCart(cart);
         }
     }
 
@@ -106,13 +110,13 @@ public class CartServiceImpl implements ICartService {
     public void clearCart(User user) {
         cartRepository.findByBuyer_Id(user.getId()).ifPresent(cart -> {
             cartItemRepository.deleteAllByCart_Id(cart.getId());
-            cartRepository.delete(cart);
+            deleteCart(cart);
         });
     }
 
-    private Cart getOrCreateCart(User user) {
+    private Cart getOrCreateCart(User user, LocalDateTime now) {
         return cartRepository.findByBuyer_Id(user.getId())
-                .orElseGet(() -> createCartFor(user.getId()));
+                .orElseGet(() -> createCartFor(user.getId(), now));
     }
 
     private Cart findCart(User user, Supplier<? extends RuntimeException> notFoundSupplier) {
@@ -120,8 +124,7 @@ public class CartServiceImpl implements ICartService {
                 .orElseThrow(notFoundSupplier);
     }
 
-    private Cart createCartFor(Long buyerId) {
-        LocalDateTime now = LocalDateTime.now();
+    private Cart createCartFor(Long buyerId, LocalDateTime now) {
         Cart cart = Cart.builder()
                 .buyer(userRepository.getReferenceById(buyerId))
                 .createdAt(now)
@@ -135,7 +138,7 @@ public class CartServiceImpl implements ICartService {
                 .orElseThrow(CartItemNotFoundException::new);
     }
 
-    private CartItem addOrMergeItem(Cart cart, Long sampleId, int quantity) {
+    private CartItem addOrMergeItem(Cart cart, Long sampleId, int quantity, LocalDateTime now) {
         Sample sample = sampleRepository.findById(sampleId)
                 .orElseThrow(SampleNotFoundException::new);
         requireActiveSample(sample);
@@ -153,7 +156,7 @@ public class CartServiceImpl implements ICartService {
                             .cart(cart)
                             .sample(sample)
                             .quantity(quantity)
-                            .addedAt(LocalDateTime.now())
+                            .addedAt(now)
                             .build();
                     return cartItemRepository.save(newItem);
                 });
@@ -181,7 +184,15 @@ public class CartServiceImpl implements ICartService {
         }
     }
 
-    private void touchCart(Cart cart) {
-        cart.setUpdatedAt(LocalDateTime.now());
+    private void touchCart(Cart cart, LocalDateTime now) {
+        cart.setUpdatedAt(now);
+    }
+
+    private void deleteCart(Cart cart) {
+        User buyer = cart.getBuyer();
+        if (buyer != null) {
+            buyer.setCart(null);
+        }
+        cartRepository.delete(cart);
     }
 }
