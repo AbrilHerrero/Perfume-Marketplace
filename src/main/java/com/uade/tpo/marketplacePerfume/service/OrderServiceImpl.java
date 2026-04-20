@@ -86,16 +86,15 @@ public class OrderServiceImpl implements IOrderService {
             Sample sample = sampleRepository.findById(itemDto.getSampleId())
                     .orElseThrow(SampleNotFoundException::new);
 
-            if (sample.getStock() < itemDto.getQuantity()) {
+            int updated = sampleRepository.decrementStock(sample.getId(), itemDto.getQuantity());
+            if (updated == 0) {
                 throw new InsufficientStockException();
             }
-
-            sample.setStock(sample.getStock() - itemDto.getQuantity());
-            sampleRepository.save(sample);
 
             OrderItem orderItem = OrderItem.builder()
                     .order(savedOrder)
                     .sample(sample)
+                    .unitPrice(sample.getPrice())
                     .quantity(itemDto.getQuantity())
                     .build();
             persistedItems.add(orderItemRepository.save(orderItem));
@@ -134,10 +133,8 @@ public class OrderServiceImpl implements IOrderService {
 
         if (order.getOrderItems() != null) {
             for (OrderItem item : order.getOrderItems()) {
-                Sample sample = item.getSample();
-                if (sample != null) {
-                    sample.setStock(sample.getStock() + item.getQuantity());
-                    sampleRepository.save(sample);
+                if (item.getSample() != null) {
+                    sampleRepository.incrementStock(item.getSample().getId(), item.getQuantity());
                 }
             }
         }

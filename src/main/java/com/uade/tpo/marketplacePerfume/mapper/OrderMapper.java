@@ -52,15 +52,16 @@ public final class OrderMapper {
         OrderItemResponseDTO dto = new OrderItemResponseDTO();
         dto.setId(entity.getId());
         dto.setQuantity(entity.getQuantity());
+        dto.setUnitPrice(entity.getUnitPrice());
+
+        if (entity.getUnitPrice() != null) {
+            dto.setSubtotal(entity.getUnitPrice().multiply(BigDecimal.valueOf(entity.getQuantity())));
+        }
 
         Sample sample = entity.getSample();
         if (sample != null) {
             dto.setSampleId(sample.getId());
             dto.setSampleDescription(sample.getDescription());
-            dto.setUnitPrice(sample.getPrice());
-            if (sample.getPrice() != null) {
-                dto.setSubtotal(sample.getPrice().multiply(BigDecimal.valueOf(entity.getQuantity())));
-            }
         }
         return dto;
     }

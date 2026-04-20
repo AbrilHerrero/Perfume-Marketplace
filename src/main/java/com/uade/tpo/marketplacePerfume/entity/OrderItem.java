@@ -1,5 +1,8 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
+import java.math.BigDecimal;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,4 +33,7 @@ public class OrderItem {
     private Sample sample;
 
     private int quantity;
+
+    @Column(name = "unit_price")
+    private BigDecimal unitPrice;
 }
