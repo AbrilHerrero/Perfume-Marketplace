@@ -13,4 +13,5 @@ public interface IReviewService {
     ReviewResponseDTO createReview(ReviewRequestDTO dto, User buyer);
     ReviewResponseDTO updateReview(Long id, ReviewRequestDTO dto, User buyer);
     void deleteReview(Long id, User buyer);
+    List<ReviewResponseDTO> getReviewsBySellerId(Long sellerId);
 }

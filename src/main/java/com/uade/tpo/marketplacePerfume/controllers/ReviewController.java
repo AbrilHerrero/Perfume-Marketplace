@@ -69,4 +69,11 @@ public class ReviewController {
         reviewService.deleteReview(id, buyer);
         return ResponseEntity.ok("Review eliminada correctamente");
     }
+
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<ReviewResponseDTO>> getBySellerId(@PathVariable Long sellerId) {
+        List<ReviewResponseDTO> reviews = reviewService.getReviewsBySellerId(sellerId);
+        if (reviews.isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(reviews);
+    }
 }

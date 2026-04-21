@@ -104,4 +104,10 @@ public class ReviewServiceImpl implements IReviewService {
             throw new ReviewInvalidRatingException();
         }
     }
+
+    @Override
+    public List<ReviewResponseDTO> getReviewsBySellerId(Long sellerId) {
+        return ReviewMapper.toResponseDtoList(reviewRepository.findBySample_Seller_Id(sellerId));
+    }
+
 }
