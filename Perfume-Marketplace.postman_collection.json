@@ -49,6 +49,10 @@
 		{
 			"key": "order_id",
 			"value": "1"
+		},
+		{
+			"key": "shipment_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -929,6 +933,116 @@
 							"path": ["address", "deleteAddress", "{{address_id}}"]
 						},
 						"description": "`DELETE /address/deleteAddress/{addressId}`. **Soft delete** only (`active` → false); row remains for FK integrity. **200** + `Address successfully deleted`. **404** if id missing or not owned by you. **409 Conflict** (`AddressAlreadyInactiveException`) if the address is already inactive — a second delete is **not** a no-op."
+					}
+				}
+			]
+		},
+		{
+			"name": "Shipments",
+			"description": "Base **`/shipments`** (`ShipmentController`). Bearer **`{{access_token}}`** (collection auth). **GET**: **ADMIN**, **BUYER** (order buyer), or **SELLER** (all order line samples belong to that seller). **POST** / **PATCH**: **ADMIN** or **SELLER** (same seller rule). **PATCH …/tracking** sets **`trackingNumber` once** (not updatable afterward; use **Create** with the right value if you need it from the start). **POST** create returns **201** with **`ResponseEntity.created`** and **`Location: /shipments/{id}`** (same pattern as perfume/cart/sample). `status` in JSON is a string enum: `PENDING`, `SHIPPED`, `IN_TRANSIT`, `DELIVERED`, `RETURNED`. Set **`{{order_id}}`**, **`{{address_id}}`**, and **`{{shipment_id}}`** from your DB or from **Create shipment** (test script saves `id` on 201).",
+			"item": [
+				{
+					"name": "Get shipment by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "{{shipment_id}}"]
+						},
+						"description": "`GET /shipments/{id}`. **200** + `ShipmentResponse` (`id`, `shippedAt`, `deliveredAt`, `status`, `trackingNumber`, `orderId`, `addressId`). **404** if no shipment. **403** if the token user may not view this shipment."
+					}
+				},
+				{
+					"name": "Get shipment by order id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/shipments/order/{{order_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "order", "{{order_id}}"]
+						},
+						"description": "`GET /shipments/order/{orderId}`. **200** + `ShipmentResponse` for that order. **404** if the order has no shipment yet. **403** if not allowed to view."
+					}
+				},
+				{
+					"name": "Create shipment (ADMIN/SELLER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('shipment_id', String(json.id));",
+									"    }",
+									"    pm.test('Shipment id in body', function () {",
+									"        pm.expect(json.id).to.be.a('number');",
+									"    });",
+									"    var loc = pm.response.headers.get('Location');",
+									"    pm.test('Location header is /shipments/{id}', function () {",
+									"        pm.expect(loc).to.include('/shipments/' + json.id);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": {{order_id}},\n    \"addressId\": {{address_id}},\n    \"status\": \"PENDING\",\n    \"trackingNumber\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments",
+							"host": ["{{base_url}}"],
+							"path": ["shipments"]
+						},
+						"description": "`POST /shipments` (`ShipmentController#create`). Body: `orderId`, `addressId` (required). Optional: `status` (defaults to **PENDING** if omitted), `trackingNumber`. Address must belong to the order’s buyer and be **active**. **201 Created** with **`ResponseEntity.created`** → body is `ShipmentResponse` and **`Location`** is **`/shipments/{id}`** (aligned with perfume/cart/sample). **404** order/address, **409** if the order already has a shipment, **403** if SELLER does not own all samples in the order. If **`status`** is not **PENDING**, **`trackingNumber`** must be non-blank (**400** `ShipmentTrackingRequiredException`)."
+					}
+				},
+				{
+					"name": "Update shipment status (ADMIN/SELLER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"SHIPPED\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "{{shipment_id}}", "status"]
+						},
+						"description": "`PATCH /shipments/{id}/status`. Body: `{ \"status\": \"PENDING\" | \"SHIPPED\" | \"IN_TRANSIT\" | \"DELIVERED\" | \"RETURNED\" }`. **200** + updated `ShipmentResponse`. If the shipment is still **PENDING**, you must set a non-blank **trackingNumber** first (**Set shipment tracking (once)** or on create) before moving to any other status — else **400** `ShipmentTrackingRequiredException`. **404** / **403** as in service rules."
+					}
+				},
+				{
+					"name": "Set shipment tracking (once) (ADMIN/SELLER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"trackingNumber\": \"AR123456789AR\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}/tracking",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "{{shipment_id}}", "tracking"]
+						},
+						"description": "`PATCH /shipments/{id}/tracking` (`ShipmentController#setTrackingNumber`). Body: `{ \"trackingNumber\": \"...\" }` (non-blank). Sets the tracking **only if it is still unset** (null/blank); once stored it **cannot be changed** — second call returns **409** `ShipmentTrackingImmutableException`. **200** + `ShipmentResponse`. Use after **Create shipment** when `trackingNumber` was null."
 					}
 				}
 			]

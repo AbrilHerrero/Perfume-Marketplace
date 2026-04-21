@@ -33,7 +33,8 @@ public class Shipment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ShipmentStatus status;
+    @Builder.Default
+    private ShipmentStatus status = ShipmentStatus.PENDING;
 
     private String trackingNumber;
 
