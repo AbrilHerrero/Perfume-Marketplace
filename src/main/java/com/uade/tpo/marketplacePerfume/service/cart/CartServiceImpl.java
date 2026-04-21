@@ -3,7 +3,9 @@ package com.uade.tpo.marketplacePerfume.service.cart;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,13 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderCreateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderItemCreateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemInsufficientStockException;
 import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemInvalidQuantityException;
 import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.cartItem.EmptyCartException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.CartItemMapper;
 import com.uade.tpo.marketplacePerfume.mapper.CartMapper;
@@ -26,6 +32,7 @@ import com.uade.tpo.marketplacePerfume.repository.CartItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.CartRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
+import com.uade.tpo.marketplacePerfume.service.order.IOrderService;
 
 @Service
 public class CartServiceImpl implements ICartService {
@@ -41,6 +48,9 @@ public class CartServiceImpl implements ICartService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private IOrderService orderService;
 
     @Override
     @Transactional(readOnly = true)
@@ -112,6 +122,56 @@ public class CartServiceImpl implements ICartService {
             cartItemRepository.deleteAllByCart_Id(cart.getId());
             deleteCart(cart);
         });
+    }
+
+    /**
+     * Converts the buyer's cart into an Order.
+     *
+     * Steps:
+     *   1. Load cart and validate it has items.
+     *   2. Map CartItems to OrderItemCreateDTOs.
+     *   3. Create the order (validates stock, decrements atomically, snapshots prices).
+     *   4. Clear the cart.
+     *
+     * Future steps (when Payment and Shipment CRUDs are ready):
+     *   5. TODO: Create a Payment (PENDING) linked to the order via PaymentService.
+     *      - POST /payment with orderId will initiate payment processing.
+     *      - On confirmation, update Payment status to COMPLETED and Order status to PAID.
+     *   6. TODO: Create a Shipment (PENDING) linked to the order + buyer's address via ShipmentService.
+     *      - POST /shipment with orderId will initiate the shipment.
+     *      - Update Shipment status through SHIPPED -> IN_TRANSIT -> DELIVERED.
+     *      - When Shipment reaches DELIVERED, update Order status to DELIVERED.
+     */
+    @Override
+    @Transactional
+    public OrderResponseDTO checkout(User user) {
+        Cart cart = cartRepository.findByBuyer_Id(user.getId())
+                .orElseThrow(EmptyCartException::new);
+
+        if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            throw new EmptyCartException();
+        }
+
+        List<OrderItemCreateDTO> items = cart.getCartItems().stream()
+                .map(cartItem -> {
+                    OrderItemCreateDTO itemDto = new OrderItemCreateDTO();
+                    itemDto.setSampleId(cartItem.getSample().getId());
+                    itemDto.setQuantity(cartItem.getQuantity());
+                    return itemDto;
+                })
+                .collect(Collectors.toList());
+
+        OrderCreateDTO orderDto = new OrderCreateDTO();
+        orderDto.setItems(items);
+
+        OrderResponseDTO order = orderService.createOrder(orderDto, user);
+
+        clearCart(user);
+
+        // TODO Step 5: paymentService.createPayment(order.getId(), user);
+        // TODO Step 6: shipmentService.createShipment(order.getId(), user);
+
+        return order;
     }
 
     private Cart getOrCreateCart(User user, LocalDateTime now) {

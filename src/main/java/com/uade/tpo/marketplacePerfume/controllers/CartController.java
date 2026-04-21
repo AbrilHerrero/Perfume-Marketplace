@@ -19,6 +19,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemUpdate;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.service.cart.ICartService;
 
 import jakarta.validation.Valid;
@@ -66,5 +67,11 @@ public class CartController {
     public ResponseEntity<Void> clearCart(@AuthenticationPrincipal User user) {
         cartService.clearCart(user);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderResponseDTO> checkout(@AuthenticationPrincipal User user) {
+        OrderResponseDTO order = cartService.checkout(user);
+        return ResponseEntity.created(URI.create("/order/" + order.getId())).body(order);
     }
 }

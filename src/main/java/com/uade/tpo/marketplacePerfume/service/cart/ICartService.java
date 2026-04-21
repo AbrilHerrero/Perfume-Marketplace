@@ -4,6 +4,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 
 public interface ICartService {
     CartResponse getCart(User user);
@@ -12,4 +13,5 @@ public interface ICartService {
     CartItemResponse updateCartItemQuantity(User user, Long cartItemId, Integer quantity);
     void removeCartItem(User user, Long cartItemId);
     void clearCart(User user);
+    OrderResponseDTO checkout(User user);
 }
