@@ -17,7 +17,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.shipment.ShipmentResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentStatusRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentTrackingRequest;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.OrderNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.order.OrderNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentAlreadyExistsException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentForbiddenException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentNotFoundException;

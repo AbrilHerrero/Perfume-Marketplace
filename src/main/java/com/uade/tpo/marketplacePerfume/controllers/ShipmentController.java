@@ -23,7 +23,7 @@ import com.uade.tpo.marketplacePerfume.service.shipment.IShipmentService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/shipments")
+@RequestMapping("shipments")
 public class ShipmentController {
 
     @Autowired
@@ -48,7 +48,7 @@ public class ShipmentController {
             @Valid @RequestBody CreateShipmentRequest request,
             @AuthenticationPrincipal User currentUser) {
         ShipmentResponse created = shipmentService.create(request, currentUser);
-        return ResponseEntity.created(URI.create("/api/shipments/" + created.getId())).body(created);
+        return ResponseEntity.created(URI.create("/shipments/" + created.getId())).body(created);
     }
 
     @PatchMapping("/{id}/status")
