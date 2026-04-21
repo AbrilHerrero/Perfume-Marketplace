@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderStatusUpdateDTO;
-import com.uade.tpo.marketplacePerfume.service.IOrderService;
+import com.uade.tpo.marketplacePerfume.service.order.IOrderService;
 
 import jakarta.validation.Valid;
 

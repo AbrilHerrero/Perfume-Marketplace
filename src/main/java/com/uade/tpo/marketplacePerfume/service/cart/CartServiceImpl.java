@@ -32,7 +32,7 @@ import com.uade.tpo.marketplacePerfume.repository.CartItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.CartRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
-import com.uade.tpo.marketplacePerfume.service.IOrderService;
+import com.uade.tpo.marketplacePerfume.service.order.IOrderService;
 
 @Service
 public class CartServiceImpl implements ICartService {

@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplacePerfume.service;
+package com.uade.tpo.marketplacePerfume.service.order;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,11 +19,11 @@ import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderItemCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderStatusUpdateDTO;
-import com.uade.tpo.marketplacePerfume.exceptions.InsufficientStockException;
-import com.uade.tpo.marketplacePerfume.exceptions.InvalidOrderStatusException;
-import com.uade.tpo.marketplacePerfume.exceptions.OrderAccessDeniedException;
-import com.uade.tpo.marketplacePerfume.exceptions.OrderNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.SampleNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.order.InsufficientStockException;
+import com.uade.tpo.marketplacePerfume.exceptions.order.InvalidOrderStatusException;
+import com.uade.tpo.marketplacePerfume.exceptions.order.OrderAccessDeniedException;
+import com.uade.tpo.marketplacePerfume.exceptions.order.OrderNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.OrderMapper;
 import com.uade.tpo.marketplacePerfume.repository.OrderItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderRepository;
