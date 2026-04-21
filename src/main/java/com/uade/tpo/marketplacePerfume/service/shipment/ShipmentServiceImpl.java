@@ -1,5 +1,7 @@
 package com.uade.tpo.marketplacePerfume.service.shipment;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +17,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.shipment.ShipmentResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentStatusRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentTrackingRequest;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressNotFoundException;
-import com.uade.tpo.marketplacePerfume.exceptions.order.OrderNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.OrderNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentAlreadyExistsException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentForbiddenException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentNotFoundException;
@@ -66,6 +68,7 @@ public class ShipmentServiceImpl implements IShipmentService {
                 .orElseThrow(AddressNotFoundException::new);
         ShipmentStatus status = normalizeStatusOrDefault(request.getStatus());
         Shipment entity = ShipmentMapper.toNewEntity(order, address, status, request.getTrackingNumber());
+        stampLifecycleTimestamps(entity, status);
         Shipment saved = shipmentRepository.save(entity);
         return ShipmentMapper.toResponse(shipmentRepository.findFetchedById(saved.getId())
                 .orElse(saved));
@@ -77,7 +80,9 @@ public class ShipmentServiceImpl implements IShipmentService {
         Shipment shipment = shipmentRepository.findFetchedById(id)
                 .orElseThrow(ShipmentNotFoundException::new);
         assertCanMutateShipment(currentUser, shipment.getOrder());
-        shipment.setStatus(request.getStatus());
+        ShipmentStatus newStatus = request.getStatus();
+        shipment.setStatus(newStatus);
+        stampLifecycleTimestamps(shipment, newStatus);
         shipmentRepository.save(shipment);
         return ShipmentMapper.toResponse(shipment);
     }
@@ -129,5 +134,28 @@ public class ShipmentServiceImpl implements IShipmentService {
 
     private ShipmentStatus normalizeStatusOrDefault(ShipmentStatus status) {
         return status != null ? status : ShipmentStatus.PENDING;
+    }
+
+    /** Sets shippedAt/deliveredAt when null according to status (see switch cases). */
+    private static void stampLifecycleTimestamps(Shipment shipment, ShipmentStatus statusAfterChange) {
+        LocalDateTime now = LocalDateTime.now();
+        switch (statusAfterChange) {
+            case SHIPPED, IN_TRANSIT -> {
+                if (shipment.getShippedAt() == null) {
+                    shipment.setShippedAt(now);
+                }
+            }
+            case DELIVERED -> {
+                if (shipment.getShippedAt() == null) {
+                    shipment.setShippedAt(now);
+                }
+                if (shipment.getDeliveredAt() == null) {
+                    shipment.setDeliveredAt(now);
+                }
+            }
+            case PENDING, RETURNED -> {
+                // keep existing instants (e.g. RETURNED after DELIVERED still shows deliveredAt)
+            }
+        }
     }
 }
