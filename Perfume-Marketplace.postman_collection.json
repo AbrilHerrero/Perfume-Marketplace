@@ -686,6 +686,18 @@
 						},
 						"description": "**204 No Content** - idempotent. Deletes all `CartItem` rows **and the `Cart` row itself**, so the post-state is identical to a buyer that never added anything (next **GET /cart** returns the synthetic empty response, next **POST /cart/items** lazily creates a fresh cart). If the buyer has no cart yet, this call is a no-op and still returns **204**."
 					}
+				},
+				{
+					"name": "Checkout",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/cart/checkout",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "checkout"]
+						},
+						"description": "**201 Created** + `OrderResponseDTO` with `Location: /order/{id}`. Converts the buyer's cart into an order: validates stock, decrements atomically, snapshots unit prices, persists order + items with status `PENDING`, then clears the cart. **400** `EmptyCartException` if the cart doesn't exist or has no items. **400** `InsufficientStockException` if any sample doesn't have enough stock. No body required."
+					}
 				}
 			]
 		},
