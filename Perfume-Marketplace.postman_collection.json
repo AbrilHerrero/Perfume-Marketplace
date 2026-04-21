@@ -54,6 +54,7 @@
 	"item": [
 		{
 			"name": "Auth",
+			"description": "Registration creates users and stores a JWT in `access_token`. For existing users, run **Authenticate (BUYER)**, **Authenticate (SELLER)**, or **Authenticate (ADMIN)** (same emails/passwords as the Register examples).",
 			"item": [
 				{
 					"name": "Register (BUYER)",
@@ -164,7 +165,7 @@
 					}
 				},
 				{
-					"name": "Authenticate (Login)",
+					"name": "Authenticate (BUYER)",
 					"event": [
 						{
 							"listen": "test",
@@ -196,14 +197,89 @@
 							"raw": "{{base_url}}/auth/authenticate",
 							"host": ["{{base_url}}"],
 							"path": ["auth", "authenticate"]
+						},
+						"description": "POST `/auth/authenticate` as the buyer from **Register (BUYER)** (`buyer@test.com`). Saves JWT to collection variable `access_token` for Bearer auth."
+					}
+				},
+				{
+					"name": "Authenticate (SELLER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.test('Token saved', function () {",
+									"        pm.expect(json.access_token).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
 						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"seller@test.com\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/authenticate",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "authenticate"]
+						},
+						"description": "POST `/auth/authenticate` as the seller from **Register (SELLER)** (`seller@test.com`). Saves JWT to `access_token`."
+					}
+				},
+				{
+					"name": "Authenticate (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.test('Token saved', function () {",
+									"        pm.expect(json.access_token).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/authenticate",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "authenticate"]
+						},
+						"description": "POST `/auth/authenticate` as the admin from **Register (ADMIN)** (`admin@test.com`). Saves JWT to `access_token`."
 					}
 				}
 			]
 		},
 		{
 			"name": "Admin",
-			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or login as admin so `access_token` is set. Most calls need no body. Change `admin_user_id` for get/delete/reactivate by id. Filtered user lists: active, inactive, active buyers, active sellers.",
+			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or **Auth → Authenticate (ADMIN)** so `access_token` is set. Most calls need no body. Change `admin_user_id` for get/delete/reactivate by id. Filtered user lists: active, inactive, active buyers, active sellers.",
 			"item": [
 				{
 					"name": "Hi",
@@ -714,7 +790,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["order", "all"]
 						},
-						"description": "Returns every order in the system. Requires ROLE_ADMIN. Log in as admin first via **Auth -> Register (ADMIN)** or **Authenticate (Login)** so `access_token` belongs to an admin."
+						"description": "Returns every order in the system. Requires ROLE_ADMIN. Log in as admin first via **Auth → Register (ADMIN)** or **Auth → Authenticate (ADMIN)** so `access_token` belongs to an admin."
 					}
 				},
 				{
