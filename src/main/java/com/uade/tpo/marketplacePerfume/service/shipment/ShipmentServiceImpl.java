@@ -21,6 +21,8 @@ import com.uade.tpo.marketplacePerfume.exceptions.OrderNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentAlreadyExistsException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentForbiddenException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentTrackingImmutableException;
+import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentTrackingRequiredException;
 import com.uade.tpo.marketplacePerfume.mapper.ShipmentMapper;
 import com.uade.tpo.marketplacePerfume.repository.AddressRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderRepository;
@@ -67,7 +69,11 @@ public class ShipmentServiceImpl implements IShipmentService {
                 order.getBuyer().getId())
                 .orElseThrow(AddressNotFoundException::new);
         ShipmentStatus status = normalizeStatusOrDefault(request.getStatus());
-        Shipment entity = ShipmentMapper.toNewEntity(order, address, status, request.getTrackingNumber());
+        String tracking = normalizeTracking(request.getTrackingNumber());
+        if (status != ShipmentStatus.PENDING && tracking == null) {
+            throw new ShipmentTrackingRequiredException();
+        }
+        Shipment entity = ShipmentMapper.toNewEntity(order, address, status, tracking);
         stampLifecycleTimestamps(entity, status);
         Shipment saved = shipmentRepository.save(entity);
         return ShipmentMapper.toResponse(shipmentRepository.findFetchedById(saved.getId())
@@ -80,7 +86,12 @@ public class ShipmentServiceImpl implements IShipmentService {
         Shipment shipment = shipmentRepository.findFetchedById(id)
                 .orElseThrow(ShipmentNotFoundException::new);
         assertCanMutateShipment(currentUser, shipment.getOrder());
+        ShipmentStatus previousStatus = shipment.getStatus();
         ShipmentStatus newStatus = request.getStatus();
+        if (previousStatus == ShipmentStatus.PENDING && newStatus != ShipmentStatus.PENDING
+                && !hasNonBlankTracking(shipment.getTrackingNumber())) {
+            throw new ShipmentTrackingRequiredException();
+        }
         shipment.setStatus(newStatus);
         stampLifecycleTimestamps(shipment, newStatus);
         shipmentRepository.save(shipment);
@@ -89,11 +100,14 @@ public class ShipmentServiceImpl implements IShipmentService {
 
     @Override
     @Transactional
-    public ShipmentResponse updateTracking(Long id, UpdateShipmentTrackingRequest request, User currentUser) {
+    public ShipmentResponse setTrackingNumber(Long id, UpdateShipmentTrackingRequest request, User currentUser) {
         Shipment shipment = shipmentRepository.findFetchedById(id)
                 .orElseThrow(ShipmentNotFoundException::new);
         assertCanMutateShipment(currentUser, shipment.getOrder());
-        shipment.setTrackingNumber(request.getTrackingNumber().trim());
+        if (hasNonBlankTracking(shipment.getTrackingNumber())) {
+            throw new ShipmentTrackingImmutableException();
+        }
+        shipment.setTrackingNumber(normalizeTracking(request.getTrackingNumber()));
         shipmentRepository.save(shipment);
         return ShipmentMapper.toResponse(shipment);
     }
@@ -134,6 +148,18 @@ public class ShipmentServiceImpl implements IShipmentService {
 
     private ShipmentStatus normalizeStatusOrDefault(ShipmentStatus status) {
         return status != null ? status : ShipmentStatus.PENDING;
+    }
+
+    private static boolean hasNonBlankTracking(String trackingNumber) {
+        return normalizeTracking(trackingNumber) != null;
+    }
+
+    private static String normalizeTracking(String trackingNumber) {
+        if (trackingNumber == null) {
+            return null;
+        }
+        String trimmed = trackingNumber.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     /** Sets shippedAt/deliveredAt when null according to status (see switch cases). */

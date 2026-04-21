@@ -16,5 +16,5 @@ public interface IShipmentService {
 
     ShipmentResponse updateStatus(Long id, UpdateShipmentStatusRequest request, User currentUser);
 
-    ShipmentResponse updateTracking(Long id, UpdateShipmentTrackingRequest request, User currentUser);
+    ShipmentResponse setTrackingNumber(Long id, UpdateShipmentTrackingRequest request, User currentUser);
 }

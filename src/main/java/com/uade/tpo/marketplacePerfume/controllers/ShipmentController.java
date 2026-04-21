@@ -3,7 +3,6 @@ package com.uade.tpo.marketplacePerfume.controllers;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,9 +48,7 @@ public class ShipmentController {
             @Valid @RequestBody CreateShipmentRequest request,
             @AuthenticationPrincipal User currentUser) {
         ShipmentResponse created = shipmentService.create(request, currentUser);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .location(URI.create("/api/shipments/" + created.getId()))
-                .body(created);
+        return ResponseEntity.created(URI.create("/api/shipments/" + created.getId())).body(created);
     }
 
     @PatchMapping("/{id}/status")
@@ -63,10 +60,10 @@ public class ShipmentController {
     }
 
     @PatchMapping("/{id}/tracking")
-    public ResponseEntity<ShipmentResponse> updateTracking(
+    public ResponseEntity<ShipmentResponse> setTrackingNumber(
             @PathVariable Long id,
             @Valid @RequestBody UpdateShipmentTrackingRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(shipmentService.updateTracking(id, request, currentUser));
+        return ResponseEntity.ok(shipmentService.setTrackingNumber(id, request, currentUser));
     }
 }
