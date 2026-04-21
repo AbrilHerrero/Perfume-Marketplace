@@ -814,7 +814,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["order", "{{order_id}}"]
 						},
-						"description": "Returns a single order. The service enforces ownership: a buyer can only read their own orders, while admins can read any. A non-owner buyer gets 403 `OrderAccessDeniedException`; a missing id gets 400 `OrderNotFoundException`. Edit `order_id` in collection variables."
+						"description": "Returns a single order. The service enforces ownership: a buyer can only read their own orders, while admins can read any. A non-owner buyer gets 403 `OrderAccessDeniedException`; a missing id gets 404 `OrderNotFoundException`. Edit `order_id` in collection variables."
 					}
 				},
 				{
@@ -845,7 +845,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["order", "{{order_id}}", "cancel"]
 						},
-						"description": "Cancels a PENDING order and restores each item's `Sample.stock`. No body. Buyer can only cancel their own order; admin can cancel any. Rules: order must exist (else 400 `OrderNotFoundException`), caller must own it or be admin (else 403 `OrderAccessDeniedException`), current status must be `PENDING` (else 400 `InvalidOrderStatusException`)."
+						"description": "Cancels a PENDING order and restores each item's `Sample.stock`. No body. Buyer can only cancel their own order; admin can cancel any. Rules: order must exist (else 404 `OrderNotFoundException`), caller must own it or be admin (else 403 `OrderAccessDeniedException`), current status must be `PENDING` (else 400 `InvalidOrderStatusException`)."
 					}
 				}
 			]
