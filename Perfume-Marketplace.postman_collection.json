@@ -53,6 +53,14 @@
 		{
 			"key": "shipment_id",
 			"value": "1"
+		},
+		{
+			"key": "review_id",
+			"value": "1"
+		},
+		{
+			"key": "buyer_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -850,6 +858,252 @@
 							"path": ["order", "{{order_id}}", "cancel"]
 						},
 						"description": "Cancels a PENDING order and restores each item's `Sample.stock`. No body. Buyer can only cancel their own order; admin can cancel any. Rules: order must exist (else 404 `OrderNotFoundException`), caller must own it or be admin (else 403 `OrderAccessDeniedException`), current status must be `PENDING` (else 400 `InvalidOrderStatusException`)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Review",
+			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
+			"item": [
+				{
+					"name": "Get reviews by sample id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/sample/{{sample_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "sample", "{{sample_id}}"]
+						},
+						"description": "`GET /review/sample/{sampleId}`. **200 OK** + `ReviewListResponseDTO` (`reviews`, `totalCount`, `averageRating`). When the sample has no reviews yet, `reviews` is `[]`, `totalCount` is `0`, and `averageRating` is `null`. **404** `SampleNotFoundException` if the sample does not exist or is inactive."
+					}
+				},
+				{
+					"name": "Get reviews by buyer id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/buyer/{{buyer_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "buyer", "{{buyer_id}}"]
+						},
+						"description": "`GET /review/buyer/{buyerId}`. **200 OK** + `ReviewListResponseDTO` with all reviews written by that buyer. Empty envelope (`reviews: []`, `totalCount: 0`, `averageRating: null`) if the buyer has no reviews."
+					}
+				},
+				{
+					"name": "Get reviews by seller id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/seller/{{seller_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "seller", "{{seller_id}}"]
+						},
+						"description": "`GET /review/seller/{sellerId}`. **200 OK** + `ReviewListResponseDTO` aggregating reviews across all samples that belong to the seller. Empty envelope if the seller has no reviewed samples."
+					}
+				},
+				{
+					"name": "Get review by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/{{review_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "{{review_id}}"]
+						},
+						"description": "`GET /review/{id}`. **200** + single `ReviewResponseDTO`. **404** if the review does not exist."
+					}
+				},
+				{
+					"name": "Create review (BUYER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('review_id', String(json.id));",
+									"    }",
+									"    pm.test('Review id saved', function () {",
+									"        pm.expect(json.id).to.be.a('number');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sampleId\": {{sample_id}},\n    \"rating\": 5,\n    \"comment\": \"Excelente fragancia, muy recomendable.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/review",
+							"host": ["{{base_url}}"],
+							"path": ["review"]
+						},
+						"description": "`POST /review`. **201 Created** + `ReviewResponseDTO`; `Location: /review/{id}`. Buyer is taken from the JWT. Body: `sampleId` (required), `rating` 1–5 (required), `comment` (optional, up to 1000 chars — a rating-only review is valid). **409** `ReviewAlreadyExistsException` if the buyer already reviewed that sample (enforced by DB unique constraint on `(buyer_id, sample_id)`). **400** for invalid rating or oversized comment. **404** if the sample does not exist."
+					}
+				},
+				{
+					"name": "Update review (BUYER)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4,\n    \"comment\": \"Actualizo mi comentario.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/review/{{review_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "{{review_id}}"]
+						},
+						"description": "`PUT /review/{id}`. **200 OK** + updated `ReviewResponseDTO`. Body: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional up to 1000 chars). **The review's sample and buyer cannot be changed** — the review is identified by the path id, so `sampleId` is not part of the update body. Only the **owner** buyer may update; otherwise the server responds with the ownership error. **400** for invalid rating or oversized comment. **404** if the review does not exist."
+					}
+				},
+				{
+					"name": "Delete review (BUYER owner)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/review/{{review_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "{{review_id}}"]
+						},
+						"description": "`DELETE /review/{id}`. **200 OK** + plain text confirmation. **Only the owner buyer** may delete their own review: `SecurityConfig` restricts this route to `ROLE_BUYER`, and the service throws the ownership error if the caller isn't the author. ADMINs cannot delete reviews. **404** if the review does not exist."
+					}
+				}
+			]
+		},
+		{
+			"name": "Review",
+			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
+			"item": [
+				{
+					"name": "Get reviews by sample id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/sample/{{sample_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "sample", "{{sample_id}}"]
+						},
+						"description": "`GET /review/sample/{sampleId}`. **200 OK** + `ReviewListResponseDTO` (`reviews`, `totalCount`, `averageRating`). When the sample has no reviews yet, `reviews` is `[]`, `totalCount` is `0`, and `averageRating` is `null`. **404** `SampleNotFoundException` if the sample does not exist or is inactive."
+					}
+				},
+				{
+					"name": "Get reviews by buyer id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/buyer/{{buyer_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "buyer", "{{buyer_id}}"]
+						},
+						"description": "`GET /review/buyer/{buyerId}`. **200 OK** + `ReviewListResponseDTO` with all reviews written by that buyer. Empty envelope (`reviews: []`, `totalCount: 0`, `averageRating: null`) if the buyer has no reviews."
+					}
+				},
+				{
+					"name": "Get reviews by seller id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/seller/{{seller_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "seller", "{{seller_id}}"]
+						},
+						"description": "`GET /review/seller/{sellerId}`. **200 OK** + `ReviewListResponseDTO` aggregating reviews across all samples that belong to the seller. Empty envelope if the seller has no reviewed samples."
+					}
+				},
+				{
+					"name": "Get review by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/review/{{review_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "{{review_id}}"]
+						},
+						"description": "`GET /review/{id}`. **200** + single `ReviewResponseDTO`. **404** if the review does not exist."
+					}
+				},
+				{
+					"name": "Create review (BUYER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('review_id', String(json.id));",
+									"    }",
+									"    pm.test('Review id saved', function () {",
+									"        pm.expect(json.id).to.be.a('number');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sampleId\": {{sample_id}},\n    \"rating\": 5,\n    \"comment\": \"Excelente fragancia, muy recomendable.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/review",
+							"host": ["{{base_url}}"],
+							"path": ["review"]
+						},
+						"description": "`POST /review`. **201 Created** + `ReviewResponseDTO`; `Location: /review/{id}`. Buyer is taken from the JWT. Body: `sampleId` (required), `rating` 1–5 (required), `comment` (optional, up to 1000 chars — a rating-only review is valid). **409** `ReviewAlreadyExistsException` if the buyer already reviewed that sample (enforced by DB unique constraint on `(buyer_id, sample_id)`). **400** for invalid rating or oversized comment. **404** if the sample does not exist."
+					}
+				},
+				{
+					"name": "Update review (BUYER)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4,\n    \"comment\": \"Actualizo mi comentario.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/review/{{review_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "{{review_id}}"]
+						},
+						"description": "`PUT /review/{id}`. **200 OK** + updated `ReviewResponseDTO`. Body: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional up to 1000 chars). **The review's sample and buyer cannot be changed** — the review is identified by the path id, so `sampleId` is not part of the update body. Only the **owner** buyer may update; otherwise the server responds with the ownership error. **400** for invalid rating or oversized comment. **404** if the review does not exist."
+					}
+				},
+				{
+					"name": "Delete review (BUYER owner)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/review/{{review_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["review", "{{review_id}}"]
+						},
+						"description": "`DELETE /review/{id}`. **200 OK** + plain text confirmation. **Only the owner buyer** may delete their own review: `SecurityConfig` restricts this route to `ROLE_BUYER`, and the service throws the ownership error if the caller isn't the author. ADMINs cannot delete reviews. **404** if the review does not exist."
 					}
 				}
 			]
