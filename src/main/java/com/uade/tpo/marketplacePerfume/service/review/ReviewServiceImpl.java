@@ -1,17 +1,20 @@
 package com.uade.tpo.marketplacePerfume.service.review;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplacePerfume.entity.Review;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewAlreadyExistsException;
+import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewCommentTooLongException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewIncompleteRequestException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewInvalidRatingException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotFoundException;
@@ -23,6 +26,8 @@ import com.uade.tpo.marketplacePerfume.service.sample.ISampleService;
 @Service
 public class ReviewServiceImpl implements IReviewService {
 
+    private static final int MAX_COMMENT_LENGTH = 1000;
+
     @Autowired
     private ReviewRepository reviewRepository;
 
@@ -30,14 +35,19 @@ public class ReviewServiceImpl implements IReviewService {
     private ISampleService sampleService;
 
     @Override
-    public List<ReviewResponseDTO> getReviewsBySampleId(Long sampleId) {
+    public ReviewListResponseDTO getReviewsBySampleId(Long sampleId) {
         sampleService.getSampleById(sampleId); // valida que el sample exista y esté activo
-        return ReviewMapper.toResponseDtoList(reviewRepository.findBySample_Id(sampleId));
+        return ReviewMapper.toListResponseDto(reviewRepository.findBySample_Id(sampleId));
     }
 
     @Override
-    public List<ReviewResponseDTO> getReviewsByBuyerId(Long buyerId) {
-        return ReviewMapper.toResponseDtoList(reviewRepository.findByBuyer_Id(buyerId));
+    public ReviewListResponseDTO getReviewsByBuyerId(Long buyerId) {
+        return ReviewMapper.toListResponseDto(reviewRepository.findByBuyer_Id(buyerId));
+    }
+
+    @Override
+    public ReviewListResponseDTO getReviewsBySellerId(Long sellerId) {
+        return ReviewMapper.toListResponseDto(reviewRepository.findBySample_Seller_Id(sellerId));
     }
 
     @Override
@@ -47,7 +57,7 @@ public class ReviewServiceImpl implements IReviewService {
 
     @Override
     public ReviewResponseDTO createReview(ReviewRequestDTO dto, User buyer) {
-        validateRequest(dto);
+        validateCreateRequest(dto);
 
         Sample sample = sampleService.getSampleById(dto.getSampleId());
 
@@ -60,12 +70,16 @@ public class ReviewServiceImpl implements IReviewService {
         review.setSample(sample);
         review.setCreatedAt(LocalDateTime.now());
 
-        return ReviewMapper.toResponseDto(reviewRepository.save(review));
+        try {
+            return ReviewMapper.toResponseDto(reviewRepository.save(review));
+        } catch (DataIntegrityViolationException e) {
+            throw new ReviewAlreadyExistsException();
+        }
     }
 
     @Override
-    public ReviewResponseDTO updateReview(Long id, ReviewRequestDTO dto, User buyer) {
-        validateRequest(dto);
+    public ReviewResponseDTO updateReview(Long id, ReviewUpdateRequestDTO dto, User buyer) {
+        validateUpdateRequest(dto);
 
         Review existing = findByIdOrThrow(id);
 
@@ -93,21 +107,35 @@ public class ReviewServiceImpl implements IReviewService {
         return reviewRepository.findById(id).orElseThrow(ReviewNotFoundException::new);
     }
 
-    private void validateRequest(ReviewRequestDTO dto) {
-        if (dto == null
-                || dto.getSampleId() == null
-                || dto.getRating() == null
-                || dto.getComment() == null || dto.getComment().isBlank()) {
+    private void validateCreateRequest(ReviewRequestDTO dto) {
+        if (dto == null || dto.getSampleId() == null) {
             throw new ReviewIncompleteRequestException();
         }
-        if (dto.getRating() < 1 || dto.getRating() > 5) {
+        validateRating(dto.getRating());
+        validateCommentLength(dto.getComment());
+    }
+
+    private void validateUpdateRequest(ReviewUpdateRequestDTO dto) {
+        if (dto == null) {
+            throw new ReviewIncompleteRequestException();
+        }
+        validateRating(dto.getRating());
+        validateCommentLength(dto.getComment());
+    }
+
+    private void validateRating(Integer rating) {
+        if (rating == null) {
+            throw new ReviewIncompleteRequestException();
+        }
+        if (rating < 1 || rating > 5) {
             throw new ReviewInvalidRatingException();
         }
     }
 
-    @Override
-    public List<ReviewResponseDTO> getReviewsBySellerId(Long sellerId) {
-        return ReviewMapper.toResponseDtoList(reviewRepository.findBySample_Seller_Id(sellerId));
+    private void validateCommentLength(String comment) {
+        if (comment != null && comment.trim().length() > MAX_COMMENT_LENGTH) {
+            throw new ReviewCommentTooLongException();
+        }
     }
 
 }

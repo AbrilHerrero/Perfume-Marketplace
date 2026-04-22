@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.uade.tpo.marketplacePerfume.entity.Review;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
 
 public final class ReviewMapper {
 
@@ -27,23 +29,43 @@ public final class ReviewMapper {
         if (dto == null) return null;
         return Review.builder()
                 .rating(dto.getRating())
-                .comment(dto.getComment())
+                .comment(normalizeComment(dto.getComment()))
                 .build();
     }
 
-    public static void applyFullUpdate(ReviewRequestDTO dto, Review existing) {
+    public static void applyFullUpdate(ReviewUpdateRequestDTO dto, Review existing) {
         if (dto == null) return;
         existing.setRating(dto.getRating());
-        existing.setComment(dto.getComment());
+        existing.setComment(normalizeComment(dto.getComment()));
     }
 
-    public static List<ReviewResponseDTO> toResponseDtoList(List<Review> entities) {
+    private static String normalizeComment(String comment) {
+        if (comment == null) return null;
+        String trimmed = comment.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    public static ReviewListResponseDTO toListResponseDto(List<Review> entities) {
         List<ReviewResponseDTO> dtos = new ArrayList<>();
+        long ratingSum = 0L;
+        int ratedCount = 0;
+
         if (entities != null) {
             for (Review entity : entities) {
                 dtos.add(toResponseDto(entity));
+                if (entity != null && entity.getRating() != null) {
+                    ratingSum += entity.getRating();
+                    ratedCount++;
+                }
             }
         }
-        return dtos;
+
+        Double averageRating = ratedCount == 0 ? null : (double) ratingSum / ratedCount;
+
+        return ReviewListResponseDTO.builder()
+                .reviews(dtos)
+                .totalCount((long) dtos.size())
+                .averageRating(averageRating)
+                .build();
     }
 }
