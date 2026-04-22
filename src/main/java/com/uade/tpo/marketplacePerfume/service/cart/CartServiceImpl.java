@@ -33,6 +33,8 @@ import com.uade.tpo.marketplacePerfume.repository.CartRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 import com.uade.tpo.marketplacePerfume.service.order.IOrderService;
+import com.uade.tpo.marketplacePerfume.service.payment.IPaymentService;
+import com.uade.tpo.marketplacePerfume.service.shipment.IShipmentService;
 
 @Service
 public class CartServiceImpl implements ICartService {
@@ -51,6 +53,12 @@ public class CartServiceImpl implements ICartService {
 
     @Autowired
     private IOrderService orderService;
+
+    @Autowired
+    private IPaymentService paymentService;
+
+    @Autowired
+    private IShipmentService shipmentService;
 
     @Override
     @Transactional(readOnly = true)
@@ -124,24 +132,6 @@ public class CartServiceImpl implements ICartService {
         });
     }
 
-    /**
-     * Converts the buyer's cart into an Order.
-     *
-     * Steps:
-     *   1. Load cart and validate it has items.
-     *   2. Map CartItems to OrderItemCreateDTOs.
-     *   3. Create the order (validates stock, decrements atomically, snapshots prices).
-     *   4. Clear the cart.
-     *
-     * Future steps (when Payment and Shipment CRUDs are ready):
-     *   5. TODO: Create a Payment (PENDING) linked to the order via PaymentService.
-     *      - POST /payment with orderId will initiate payment processing.
-     *      - On confirmation, update Payment status to COMPLETED and Order status to PAID.
-     *   6. TODO: Create a Shipment (PENDING) linked to the order + buyer's address via ShipmentService.
-     *      - POST /shipment with orderId will initiate the shipment.
-     *      - Update Shipment status through SHIPPED -> IN_TRANSIT -> DELIVERED.
-     *      - When Shipment reaches DELIVERED, update Order status to DELIVERED.
-     */
     @Override
     @Transactional
     public OrderResponseDTO checkout(User user) {
@@ -168,8 +158,8 @@ public class CartServiceImpl implements ICartService {
 
         clearCart(user);
 
-        // TODO Step 5: paymentService.createPayment(order.getId(), user);
-        // TODO Step 6: shipmentService.createShipment(order.getId(), user);
+        paymentService.create(order.getId(), user);
+        shipmentService.create(order.getId(), user);
 
         return order;
     }

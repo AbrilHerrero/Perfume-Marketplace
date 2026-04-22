@@ -20,7 +20,9 @@ import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -82,17 +84,27 @@ public class User implements UserDetails {
     }
 
     @OneToMany(mappedBy = "seller")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Sample> samples;
 
     @OneToMany(mappedBy = "buyer")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Review> reviews;
 
     @OneToOne(mappedBy = "buyer")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Cart cart;
 
     @OneToMany(mappedBy = "buyer")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Address> addresses;
 
     @OneToMany(mappedBy = "buyer")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Order> orders;
 }
