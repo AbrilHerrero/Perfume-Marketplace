@@ -61,6 +61,10 @@
 		{
 			"key": "buyer_id",
 			"value": "1"
+		},
+		{
+			"key": "payment_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -88,10 +92,15 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -99,8 +108,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "register"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
 						}
 					}
 				},
@@ -124,10 +138,15 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -135,8 +154,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "register"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
 						}
 					}
 				},
@@ -160,10 +184,15 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -171,8 +200,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "register"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
 						}
 					}
 				},
@@ -196,10 +230,15 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -207,8 +246,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/authenticate",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "authenticate"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"authenticate"
+							]
 						},
 						"description": "POST `/auth/authenticate` as the buyer from **Register (BUYER)** (`buyer@test.com`). Saves JWT to collection variable `access_token` for Bearer auth."
 					}
@@ -233,10 +277,15 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -244,8 +293,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/authenticate",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "authenticate"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"authenticate"
+							]
 						},
 						"description": "POST `/auth/authenticate` as the seller from **Register (SELLER)** (`seller@test.com`). Saves JWT to `access_token`."
 					}
@@ -270,10 +324,15 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -281,8 +340,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/authenticate",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "authenticate"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"authenticate"
+							]
 						},
 						"description": "POST `/auth/authenticate` as the admin from **Register (ADMIN)** (`admin@test.com`). Saves JWT to `access_token`."
 					}
@@ -291,7 +355,7 @@
 		},
 		{
 			"name": "Admin",
-			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth → Register (ADMIN)** or **Auth → Authenticate (ADMIN)** so `access_token` is set. Most calls need no body. Change `admin_user_id` for get/delete/reactivate by id. Filtered user lists: active, inactive, active buyers, active sellers.",
+			"description": "Requires ROLE_ADMIN. Use collection Bearer auth: run **Auth \u2192 Register (ADMIN)** or **Auth \u2192 Authenticate (ADMIN)** so `access_token` is set. Most calls need no body. Change `admin_user_id` for get/delete/reactivate by id. Filtered user lists: active, inactive, active buyers, active sellers.",
 			"item": [
 				{
 					"name": "Hi",
@@ -299,8 +363,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/hi",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "hi"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"hi"
+							]
 						},
 						"description": "Smoke test. Response: plain text, e.g. `Hi, Test Admin`."
 					}
@@ -311,8 +380,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/users",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users"
+							]
 						}
 					}
 				},
@@ -322,8 +396,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/users/active",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "active"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"active"
+							]
 						},
 						"description": "All users with `active: true` (any role)."
 					}
@@ -334,8 +414,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/users/inactive",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "inactive"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"inactive"
+							]
 						},
 						"description": "All users with `active: false`."
 					}
@@ -346,8 +432,15 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/users/buyers/active",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "buyers", "active"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"buyers",
+								"active"
+							]
 						},
 						"description": "Users with role BUYER and `active: true`."
 					}
@@ -358,8 +451,15 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/users/sellers/active",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "sellers", "active"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"sellers",
+								"active"
+							]
 						},
 						"description": "Users with role SELLER and `active: true`."
 					}
@@ -370,8 +470,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/admin/users/{{admin_user_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "{{admin_user_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"{{admin_user_id}}"
+							]
 						}
 					}
 				},
@@ -381,10 +487,16 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/admin/users/{{admin_user_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "{{admin_user_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"{{admin_user_id}}"
+							]
 						},
-						"description": "No body. Sets user `active` to false. Edit `admin_user_id` in collection variables (not the admin’s own id if you still need that session)."
+						"description": "No body. Sets user `active` to false. Edit `admin_user_id` in collection variables (not the admin\u2019s own id if you still need that session)."
 					}
 				},
 				{
@@ -403,8 +515,14 @@
 						"method": "PUT",
 						"url": {
 							"raw": "{{base_url}}/admin/users/{{admin_user_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["admin", "users", "{{admin_user_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"{{admin_user_id}}"
+							]
 						},
 						"description": "No body. Sets user `active` to true. May return error if user is already active (`UserAlreadyActivatedException`). Uses Bearer token explicitly (same as collection auth)."
 					}
@@ -420,8 +538,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/perfume/all",
-							"host": ["{{base_url}}"],
-							"path": ["perfume", "all"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"perfume",
+								"all"
+							]
 						}
 					}
 				},
@@ -430,7 +553,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -438,8 +564,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/perfume",
-							"host": ["{{base_url}}"],
-							"path": ["perfume"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"perfume"
+							]
 						}
 					}
 				},
@@ -448,7 +578,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -456,8 +589,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/perfume/1",
-							"host": ["{{base_url}}"],
-							"path": ["perfume", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"perfume",
+								"1"
+							]
 						}
 					}
 				},
@@ -467,8 +605,13 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/perfume/1",
-							"host": ["{{base_url}}"],
-							"path": ["perfume", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"perfume",
+								"1"
+							]
 						}
 					}
 				}
@@ -482,7 +625,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -490,8 +636,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/user/updatePassword",
-							"host": ["{{base_url}}"],
-							"path": ["user", "updatePassword"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"updatePassword"
+							]
 						},
 						"description": "Authenticated user only. JWT identifies the account; body is only the new password."
 					}
@@ -503,8 +654,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/user/me",
-							"host": ["{{base_url}}"],
-							"path": ["user", "me"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"me"
+							]
 						},
 						"description": "Returns the authenticated user's profile (id, name, surname, email, telephone, registerDate, active, role). Requires Bearer token (collection auth)."
 					}
@@ -514,16 +670,24 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Juan\",\n    \"surname\": \"Pérez\",\n    \"telephone\": \"1122334455\"\n}"
+							"raw": "{\n    \"name\": \"Juan\",\n    \"surname\": \"P\u00e9rez\",\n    \"telephone\": \"1122334455\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/user/updateUser",
-							"host": ["{{base_url}}"],
-							"path": ["user", "updateUser"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"updateUser"
+							]
 						},
 						"description": "All fields optional in the API (partial update); send only what you want to change."
 					}
@@ -535,8 +699,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/user/deleteUser",
-							"host": ["{{base_url}}"],
-							"path": ["user", "deleteUser"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"deleteUser"
+							]
 						},
 						"description": "No body. Requires Bearer token."
 					}
@@ -553,8 +722,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/sample/all",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "all"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"all"
+							]
 						},
 						"description": "Returns active samples only."
 					}
@@ -565,8 +739,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/sample/seller/{{seller_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "seller", "{{seller_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"seller",
+								"{{seller_id}}"
+							]
 						},
 						"description": "Active samples for the given seller. May return 204 No Content if empty."
 					}
@@ -577,8 +757,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/sample/perfume/{{perfume_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "perfume", "{{perfume_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"perfume",
+								"{{perfume_id}}"
+							]
 						},
 						"description": "Active samples for the given perfume. 204 No Content if empty. 404 if the perfume does not exist."
 					}
@@ -589,8 +775,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/sample/{{sample_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "{{sample_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"{{sample_id}}"
+							]
 						},
 						"description": "404 if not found or soft-deleted (inactive)."
 					}
@@ -600,7 +791,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -608,8 +802,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/sample",
-							"host": ["{{base_url}}"],
-							"path": ["sample"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample"
+							]
 						},
 						"description": "Returns 201 Created with Location header. Body must include all fields: price, stock, volumeMl, description, imageUrl, perfumeId (400 if incomplete). Seller is taken from the JWT (Bearer); do not send sellerId in the body."
 					}
@@ -619,7 +817,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -627,8 +828,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/sample/{{sample_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "{{sample_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"{{sample_id}}"
+							]
 						},
 						"description": "PUT replaces the sample with a full resource: send price, stock, volumeMl, description, imageUrl, and perfumeId (all required). 400 if any field is missing or blank. Requires Bearer (SELLER). You can only update samples you own (403 otherwise)."
 					}
@@ -638,7 +844,10 @@
 					"request": {
 						"method": "PATCH",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -646,20 +855,31 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/sample/{{sample_id}}/stock",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "{{sample_id}}", "stock"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"{{sample_id}}",
+								"stock"
+							]
 						},
 						"description": "Updates only the stock of a sample. Requires Bearer (SELLER) and ownership (403 otherwise). Body: { \"stock\": >= 0 }. 400 if missing or negative."
 					}
 				},
 				{
-					"name": "Delete sample — soft delete (ADMIN/SELLER)",
+					"name": "Delete sample \u2014 soft delete (ADMIN/SELLER)",
 					"request": {
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/sample/{{sample_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["sample", "{{sample_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sample",
+								"{{sample_id}}"
+							]
 						},
 						"description": "Sets sample inactive. 204 No Content on success. SELLER may only delete their own samples; ADMIN may delete any."
 					}
@@ -668,7 +888,7 @@
 		},
 		{
 			"name": "Cart",
-			"description": "Base **`/cart`**. **Bearer required.** All routes require **`ROLE_BUYER`** (use **Auth → Register (BUYER)** or login as buyer). Use **`{{sample_id}}`** for an existing active sample when adding lines. Set **`{{cart_item_id}}`** from **Add cart item** (test script saves `id` on 201) or from **Get cart** -> `items[].id`.",
+			"description": "Base **`/cart`**. **Bearer required.** All routes require **`ROLE_BUYER`** (use **Auth \u2192 Register (BUYER)** or login as buyer). Use **`{{sample_id}}`** for an existing active sample when adding lines. Set **`{{cart_item_id}}`** from **Add cart item** (test script saves `id` on 201) or from **Get cart** -> `items[].id`.",
 			"item": [
 				{
 					"name": "Get cart",
@@ -676,8 +896,12 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/cart",
-							"host": ["{{base_url}}"],
-							"path": ["cart"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart"
+							]
 						},
 						"description": "**200** + `CartResponse` (`id`, `items`, `totalPrice`, `createdAt`, `updatedAt`). Pure read: if the buyer has **no cart row yet**, a synthetic empty response is returned (`items: []`, `totalPrice: 0`, without `id`/`createdAt`/`updatedAt`) and **nothing is persisted**. The cart row is created lazily on the first **POST /cart/items**."
 					}
@@ -688,8 +912,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/cart/items/{{cart_item_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "items", "{{cart_item_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"items",
+								"{{cart_item_id}}"
+							]
 						},
 						"description": "**200** + `CartItemResponse` (`id`, `quantity`, `addedAt`, `sampleId`). **404** if the line is not in your cart."
 					}
@@ -718,7 +948,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -726,8 +959,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/cart/items",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "items"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"items"
+							]
 						},
 						"description": "**201 Created** + `CartItemResponse`; `Location: /cart/items/{id}`. Body: `sampleId` (required), `quantity` (required, >= 1). Duplicate `sampleId` merges quantities on the server."
 					}
@@ -737,7 +975,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -745,8 +986,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/cart/items/{{cart_item_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "items", "{{cart_item_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"items",
+								"{{cart_item_id}}"
+							]
 						},
 						"description": "**200 OK** + `CartItemResponse` with the updated line (`id`, `quantity`, `addedAt`, `sampleId`). Body: `quantity` (required, >= 1). **404** `CartItemNotFoundException` if the line is not yours. **404** `SampleNotFoundException` if the linked sample was **soft-deleted / inactive** after it was added (same rule as add: you cannot change quantity for inactive samples)."
 					}
@@ -757,8 +1004,14 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/cart/items/{{cart_item_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "items", "{{cart_item_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"items",
+								"{{cart_item_id}}"
+							]
 						},
 						"description": "**204 No Content**. Deletes the line from your cart. If it was the **last** line, the cart row is also deleted (keeps the invariant `cart exists iff has items`). The next **GET /cart** will return the synthetic empty response; the next **POST /cart/items** lazily creates a fresh cart."
 					}
@@ -769,8 +1022,13 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/cart/clear",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "clear"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"clear"
+							]
 						},
 						"description": "**204 No Content** - idempotent. Deletes all `CartItem` rows **and the `Cart` row itself**, so the post-state is identical to a buyer that never added anything (next **GET /cart** returns the synthetic empty response, next **POST /cart/items** lazily creates a fresh cart). If the buyer has no cart yet, this call is a no-op and still returns **204**."
 					}
@@ -781,10 +1039,15 @@
 						"method": "POST",
 						"url": {
 							"raw": "{{base_url}}/cart/checkout",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "checkout"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"checkout"
+							]
 						},
-						"description": "**201 Created** + `OrderResponseDTO` with `Location: /order/{id}`. Converts the buyer's cart into an order: validates stock, decrements atomically, snapshots unit prices, persists order + items with status `PENDING`, then clears the cart. **400** `EmptyCartException` if the cart doesn't exist or has no items. **400** `InsufficientStockException` if any sample doesn't have enough stock. No body required."
+						"description": "**200 OK** + `OrderResponseDTO`. Converts the buyer's cart into an order: validates stock, decrements atomically, snapshots unit prices, persists order + items with status `PENDING`, then clears the cart. Additionally, creates the associated **Payment** (status `PENDING`, `methodName` null) and **Shipment** (status `PENDING`, `addressId` null, no tracking) for the order \u2014 the buyer is expected to fill those via `PATCH /payments/{id}/method` and `PATCH /shipments/{id}/address`. **400** `EmptyCartException` if the cart doesn't exist or has no items. **400** `InsufficientStockException` if any sample doesn't have enough stock. No body required."
 					}
 				}
 			]
@@ -799,10 +1062,15 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/order/all",
-							"host": ["{{base_url}}"],
-							"path": ["order", "all"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"all"
+							]
 						},
-						"description": "Returns every order in the system. Requires ROLE_ADMIN. Log in as admin first via **Auth → Register (ADMIN)** or **Auth → Authenticate (ADMIN)** so `access_token` belongs to an admin."
+						"description": "Returns every order in the system. Requires ROLE_ADMIN. Log in as admin first via **Auth \u2192 Register (ADMIN)** or **Auth \u2192 Authenticate (ADMIN)** so `access_token` belongs to an admin."
 					}
 				},
 				{
@@ -811,8 +1079,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/order/me",
-							"host": ["{{base_url}}"],
-							"path": ["order", "me"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"me"
+							]
 						},
 						"description": "Returns all orders belonging to the authenticated buyer (JWT subject). Any authenticated user can call this; admins see only their own orders via this endpoint - use **Get All Orders** for a full list."
 					}
@@ -823,8 +1096,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/order/{{order_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["order", "{{order_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"{{order_id}}"
+							]
 						},
 						"description": "Returns a single order. The service enforces ownership: a buyer can only read their own orders, while admins can read any. A non-owner buyer gets 403 `OrderAccessDeniedException`; a missing id gets 404 `OrderNotFoundException`. Edit `order_id` in collection variables."
 					}
@@ -834,7 +1112,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -842,8 +1123,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/order/{{order_id}}/status",
-							"host": ["{{base_url}}"],
-							"path": ["order", "{{order_id}}", "status"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"{{order_id}}",
+								"status"
+							]
 						},
 						"description": "Admin-only status transition. Allowed values: `PENDING`, `PAID`, `SHIPPED`, `DELIVERED`, `CANCELLED`. Anything else returns 400 `InvalidOrderStatusException`. Non-admins get 403 from SecurityConfig before reaching the controller.\n\nNote: calling this with `CANCELLED` does NOT restore stock - use **Cancel Order** for proper cancellation of pending orders."
 					}
@@ -854,8 +1141,14 @@
 						"method": "PUT",
 						"url": {
 							"raw": "{{base_url}}/order/{{order_id}}/cancel",
-							"host": ["{{base_url}}"],
-							"path": ["order", "{{order_id}}", "cancel"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"{{order_id}}",
+								"cancel"
+							]
 						},
 						"description": "Cancels a PENDING order and restores each item's `Sample.stock`. No body. Buyer can only cancel their own order; admin can cancel any. Rules: order must exist (else 404 `OrderNotFoundException`), caller must own it or be admin (else 403 `OrderAccessDeniedException`), current status must be `PENDING` (else 400 `InvalidOrderStatusException`)."
 					}
@@ -864,7 +1157,7 @@
 		},
 		{
 			"name": "Review",
-			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
+			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1\u20135 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1\u20135 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update \u2014 the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
 			"item": [
 				{
 					"name": "Get reviews by sample id",
@@ -872,8 +1165,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/sample/{{sample_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "sample", "{{sample_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"sample",
+								"{{sample_id}}"
+							]
 						},
 						"description": "`GET /review/sample/{sampleId}`. **200 OK** + `ReviewListResponseDTO` (`reviews`, `totalCount`, `averageRating`). When the sample has no reviews yet, `reviews` is `[]`, `totalCount` is `0`, and `averageRating` is `null`. **404** `SampleNotFoundException` if the sample does not exist or is inactive."
 					}
@@ -884,8 +1183,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/buyer/{{buyer_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "buyer", "{{buyer_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"buyer",
+								"{{buyer_id}}"
+							]
 						},
 						"description": "`GET /review/buyer/{buyerId}`. **200 OK** + `ReviewListResponseDTO` with all reviews written by that buyer. Empty envelope (`reviews: []`, `totalCount: 0`, `averageRating: null`) if the buyer has no reviews."
 					}
@@ -896,8 +1201,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/seller/{{seller_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "seller", "{{seller_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"seller",
+								"{{seller_id}}"
+							]
 						},
 						"description": "`GET /review/seller/{sellerId}`. **200 OK** + `ReviewListResponseDTO` aggregating reviews across all samples that belong to the seller. Empty envelope if the seller has no reviewed samples."
 					}
@@ -908,8 +1219,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "{{review_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"{{review_id}}"
+							]
 						},
 						"description": "`GET /review/{id}`. **200** + single `ReviewResponseDTO`. **404** if the review does not exist."
 					}
@@ -938,7 +1254,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -946,10 +1265,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/review",
-							"host": ["{{base_url}}"],
-							"path": ["review"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review"
+							]
 						},
-						"description": "`POST /review`. **201 Created** + `ReviewResponseDTO`; `Location: /review/{id}`. Buyer is taken from the JWT. Body: `sampleId` (required), `rating` 1–5 (required), `comment` (optional, up to 1000 chars — a rating-only review is valid). **409** `ReviewAlreadyExistsException` if the buyer already reviewed that sample (enforced by DB unique constraint on `(buyer_id, sample_id)`). **400** for invalid rating or oversized comment. **404** if the sample does not exist."
+						"description": "`POST /review`. **201 Created** + `ReviewResponseDTO`; `Location: /review/{id}`. Buyer is taken from the JWT. Body: `sampleId` (required), `rating` 1\u20135 (required), `comment` (optional, up to 1000 chars \u2014 a rating-only review is valid). **409** `ReviewAlreadyExistsException` if the buyer already reviewed that sample (enforced by DB unique constraint on `(buyer_id, sample_id)`). **400** for invalid rating or oversized comment. **404** if the sample does not exist."
 					}
 				},
 				{
@@ -957,7 +1280,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -965,10 +1291,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "{{review_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"{{review_id}}"
+							]
 						},
-						"description": "`PUT /review/{id}`. **200 OK** + updated `ReviewResponseDTO`. Body: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional up to 1000 chars). **The review's sample and buyer cannot be changed** — the review is identified by the path id, so `sampleId` is not part of the update body. Only the **owner** buyer may update; otherwise the server responds with the ownership error. **400** for invalid rating or oversized comment. **404** if the review does not exist."
+						"description": "`PUT /review/{id}`. **200 OK** + updated `ReviewResponseDTO`. Body: `ReviewUpdateRequestDTO` (`rating` 1\u20135 required, `comment` optional up to 1000 chars). **The review's sample and buyer cannot be changed** \u2014 the review is identified by the path id, so `sampleId` is not part of the update body. Only the **owner** buyer may update; otherwise the server responds with the ownership error. **400** for invalid rating or oversized comment. **404** if the review does not exist."
 					}
 				},
 				{
@@ -977,8 +1308,13 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "{{review_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"{{review_id}}"
+							]
 						},
 						"description": "`DELETE /review/{id}`. **200 OK** + plain text confirmation. **Only the owner buyer** may delete their own review: `SecurityConfig` restricts this route to `ROLE_BUYER`, and the service throws the ownership error if the caller isn't the author. ADMINs cannot delete reviews. **404** if the review does not exist."
 					}
@@ -987,7 +1323,7 @@
 		},
 		{
 			"name": "Review",
-			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
+			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1\u20135 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1\u20135 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update \u2014 the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
 			"item": [
 				{
 					"name": "Get reviews by sample id",
@@ -995,8 +1331,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/sample/{{sample_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "sample", "{{sample_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"sample",
+								"{{sample_id}}"
+							]
 						},
 						"description": "`GET /review/sample/{sampleId}`. **200 OK** + `ReviewListResponseDTO` (`reviews`, `totalCount`, `averageRating`). When the sample has no reviews yet, `reviews` is `[]`, `totalCount` is `0`, and `averageRating` is `null`. **404** `SampleNotFoundException` if the sample does not exist or is inactive."
 					}
@@ -1007,8 +1349,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/buyer/{{buyer_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "buyer", "{{buyer_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"buyer",
+								"{{buyer_id}}"
+							]
 						},
 						"description": "`GET /review/buyer/{buyerId}`. **200 OK** + `ReviewListResponseDTO` with all reviews written by that buyer. Empty envelope (`reviews: []`, `totalCount: 0`, `averageRating: null`) if the buyer has no reviews."
 					}
@@ -1019,8 +1367,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/seller/{{seller_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "seller", "{{seller_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"seller",
+								"{{seller_id}}"
+							]
 						},
 						"description": "`GET /review/seller/{sellerId}`. **200 OK** + `ReviewListResponseDTO` aggregating reviews across all samples that belong to the seller. Empty envelope if the seller has no reviewed samples."
 					}
@@ -1031,8 +1385,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "{{review_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"{{review_id}}"
+							]
 						},
 						"description": "`GET /review/{id}`. **200** + single `ReviewResponseDTO`. **404** if the review does not exist."
 					}
@@ -1061,7 +1420,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1069,10 +1431,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/review",
-							"host": ["{{base_url}}"],
-							"path": ["review"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review"
+							]
 						},
-						"description": "`POST /review`. **201 Created** + `ReviewResponseDTO`; `Location: /review/{id}`. Buyer is taken from the JWT. Body: `sampleId` (required), `rating` 1–5 (required), `comment` (optional, up to 1000 chars — a rating-only review is valid). **409** `ReviewAlreadyExistsException` if the buyer already reviewed that sample (enforced by DB unique constraint on `(buyer_id, sample_id)`). **400** for invalid rating or oversized comment. **404** if the sample does not exist."
+						"description": "`POST /review`. **201 Created** + `ReviewResponseDTO`; `Location: /review/{id}`. Buyer is taken from the JWT. Body: `sampleId` (required), `rating` 1\u20135 (required), `comment` (optional, up to 1000 chars \u2014 a rating-only review is valid). **409** `ReviewAlreadyExistsException` if the buyer already reviewed that sample (enforced by DB unique constraint on `(buyer_id, sample_id)`). **400** for invalid rating or oversized comment. **404** if the sample does not exist."
 					}
 				},
 				{
@@ -1080,7 +1446,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1088,10 +1457,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "{{review_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"{{review_id}}"
+							]
 						},
-						"description": "`PUT /review/{id}`. **200 OK** + updated `ReviewResponseDTO`. Body: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional up to 1000 chars). **The review's sample and buyer cannot be changed** — the review is identified by the path id, so `sampleId` is not part of the update body. Only the **owner** buyer may update; otherwise the server responds with the ownership error. **400** for invalid rating or oversized comment. **404** if the review does not exist."
+						"description": "`PUT /review/{id}`. **200 OK** + updated `ReviewResponseDTO`. Body: `ReviewUpdateRequestDTO` (`rating` 1\u20135 required, `comment` optional up to 1000 chars). **The review's sample and buyer cannot be changed** \u2014 the review is identified by the path id, so `sampleId` is not part of the update body. Only the **owner** buyer may update; otherwise the server responds with the ownership error. **400** for invalid rating or oversized comment. **404** if the review does not exist."
 					}
 				},
 				{
@@ -1100,8 +1474,13 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["review", "{{review_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"review",
+								"{{review_id}}"
+							]
 						},
 						"description": "`DELETE /review/{id}`. **200 OK** + plain text confirmation. **Only the owner buyer** may delete their own review: `SecurityConfig` restricts this route to `ROLE_BUYER`, and the service throws the ownership error if the caller isn't the author. ADMINs cannot delete reviews. **404** if the review does not exist."
 					}
@@ -1110,14 +1489,17 @@
 		},
 		{
 			"name": "Address",
-			"description": "Base **`/address`**. Bearer token required. **GET** (`/address/...`): **BUYER** or **ADMIN**. **POST** / **PUT** / **DELETE**: **BUYER** only. A buyer can have **many** addresses (`User` 1—N `Address`). **Delete** is a **soft delete** (`active = false`): the row stays so **Shipment** and other FKs are not broken. Attempting to delete an already-inactive address returns **409 Conflict**.\n\nUse collection variable **`{{address_id}}`** (set it from **Add address** or **List addresses** response `id`).",
+			"description": "Base **`/address`**. Bearer token required. **GET** (`/address/...`): **BUYER** or **ADMIN**. **POST** / **PUT** / **DELETE**: **BUYER** only. A buyer can have **many** addresses (`User` 1\u2014N `Address`). **Delete** is a **soft delete** (`active = false`): the row stays so **Shipment** and other FKs are not broken. Attempting to delete an already-inactive address returns **409 Conflict**.\n\nUse collection variable **`{{address_id}}`** (set it from **Add address** or **List addresses** response `id`).",
 			"item": [
 				{
 					"name": "Add address",
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1125,10 +1507,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/address/addAddress",
-							"host": ["{{base_url}}"],
-							"path": ["address", "addAddress"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"addAddress"
+							]
 						},
-						"description": "`POST /address/addAddress`. Body: `CreateAddressRequest`. **201** + `AddressResponse` (`id`, `active`, …). You can add multiple addresses per user."
+						"description": "`POST /address/addAddress`. Body: `CreateAddressRequest`. **201** + `AddressResponse` (`id`, `active`, \u2026). You can add multiple addresses per user."
 					}
 				},
 				{
@@ -1138,8 +1525,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/address/addresses",
-							"host": ["{{base_url}}"],
-							"path": ["address", "addresses"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"addresses"
+							]
 						},
 						"description": "`GET /address/addresses`. **200** + JSON array of **active** `AddressResponse` (empty array if none)."
 					}
@@ -1151,8 +1543,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/address/{{address_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["address", "{{address_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"{{address_id}}"
+							]
 						},
 						"description": "`GET /address/{addressId}`. **200** + single `AddressResponse` (active or inactive) for the authenticated buyer. **404** (`AddressNotFoundException`) if the id does not exist or does not belong to you."
 					}
@@ -1162,7 +1559,10 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1170,8 +1570,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/address/modifyAddress/{{address_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["address", "modifyAddress", "{{address_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"modifyAddress",
+								"{{address_id}}"
+							]
 						},
 						"description": "`PUT /address/modifyAddress/{addressId}`. Body: `CreateAddressRequest`. **200** + `AddressResponse`. **404** if the id does not exist, is not yours, or is already soft-deleted."
 					}
@@ -1183,17 +1589,91 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/address/deleteAddress/{{address_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["address", "deleteAddress", "{{address_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"deleteAddress",
+								"{{address_id}}"
+							]
 						},
-						"description": "`DELETE /address/deleteAddress/{addressId}`. **Soft delete** only (`active` → false); row remains for FK integrity. **200** + `Address successfully deleted`. **404** if id missing or not owned by you. **409 Conflict** (`AddressAlreadyInactiveException`) if the address is already inactive — a second delete is **not** a no-op."
+						"description": "`DELETE /address/deleteAddress/{addressId}`. **Soft delete** only (`active` \u2192 false); row remains for FK integrity. **200** + `Address successfully deleted`. **404** if id missing or not owned by you. **409 Conflict** (`AddressAlreadyInactiveException`) if the address is already inactive \u2014 a second delete is **not** a no-op."
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Get payment by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/payments/{{payment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"{{payment_id}}"
+							]
+						},
+						"description": "`GET /payments/{id}` (`PaymentController#getById`). Returns **200** + `PaymentResponse`. Accessible to **ADMIN** or the **BUYER** that owns the underlying order (`403` `PaymentForbiddenException` otherwise). `404` `PaymentNotFoundException` if the id doesn't exist."
+					}
+				},
+				{
+					"name": "Get payment by order id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/payments/order/{{order_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"order",
+								"{{order_id}}"
+							]
+						},
+						"description": "`GET /payments/order/{orderId}` (`PaymentController#getByOrderId`). Returns **200** + `PaymentResponse` for the payment linked to that order. Same access rules as **Get payment by id**. `404` if no payment exists for the order (should not happen after a successful checkout)."
+					}
+				},
+				{
+					"name": "Update payment method (BUYER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"methodName\": \"VISA **** 4242\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/{{payment_id}}/method",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"{{payment_id}}",
+								"method"
+							]
+						},
+						"description": "`PATCH /payments/{id}/method` (`PaymentController#updateMethod`). Body: `{ \"methodName\": \"...\" }` (non-blank). Sets the payment method chosen by the buyer after `Checkout` (payment is created with `methodName = null`). Only allowed while the payment is **PENDING** \u2014 `409` `PaymentNotPendingException` once it transitions to `COMPLETED` / `FAILED` / `REFUNDED`. **200** + updated `PaymentResponse`. **400** on blank body. **403** for non-owners; **404** if the payment id doesn't exist."
 					}
 				}
 			]
 		},
 		{
 			"name": "Shipments",
-			"description": "Base **`/shipments`** (`ShipmentController`). Bearer **`{{access_token}}`** (collection auth). **GET**: **ADMIN**, **BUYER** (order buyer), or **SELLER** (all order line samples belong to that seller). **POST** / **PATCH**: **ADMIN** or **SELLER** (same seller rule). **PATCH …/tracking** sets **`trackingNumber` once** (not updatable afterward; use **Create** with the right value if you need it from the start). **POST** create returns **201** with **`ResponseEntity.created`** and **`Location: /shipments/{id}`** (same pattern as perfume/cart/sample). `status` in JSON is a string enum: `PENDING`, `SHIPPED`, `IN_TRANSIT`, `DELIVERED`, `RETURNED`. Set **`{{order_id}}`**, **`{{address_id}}`**, and **`{{shipment_id}}`** from your DB or from **Create shipment** (test script saves `id` on 201).",
+			"description": "Base **`/shipments`** (`ShipmentController`). Bearer **`{{access_token}}`** (collection auth). **GET**: **ADMIN**, **BUYER** (order buyer), or **SELLER** (all order line samples belong to that seller). **POST** / **PATCH**: **ADMIN** or **SELLER** (same seller rule). **PATCH \u2026/tracking** sets **`trackingNumber` once** (not updatable afterward; use **Create** with the right value if you need it from the start). **POST** create returns **201** with **`ResponseEntity.created`** and **`Location: /shipments/{id}`** (same pattern as perfume/cart/sample). `status` in JSON is a string enum: `PENDING`, `SHIPPED`, `IN_TRANSIT`, `DELIVERED`, `RETURNED`. Set **`{{order_id}}`**, **`{{address_id}}`**, and **`{{shipment_id}}`** from your DB or from **Create shipment** (test script saves `id` on 201).",
 			"item": [
 				{
 					"name": "Get shipment by id",
@@ -1201,8 +1681,13 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/shipments/{{shipment_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["shipments", "{{shipment_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipments",
+								"{{shipment_id}}"
+							]
 						},
 						"description": "`GET /shipments/{id}`. **200** + `ShipmentResponse` (`id`, `shippedAt`, `deliveredAt`, `status`, `trackingNumber`, `orderId`, `addressId`). **404** if no shipment. **403** if the token user may not view this shipment."
 					}
@@ -1213,8 +1698,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/shipments/order/{{order_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["shipments", "order", "{{order_id}}"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipments",
+								"order",
+								"{{order_id}}"
+							]
 						},
 						"description": "`GET /shipments/order/{orderId}`. **200** + `ShipmentResponse` for that order. **404** if the order has no shipment yet. **403** if not allowed to view."
 					}
@@ -1247,7 +1738,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1255,10 +1749,42 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/shipments",
-							"host": ["{{base_url}}"],
-							"path": ["shipments"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipments"
+							]
 						},
-						"description": "`POST /shipments` (`ShipmentController#create`). Body: `orderId`, `addressId` (required). Optional: `status` (defaults to **PENDING** if omitted), `trackingNumber`. Address must belong to the order’s buyer and be **active**. **201 Created** with **`ResponseEntity.created`** → body is `ShipmentResponse` and **`Location`** is **`/shipments/{id}`** (aligned with perfume/cart/sample). **404** order/address, **409** if the order already has a shipment, **403** if SELLER does not own all samples in the order. If **`status`** is not **PENDING**, **`trackingNumber`** must be non-blank (**400** `ShipmentTrackingRequiredException`)."
+						"description": "`POST /shipments` (`ShipmentController#create`). Body: `orderId`, `addressId` (required). Optional: `status` (defaults to **PENDING** if omitted), `trackingNumber`. Address must belong to the order\u2019s buyer and be **active**. **201 Created** with **`ResponseEntity.created`** \u2192 body is `ShipmentResponse` and **`Location`** is **`/shipments/{id}`** (aligned with perfume/cart/sample). **404** order/address, **409** if the order already has a shipment, **403** if SELLER does not own all samples in the order. If **`status`** is not **PENDING**, **`trackingNumber`** must be non-blank (**400** `ShipmentTrackingRequiredException`)."
+					}
+				},
+				{
+					"name": "Update shipment address (BUYER)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"addressId\": {{address_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}/address",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipments",
+								"{{shipment_id}}",
+								"address"
+							]
+						},
+						"description": "`PATCH /shipments/{id}/address` (`ShipmentController#updateAddress`). Body: `{ \"addressId\": N }` (required). Sets the shipping address \u2014 used by the buyer after `Checkout` because the shipment is created with `addressId = null`. The address **must belong to the current buyer** and be active (`404` `AddressNotFoundException` otherwise). Only allowed while the shipment is **PENDING** \u2014 `409` `ShipmentNotPendingException` once it leaves PENDING. **200** + updated `ShipmentResponse`. **403** for non-owner buyers / sellers; **404** if the shipment id doesn't exist."
 					}
 				},
 				{
@@ -1266,7 +1792,10 @@
 					"request": {
 						"method": "PATCH",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1274,10 +1803,16 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/shipments/{{shipment_id}}/status",
-							"host": ["{{base_url}}"],
-							"path": ["shipments", "{{shipment_id}}", "status"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipments",
+								"{{shipment_id}}",
+								"status"
+							]
 						},
-						"description": "`PATCH /shipments/{id}/status`. Body: `{ \"status\": \"PENDING\" | \"SHIPPED\" | \"IN_TRANSIT\" | \"DELIVERED\" | \"RETURNED\" }`. **200** + updated `ShipmentResponse`. If the shipment is still **PENDING**, you must set a non-blank **trackingNumber** first (**Set shipment tracking (once)** or on create) before moving to any other status — else **400** `ShipmentTrackingRequiredException`. **404** / **403** as in service rules."
+						"description": "`PATCH /shipments/{id}/status`. Body: `{ \"status\": \"PENDING\" | \"SHIPPED\" | \"IN_TRANSIT\" | \"DELIVERED\" | \"RETURNED\" }`. **200** + updated `ShipmentResponse`. If the shipment is still **PENDING**, you must set a non-blank **trackingNumber** first (**Set shipment tracking (once)** or on create) before moving to any other status \u2014 else **400** `ShipmentTrackingRequiredException`. **404** / **403** as in service rules."
 					}
 				},
 				{
@@ -1285,7 +1820,10 @@
 					"request": {
 						"method": "PATCH",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -1293,10 +1831,16 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/shipments/{{shipment_id}}/tracking",
-							"host": ["{{base_url}}"],
-							"path": ["shipments", "{{shipment_id}}", "tracking"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipments",
+								"{{shipment_id}}",
+								"tracking"
+							]
 						},
-						"description": "`PATCH /shipments/{id}/tracking` (`ShipmentController#setTrackingNumber`). Body: `{ \"trackingNumber\": \"...\" }` (non-blank). Sets the tracking **only if it is still unset** (null/blank); once stored it **cannot be changed** — second call returns **409** `ShipmentTrackingImmutableException`. **200** + `ShipmentResponse`. Use after **Create shipment** when `trackingNumber` was null."
+						"description": "`PATCH /shipments/{id}/tracking` (`ShipmentController#setTrackingNumber`). Body: `{ \"trackingNumber\": \"...\" }` (non-blank). Sets the tracking **only if it is still unset** (null/blank); once stored it **cannot be changed** \u2014 second call returns **409** `ShipmentTrackingImmutableException`. **200** + `ShipmentResponse`. Use after **Create shipment** when `trackingNumber` was null."
 					}
 				}
 			]
