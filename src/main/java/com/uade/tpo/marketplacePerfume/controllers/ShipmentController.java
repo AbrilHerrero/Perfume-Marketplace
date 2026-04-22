@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.CreateShipmentRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.ShipmentResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentAddressRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentStatusRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentTrackingRequest;
 import com.uade.tpo.marketplacePerfume.service.shipment.IShipmentService;
@@ -49,6 +50,14 @@ public class ShipmentController {
             @AuthenticationPrincipal User currentUser) {
         ShipmentResponse created = shipmentService.create(request, currentUser);
         return ResponseEntity.created(URI.create("/shipments/" + created.getId())).body(created);
+    }
+
+    @PatchMapping("/{id}/address")
+    public ResponseEntity<ShipmentResponse> updateAddress(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateShipmentAddressRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(shipmentService.updateAddress(id, request, currentUser));
     }
 
     @PatchMapping("/{id}/status")

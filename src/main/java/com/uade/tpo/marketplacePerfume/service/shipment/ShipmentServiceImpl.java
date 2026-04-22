@@ -14,6 +14,7 @@ import com.uade.tpo.marketplacePerfume.entity.ShipmentStatus;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.CreateShipmentRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.ShipmentResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentAddressRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentStatusRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.shipment.UpdateShipmentTrackingRequest;
 import com.uade.tpo.marketplacePerfume.exceptions.address.AddressNotFoundException;
@@ -21,6 +22,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.order.OrderNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentAlreadyExistsException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentForbiddenException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentNotPendingException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentTrackingImmutableException;
 import com.uade.tpo.marketplacePerfume.exceptions.shipment.ShipmentTrackingRequiredException;
 import com.uade.tpo.marketplacePerfume.mapper.ShipmentMapper;
@@ -82,6 +84,37 @@ public class ShipmentServiceImpl implements IShipmentService {
 
     @Override
     @Transactional
+    public ShipmentResponse create(Long orderId, User currentUser) {
+        Order order = orderRepository.findByIdWithBuyerAndItems(orderId)
+                .orElseThrow(OrderNotFoundException::new);
+        assertCanCreateForBuyer(currentUser, order);
+        if (shipmentRepository.existsByOrder_Id(order.getId())) {
+            throw new ShipmentAlreadyExistsException();
+        }
+        Shipment entity = ShipmentMapper.toNewEntity(order, null, ShipmentStatus.PENDING, null);
+        Shipment saved = shipmentRepository.save(entity);
+        return ShipmentMapper.toResponse(shipmentRepository.findFetchedById(saved.getId())
+                .orElse(saved));
+    }
+
+    @Override
+    @Transactional
+    public ShipmentResponse updateAddress(Long id, UpdateShipmentAddressRequest request, User currentUser) {
+        Shipment shipment = shipmentRepository.findFetchedById(id)
+                .orElseThrow(ShipmentNotFoundException::new);
+        assertCanCreateForBuyer(currentUser, shipment.getOrder());
+        if (shipment.getStatus() != ShipmentStatus.PENDING) {
+            throw new ShipmentNotPendingException();
+        }
+        Address address = addressRepository.findByIdAndBuyer_IdAndActiveTrue(request.getAddressId(),
+                shipment.getOrder().getBuyer().getId())
+                .orElseThrow(AddressNotFoundException::new);
+        shipment.setAddress(address);
+        return ShipmentMapper.toResponse(shipment);
+    }
+
+    @Override
+    @Transactional
     public ShipmentResponse updateStatus(Long id, UpdateShipmentStatusRequest request, User currentUser) {
         Shipment shipment = shipmentRepository.findFetchedById(id)
                 .orElseThrow(ShipmentNotFoundException::new);
@@ -121,6 +154,18 @@ public class ShipmentServiceImpl implements IShipmentService {
             return;
         }
         if (user.getRole() == Role.SELLER && sellerOwnsOrder(shipment.getOrder(), user.getId())) {
+            return;
+        }
+        throw new ShipmentForbiddenException();
+    }
+
+    private void assertCanCreateForBuyer(User user, Order order) {
+        if (user.getRole() == Role.ADMIN) {
+            return;
+        }
+        if (user.getRole() == Role.BUYER
+                && order.getBuyer() != null
+                && order.getBuyer().getId().equals(user.getId())) {
             return;
         }
         throw new ShipmentForbiddenException();

@@ -13,7 +13,9 @@ import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -27,6 +29,8 @@ public class Cart {
 
     @OneToOne
     @JoinColumn(name="buyer_id", referencedColumnName="id", unique = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private User buyer;
 
     private LocalDateTime createdAt;
@@ -34,5 +38,7 @@ public class Cart {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "cart")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<CartItem> cartItems;
 }
