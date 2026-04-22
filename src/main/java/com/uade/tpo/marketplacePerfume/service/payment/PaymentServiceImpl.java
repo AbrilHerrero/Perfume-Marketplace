@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,9 +78,6 @@ public class PaymentServiceImpl implements IPaymentService {
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new PaymentOrderInvalidStateException();
         }
-        if (paymentRepository.findByOrder_Id(order.getId()).isPresent()) {
-            throw new PaymentAlreadyExistsException();
-        }
 
         String method = dto.getMethodName();
         if (method == null || method.isBlank()) {
@@ -93,7 +91,12 @@ public class PaymentServiceImpl implements IPaymentService {
                 .status(PaymentStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
-        Payment saved = paymentRepository.save(payment);
+        final Payment saved;
+        try {
+            saved = paymentRepository.save(payment);
+        } catch (DataIntegrityViolationException e) {
+            throw new PaymentAlreadyExistsException();
+        }
         return PaymentMapper.toResponseDto(saved);
     }
 

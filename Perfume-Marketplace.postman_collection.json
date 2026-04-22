@@ -53,6 +53,10 @@
 		{
 			"key": "payment_id",
 			"value": "1"
+		},
+		{
+			"key": "shipment_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -707,7 +711,7 @@
 		},
 		{
 			"name": "Order",
-			"description": "Order CRUD. Order **creation** is not exposed here - it is handled by the future `CartController#/cart/checkout`, which calls `OrderService#createOrder` internally. This folder only covers reads, admin status transitions, and buyer cancellation. Set `order_id` in collection variables before calling single-order endpoints.",
+			"description": "Order reads and admin/buyer actions. **Creation** va por **Cart → Checkout** (`POST /cart/checkout`). Esta carpeta: listados, lectura por id, cambio de estado (admin) y cancelación (comprador). Ajusta **`{{order_id}}`** antes de los endpoints por id.",
 			"item": [
 				{
 					"name": "Get All Orders (ADMIN only)",
@@ -780,7 +784,7 @@
 		},
 		{
 			"name": "Payment",
-			"description": "Base **`/payment`**. **Bearer** con `{{access_token}}`. **GET /payment/me** y **POST /payment**: token **BUYER**. **GET /payment/order/{orderId}/status** y **PATCH /payment/{id}/status**: token **SELLER** que tenga al menos un `Sample` en ítems de esa orden. Tras **checkout**, registrar pago con **POST**; el vendedor confirma con **PATCH** `COMPLETED` → la orden pasa a **PAID** si estaba **PENDING**. Usa **`{{order_id}}`** y **`{{payment_id}}`** (este último se guarda en **Register payment** al recibir **201**).",
+			"description": "Base **`/payment`**. **Bearer** con `{{access_token}}`. **GET /payment/me** y **POST /payment**: token **BUYER**. **GET /payment/order/{orderId}/status** y **PATCH /payment/{id}/status**: token **SELLER** que tenga al menos un `Sample` en ítems de esa orden. Tras **Cart → Checkout**, registrar pago con **POST**; el vendedor confirma con **PATCH** `COMPLETED` → la orden pasa a **PAID** si estaba **PENDING**. Unicidad **un pago por orden** (`order_id` único en BD): si ya hay pago o dos **POST** compiten, el backend responde **409** `PaymentAlreadyExistsException` (no 500). Usa **`{{order_id}}`** y **`{{payment_id}}`** (guardado en **Register payment** con **201**).",
 			"item": [
 				{
 					"name": "Get my payments (BUYER)",
@@ -841,7 +845,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["payment"]
 						},
-						"description": "`POST /payment`. Body: `PaymentRegisterRequestDTO` (`orderId` obligatorio, `methodName` opcional; si falta, el backend usa `CARD`). Orden debe ser **PENDING**, del comprador autenticado, sin pago previo. **201** + `PaymentResponseDTO`; `Location: /payment/{id}`. **409** si ya existe pago para la orden."
+						"description": "`POST /payment`. Body: `PaymentRegisterRequestDTO` (`orderId` obligatorio, `methodName` opcional; si falta o va vacío, el backend usa **`CARD`**). Requisitos: orden **PENDING** y **dueña** del comprador del JWT (**403** si no). **201** + `PaymentResponseDTO`; header `Location: /payment/{id}`. **409** `PaymentAlreadyExistsException` si ya hay pago para esa orden (incluye **carreras concurrentes**: violación de `UNIQUE` en `order_id` → 409, no 500)."
 					}
 				},
 				{
@@ -861,6 +865,112 @@
 							"path": ["payment", "{{payment_id}}", "status"]
 						},
 						"description": "`PATCH /payment/{id}/status`. Body: `PaymentStatusPatchDTO` con `status` en mayúsculas: `PENDING`, `COMPLETED`, `FAILED`, `REFUNDED`. Solo vendedores con productos en la orden del pago. Con **`COMPLETED`**, si la orden está **PENDING**, pasa a **PAID**. **403** si el vendedor no participa en la orden."
+					}
+				}
+			]
+		},
+		{
+			"name": "Shipments",
+			"description": "Base **`/shipments`**. **Bearer** obligatorio. **GET**: **ADMIN**, **BUYER** u **SELLER** (según reglas del servicio: comprador dueño de la orden, vendedor que posee todos los ítems, o admin). **POST** y **PATCH**: **ADMIN** o **SELLER**. Tras crear envío, **`{{shipment_id}}`** se guarda con el script en **201**. Usa **`{{order_id}}`** y **`{{address_id}}`** del comprador de esa orden.",
+			"item": [
+				{
+					"name": "Get shipment by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "{{shipment_id}}"]
+						},
+						"description": "`GET /shipments/{id}`. **200** + `ShipmentResponse`. **403** si el usuario no puede ver ese envío."
+					}
+				},
+				{
+					"name": "Get shipment by order id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/shipments/order/{{order_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "order", "{{order_id}}"]
+						},
+						"description": "`GET /shipments/order/{orderId}`. **200** + `ShipmentResponse` del envío ligado a esa orden."
+					}
+				},
+				{
+					"name": "Create shipment (SELLER / ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('shipment_id', String(json.id));",
+									"    }",
+									"    pm.test('Shipment id saved', function () {",
+									"        pm.expect(json.id).to.be.a('number');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": {{order_id}},\n    \"addressId\": {{address_id}},\n    \"status\": \"PENDING\",\n    \"trackingNumber\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments",
+							"host": ["{{base_url}}"],
+							"path": ["shipments"]
+						},
+						"description": "`POST /shipments`. Body: `CreateShipmentRequest` (`orderId`, `addressId` obligatorios; `status` y `trackingNumber` opcionales). Si `status` ≠ `PENDING`, hace falta `trackingNumber` no vacío (regla de negocio). **201** + `ShipmentResponse`; `Location: /shipments/{id}`. **409** si ya existe envío para la orden."
+					}
+				},
+				{
+					"name": "Update shipment status (SELLER / ADMIN)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"SHIPPED\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "{{shipment_id}}", "status"]
+						},
+						"description": "`PATCH /shipments/{id}/status`. Body: `{ \"status\": \"PENDING\" | \"SHIPPED\" | \"IN_TRANSIT\" | \"DELIVERED\" | \"RETURNED\" }` (`ShipmentStatus`)."
+					}
+				},
+				{
+					"name": "Set shipment tracking (SELLER / ADMIN)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"trackingNumber\": \"AR123456789AR\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shipments/{{shipment_id}}/tracking",
+							"host": ["{{base_url}}"],
+							"path": ["shipments", "{{shipment_id}}", "tracking"]
+						},
+						"description": "`PATCH /shipments/{id}/tracking`. Body: `{ \"trackingNumber\": \"...\" }` (**@NotBlank**). Solo si el tracking aún no estaba fijado (**409** / excepción de inmutabilidad si ya había valor)."
 					}
 				}
 			]
