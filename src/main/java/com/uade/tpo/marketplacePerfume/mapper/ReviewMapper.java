@@ -20,6 +20,7 @@ public final class ReviewMapper {
         dto.setRating(entity.getRating());
         dto.setComment(entity.getComment());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
         if (entity.getBuyer() != null) dto.setBuyerId(entity.getBuyer().getId());
         if (entity.getSample() != null) dto.setSampleId(entity.getSample().getId());
         return dto;

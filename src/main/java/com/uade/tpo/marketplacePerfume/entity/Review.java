@@ -40,6 +40,8 @@ public class Review {
 
     private LocalDateTime createdAt;
 
+    private LocalDateTime updatedAt;
+
     @ManyToOne
     @JoinColumn (name = "buyer_id", referencedColumnName = "id")
     private User buyer;

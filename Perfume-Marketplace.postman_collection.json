@@ -864,7 +864,7 @@
 		},
 		{
 			"name": "Review",
-			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **BUYER** or **ADMIN**. Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
+			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
 			"item": [
 				{
 					"name": "Get reviews by sample id",
@@ -972,7 +972,7 @@
 					}
 				},
 				{
-					"name": "Delete review (BUYER / ADMIN)",
+					"name": "Delete review (BUYER owner)",
 					"request": {
 						"method": "DELETE",
 						"url": {
@@ -980,14 +980,14 @@
 							"host": ["{{base_url}}"],
 							"path": ["review", "{{review_id}}"]
 						},
-						"description": "`DELETE /review/{id}`. **200** + plain text confirmation. Buyer may delete own review; **ADMIN** may delete any (per `SecurityConfig`)."
+						"description": "`DELETE /review/{id}`. **200 OK** + plain text confirmation. **Only the owner buyer** may delete their own review: `SecurityConfig` restricts this route to `ROLE_BUYER`, and the service throws the ownership error if the caller isn't the author. ADMINs cannot delete reviews. **404** if the review does not exist."
 					}
 				}
 			]
 		},
 		{
 			"name": "Review",
-			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **BUYER** or **ADMIN**. Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
+			"description": "Base **`/review`**. **Bearer required** for all routes. **GET** `/**`: any authenticated role. **POST** / **PUT**: **`ROLE_BUYER`** only. **DELETE**: **`ROLE_BUYER`** only, and only the owner of the review (the service enforces ownership). Body for **create**: `ReviewRequestDTO` (`sampleId` required, `rating` 1–5 required, `comment` optional, max 1000 chars). Body for **update**: `ReviewUpdateRequestDTO` (`rating` 1–5 required, `comment` optional, max 1000 chars; the sample/buyer cannot be changed on update — the review is identified by the path id). Blank/whitespace-only comments are normalized to `null`. List endpoints return `ReviewListResponseDTO` with `reviews`, `totalCount`, `averageRating` (always **200 OK**, even when empty). Set **`{{review_id}}`** from **Create review** (test script on 201) or from list responses; **`{{buyer_id}}`** for listing another buyer's reviews (same as a user's id in DB).",
 			"item": [
 				{
 					"name": "Get reviews by sample id",
@@ -1095,7 +1095,7 @@
 					}
 				},
 				{
-					"name": "Delete review (BUYER / ADMIN)",
+					"name": "Delete review (BUYER owner)",
 					"request": {
 						"method": "DELETE",
 						"url": {
@@ -1103,7 +1103,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["review", "{{review_id}}"]
 						},
-						"description": "`DELETE /review/{id}`. **200** + plain text confirmation. Buyer may delete own review; **ADMIN** may delete any (per `SecurityConfig`)."
+						"description": "`DELETE /review/{id}`. **200 OK** + plain text confirmation. **Only the owner buyer** may delete their own review: `SecurityConfig` restricts this route to `ROLE_BUYER`, and the service throws the ownership error if the caller isn't the author. ADMINs cannot delete reviews. **404** if the review does not exist."
 					}
 				}
 			]

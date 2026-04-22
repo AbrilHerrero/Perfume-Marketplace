@@ -68,7 +68,9 @@ public class ReviewServiceImpl implements IReviewService {
         Review review = ReviewMapper.toEntityFromRequest(dto);
         review.setBuyer(buyer);
         review.setSample(sample);
-        review.setCreatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        review.setCreatedAt(now);
+        review.setUpdatedAt(now);
 
         try {
             return ReviewMapper.toResponseDto(reviewRepository.save(review));
@@ -88,6 +90,7 @@ public class ReviewServiceImpl implements IReviewService {
         }
 
         ReviewMapper.applyFullUpdate(dto, existing);
+        existing.setUpdatedAt(LocalDateTime.now());
 
         return ReviewMapper.toResponseDto(reviewRepository.save(existing));
     }
