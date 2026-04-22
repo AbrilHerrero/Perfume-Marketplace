@@ -1,7 +1,6 @@
 package com.uade.tpo.marketplacePerfume.repository;
 
 import java.util.List;
-
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,9 +17,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o "
             + "LEFT JOIN FETCH o.buyer "
-            + "LEFT JOIN FETCH o.orderItems oi "
-            + "LEFT JOIN FETCH oi.sample s "
-            + "LEFT JOIN FETCH s.seller "
+            + "LEFT JOIN FETCH o.orderItems "
             + "WHERE o.id = :id")
     Optional<Order> findByIdWithBuyerAndItems(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT o FROM Order o "
+            + "LEFT JOIN FETCH o.orderItems i LEFT JOIN FETCH i.sample s LEFT JOIN FETCH s.seller "
+            + "WHERE o.id = :id")
+    Optional<Order> findByIdWithItemsAndSamples(@Param("id") Long id);
 }
