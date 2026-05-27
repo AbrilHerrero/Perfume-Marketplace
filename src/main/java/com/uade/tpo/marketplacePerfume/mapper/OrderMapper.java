@@ -28,6 +28,8 @@ public final class OrderMapper {
         }
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setTotal(entity.getTotal());
+        dto.setDiscountAmount(entity.getDiscountAmount());
+        dto.setCouponCode(entity.getCouponCode());
         dto.setStatus(entity.getStatus() != null ? entity.getStatus().name() : null);
         dto.setItems(toItemResponseDtoList(entity.getOrderItems()));
         return dto;

@@ -134,7 +134,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public OrderResponseDTO checkout(User user) {
+    public OrderResponseDTO checkout(User user, String couponCode) {
         Cart cart = cartRepository.findByBuyer_Id(user.getId())
                 .orElseThrow(EmptyCartException::new);
 
@@ -153,6 +153,7 @@ public class CartServiceImpl implements ICartService {
 
         OrderCreateDTO orderDto = new OrderCreateDTO();
         orderDto.setItems(items);
+        orderDto.setCouponCode(couponCode);
 
         OrderResponseDTO order = orderService.createOrder(orderDto, user);
 

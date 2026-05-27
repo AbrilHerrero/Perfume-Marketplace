@@ -14,46 +14,46 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "orders")
-public class Order {
+public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id", referencedColumnName = "id")
-    private User buyer;
-
-    private LocalDateTime createdAt;
-
-    private BigDecimal total;
-
-    private BigDecimal discountAmount;
-
-    private String couponCode;
+    @Column(unique = true, nullable = false)
+    private String code;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status;
+    private DiscountType discountType;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems;
+    private BigDecimal discountValue;
 
-    @OneToOne(mappedBy = "order")
-    private Payment payment;
+    private LocalDateTime validFrom;
+    private LocalDateTime validUntil;
 
-    @OneToOne(mappedBy = "order")
-    private Shipment shipment;
+    @Builder.Default
+    private boolean active = true;
+
+    private LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "seller_id", referencedColumnName = "id")
+    private User seller;
+
+    @OneToMany(mappedBy = "coupon")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<CouponRedemption> redemptions;
 }

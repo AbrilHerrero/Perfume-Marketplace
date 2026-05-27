@@ -13,5 +13,5 @@ public interface ICartService {
     CartItemResponse updateCartItemQuantity(User user, Long cartItemId, Integer quantity);
     void removeCartItem(User user, Long cartItemId);
     void clearCart(User user);
-    OrderResponseDTO checkout(User user);
+    OrderResponseDTO checkout(User user, String couponCode);
 }

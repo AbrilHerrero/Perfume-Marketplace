@@ -3,12 +3,15 @@ package com.uade.tpo.marketplacePerfume.service.order;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.tpo.marketplacePerfume.entity.Coupon;
 import com.uade.tpo.marketplacePerfume.entity.Order;
 import com.uade.tpo.marketplacePerfume.entity.OrderItem;
 import com.uade.tpo.marketplacePerfume.entity.OrderStatus;
@@ -20,6 +23,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderItemCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderStatusUpdateDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.coupon.CouponNotApplicableException;
 import com.uade.tpo.marketplacePerfume.exceptions.order.InsufficientStockException;
 import com.uade.tpo.marketplacePerfume.exceptions.order.InvalidOrderStatusException;
 import com.uade.tpo.marketplacePerfume.exceptions.order.OrderAccessDeniedException;
@@ -28,6 +32,7 @@ import com.uade.tpo.marketplacePerfume.mapper.OrderMapper;
 import com.uade.tpo.marketplacePerfume.repository.OrderItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
+import com.uade.tpo.marketplacePerfume.service.coupon.ICouponService;
 
 @Service
 public class OrderServiceImpl implements IOrderService {
@@ -40,6 +45,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private SampleRepository sampleRepository;
+
+    @Autowired
+    private ICouponService couponService;
 
     @Override
     public List<OrderResponseDTO> getAllOrders() {
@@ -75,6 +83,7 @@ public class OrderServiceImpl implements IOrderService {
         Order savedOrder = orderRepository.save(order);
 
         BigDecimal total = BigDecimal.ZERO;
+        Map<Long, BigDecimal> subtotalBySeller = new HashMap<>();
         List<OrderItem> persistedItems = new ArrayList<>();
 
         for (OrderItemCreateDTO itemDto : dto.getItems()) {
@@ -94,12 +103,36 @@ public class OrderServiceImpl implements IOrderService {
                     .build();
             persistedItems.add(orderItemRepository.save(orderItem));
 
-            total = total.add(sample.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())));
+            BigDecimal lineTotal = sample.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity()));
+            total = total.add(lineTotal);
+            if (sample.getSeller() != null) {
+                subtotalBySeller.merge(sample.getSeller().getId(), lineTotal, BigDecimal::add);
+            }
+        }
+
+        Coupon coupon = null;
+        BigDecimal discount = BigDecimal.ZERO;
+        String couponCode = dto.getCouponCode();
+        if (couponCode != null && !couponCode.isBlank()) {
+            coupon = couponService.validateForRedemption(couponCode, buyer);
+            BigDecimal sellerSubtotal = subtotalBySeller.getOrDefault(
+                    coupon.getSeller().getId(), BigDecimal.ZERO);
+            if (sellerSubtotal.signum() == 0) {
+                throw new CouponNotApplicableException();
+            }
+            discount = couponService.computeDiscount(coupon, sellerSubtotal);
+            total = total.subtract(discount);
+            savedOrder.setCouponCode(coupon.getCode());
+            savedOrder.setDiscountAmount(discount);
         }
 
         savedOrder.setOrderItems(persistedItems);
         savedOrder.setTotal(total);
         Order finalOrder = orderRepository.save(savedOrder);
+
+        if (coupon != null) {
+            couponService.recordRedemption(coupon, buyer, finalOrder, discount);
+        }
 
         return OrderMapper.toResponseDto(finalOrder);
     }
