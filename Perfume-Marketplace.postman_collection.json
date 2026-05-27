@@ -65,6 +65,14 @@
 		{
 			"key": "payment_id",
 			"value": "1"
+		},
+		{
+			"key": "coupon_id",
+			"value": "1"
+		},
+		{
+			"key": "coupon_code",
+			"value": ""
 		}
 	],
 	"item": [
@@ -1037,6 +1045,16 @@
 					"name": "Checkout",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"couponCode\": \"{{coupon_code}}\"\n}"
+						},
 						"url": {
 							"raw": "{{base_url}}/cart/checkout",
 							"host": [
@@ -1047,7 +1065,174 @@
 								"checkout"
 							]
 						},
-						"description": "**200 OK** + `OrderResponseDTO`. Converts the buyer's cart into an order: validates stock, decrements atomically, snapshots unit prices, persists order + items with status `PENDING`, then clears the cart. Additionally, creates the associated **Payment** (status `PENDING`, `methodName` null) and **Shipment** (status `PENDING`, `addressId` null, no tracking) for the order — the buyer is expected to fill those via `PATCH /payments/{id}/method` and `PATCH /shipments/{id}/address`. **400** `EmptyCartException` if the cart doesn't exist or has no items. **400** `InsufficientStockException` if any sample doesn't have enough stock. No body required."
+						"description": "**200 OK** + `OrderResponseDTO`. Converts the buyer's cart into an order: validates stock, decrements atomically, snapshots unit prices, persists order + items with status `PENDING`, then clears the cart. Additionally, creates the associated **Payment** (status `PENDING`, `methodName` null) and **Shipment** (status `PENDING`, `addressId` null, no tracking) for the order — the buyer is expected to fill those via `PATCH /payments/{id}/method` and `PATCH /shipments/{id}/address`. **400** `EmptyCartException` if the cart doesn't exist or has no items. **400** `InsufficientStockException` if any sample doesn't have enough stock.\n\n**Optional discount coupon** (body): send `{ \"couponCode\": \"...\" }` to apply a seller's coupon. The discount is applied **only to the subtotal of the cart items whose seller owns the coupon**; the order `total` is reduced and the response includes `discountAmount` and `couponCode`. The body is optional — leave `couponCode` blank (default `{{coupon_code}}` is empty) to checkout with no discount; the **Coupons → Create coupon** request fills `coupon_code` automatically. Coupon errors: **404** `CouponNotFound`; **400** `CouponExpired` (inactive or outside its valid date range); **400** `CouponNotApplicable` (the cart has no items from that coupon's seller); **409** `CouponAlreadyUsed` (this buyer already redeemed it)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Coupons",
+			"description": "Base **`/coupons`**. Discount coupons **created by a seller** for their own products, plus a **redemption history**. **Bearer required.** **POST** / **PUT**: `ROLE_SELLER` (and the seller must own the coupon for PUT). **DELETE** / **GET**: `ROLE_SELLER` or `ROLE_ADMIN` (sellers limited to their own coupons; admin may act on any). Coupons are **applied by the buyer at `Cart → Checkout`** via `couponCode`, not here. `discountType` is `PERCENTAGE` (1–100) or `FIXED` (absolute amount); the discount applies only to the subtotal of the order items that belong to the coupon's seller. Validity rules: `validFrom`/`validUntil` date range + **one redemption per buyer**. Set **`{{coupon_id}}`** / **`{{coupon_code}}`** from **Create coupon** (test script saves both on 201).",
+			"item": [
+				{
+					"name": "Create coupon (SELLER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('coupon_id', String(json.id));",
+									"    }",
+									"    if (json && json.code != null) {",
+									"        pm.collectionVariables.set('coupon_code', json.code);",
+									"    }",
+									"    pm.test('Coupon id saved', function () {",
+									"        pm.expect(json.id).to.be.a('number');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"DESC20\",\n    \"discountType\": \"PERCENTAGE\",\n    \"discountValue\": 20,\n    \"validFrom\": \"2026-01-01T00:00:00\",\n    \"validUntil\": \"2026-12-31T23:59:59\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/coupons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons"
+							]
+						},
+						"description": "`POST /coupons`. **201 Created** + `CouponResponseDTO`; `Location: /coupons/{id}`. Seller is taken from the JWT (do not send `sellerId`). Body: `code` (required, unique), `discountType` (`PERCENTAGE` or `FIXED`), `discountValue` (> 0; for `PERCENTAGE` must be 1–100), and optional `validFrom` / `validUntil` (ISO `LocalDateTime`, e.g. `2026-01-01T00:00:00`). For a **fixed** coupon use `\"discountType\": \"FIXED\", \"discountValue\": 1000`. **409** `CouponCodeAlreadyExists` for a duplicate code. **400** `CouponInvalid` for a bad config (e.g. percentage > 100, `discountValue` ≤ 0, or `validUntil` before `validFrom`). The test script saves `coupon_id` and `coupon_code`."
+					}
+				},
+				{
+					"name": "List my coupons (SELLER)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/coupons/mine",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"mine"
+							]
+						},
+						"description": "`GET /coupons/mine`. **200** + array of `CouponResponseDTO` for the authenticated seller (its own coupons, active and inactive). Empty array if none."
+					}
+				},
+				{
+					"name": "Get coupon by id (SELLER owner / ADMIN)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/coupons/{{coupon_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"{{coupon_id}}"
+							]
+						},
+						"description": "`GET /coupons/{id}`. **200** + single `CouponResponseDTO`. A seller may only read their own coupon (**403** `CouponNotOwned` otherwise); admin may read any. **404** `CouponNotFound` if the id does not exist."
+					}
+				},
+				{
+					"name": "Update coupon (SELLER owner)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"discountValue\": 15,\n    \"validUntil\": \"2026-10-31T23:59:59\",\n    \"active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/coupons/{{coupon_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"{{coupon_id}}"
+							]
+						},
+						"description": "`PUT /coupons/{id}`. **200** + updated `CouponResponseDTO`. Body: `CouponUpdateDTO` — partial update of `discountType`, `discountValue`, `validFrom`, `validUntil`, `active` (the `code` cannot be changed). The resulting config is re-validated (**400** `CouponInvalid` for percentage > 100, non-positive value, or `validUntil` before `validFrom`). Only the owner seller may update (**403** `CouponNotOwned`). **404** `CouponNotFound` if the id does not exist."
+					}
+				},
+				{
+					"name": "Delete coupon — soft delete (SELLER owner / ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/coupons/{{coupon_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"{{coupon_id}}"
+							]
+						},
+						"description": "`DELETE /coupons/{id}`. **200** + `Coupon successfully deleted`. **Soft delete**: sets `active = false`, so the coupon stops applying at checkout but the row (and its redemption history) is preserved. Seller may only delete their own coupon; admin may delete any (**403** `CouponNotOwned` otherwise). **404** `CouponNotFound` if the id does not exist."
+					}
+				},
+				{
+					"name": "My redemption history (SELLER)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/coupons/history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"history"
+							]
+						},
+						"description": "`GET /coupons/history`. **200** + array of `CouponRedemptionResponseDTO` across **all** of the seller's coupons. Each entry: `id`, `couponId`, `couponCode`, `buyerId`, `buyerEmail`, `orderId`, `discountAmount`, `redeemedAt`. Empty array if no coupon of the seller has been used yet."
+					}
+				},
+				{
+					"name": "Coupon redemption history by id (SELLER owner)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/coupons/{{coupon_id}}/history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"{{coupon_id}}",
+								"history"
+							]
+						},
+						"description": "`GET /coupons/{id}/history`. **200** + array of `CouponRedemptionResponseDTO` for a single coupon. Only the owner seller may read it (**403** `CouponNotOwned`); admin may read any. **404** `CouponNotFound` if the id does not exist."
 					}
 				}
 			]

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
+import com.uade.tpo.marketplacePerfume.entity.dto.cart.CheckoutRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemUpdate;
@@ -70,8 +71,10 @@ public class CartController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderResponseDTO> checkout(@AuthenticationPrincipal User user) {
-        OrderResponseDTO order = cartService.checkout(user);
+    public ResponseEntity<OrderResponseDTO> checkout(@AuthenticationPrincipal User user,
+            @RequestBody(required = false) CheckoutRequest body) {
+        String couponCode = body != null ? body.getCouponCode() : null;
+        OrderResponseDTO order = cartService.checkout(user, couponCode);
         return ResponseEntity.created(URI.create("/order/" + order.getId())).body(order);
     }
 }

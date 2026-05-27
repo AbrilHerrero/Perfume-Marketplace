@@ -12,4 +12,6 @@ public class OrderCreateDTO {
     @NotEmpty
     @Valid
     private List<OrderItemCreateDTO> items;
+
+    private String couponCode;
 }

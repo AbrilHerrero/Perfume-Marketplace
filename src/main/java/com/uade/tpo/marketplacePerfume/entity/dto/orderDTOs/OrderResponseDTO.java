@@ -14,6 +14,8 @@ public class OrderResponseDTO {
     private String buyerEmail;
     private LocalDateTime createdAt;
     private BigDecimal total;
+    private BigDecimal discountAmount;
+    private String couponCode;
     private String status;
     private List<OrderItemResponseDTO> items;
 }
