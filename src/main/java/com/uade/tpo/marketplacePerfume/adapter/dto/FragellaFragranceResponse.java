@@ -1,5 +1,8 @@
 package com.uade.tpo.marketplacePerfume.adapter.dto;
 
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -29,4 +32,52 @@ public class FragellaFragranceResponse {
 
     @JsonProperty("Confidence")
     private String confidence;
+
+    @JsonProperty("rating")
+    private String rating;
+
+    @JsonProperty("General Notes")
+    private List<String> generalNotes;
+
+    @JsonProperty("Main Accords")
+    private List<String> mainAccords;
+
+    @JsonProperty("Main Accords Percentage")
+    private Map<String, String> mainAccordsPercentage;
+
+    @JsonProperty("Notes")
+    private NotesDetail notes;
+
+    @JsonProperty("Season Ranking")
+    private List<RankingEntry> seasonRanking;
+
+    @JsonProperty("Occasion Ranking")
+    private List<RankingEntry> occasionRanking;
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class RankingEntry {
+        private String name;
+        private double score;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class NotesDetail {
+        @JsonProperty("Top")
+        private List<NoteEntry> top;
+
+        @JsonProperty("Middle")
+        private List<NoteEntry> middle;
+
+        @JsonProperty("Base")
+        private List<NoteEntry> base;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class NoteEntry {
+        private String name;
+        private String imageUrl;
+    }
 }

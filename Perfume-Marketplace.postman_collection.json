@@ -539,9 +539,49 @@
 		},
 		{
 			"name": "Perfume",
+			"description": "Perfume catalog with full profile data. **GET /perfume/all** requires any authenticated user (Bearer). **POST/PUT/DELETE** require **ADMIN** or **SELLER**. Each `PerfumeResponseDTO` includes: `id`, `name`, `brand`, `line`, `description`, `releaseYear`, `imageUrl`, `gender`, `sillage`, `confidence`, `notes` (`top`/`middle`/`base`), `accords`, `season` (`Spring`/`Summer`/`Autumn`/`Winter`, 0–1), `occasion` (`Daily`/`Office`/`Evening`/`Special`, 0–1), `rating`, `reviewCount`. After a DB reset, run **Get All Perfumes** to verify seeded data.",
 			"item": [
 				{
 					"name": "Get All Perfumes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"if (pm.response.code === 200) {",
+									"    var perfumes = pm.response.json();",
+									"    pm.test('Response is an array', function () {",
+									"        pm.expect(perfumes).to.be.an('array');",
+									"    });",
+									"    if (perfumes.length > 0) {",
+									"        var p = perfumes[0];",
+									"        pm.collectionVariables.set('perfume_id', String(p.id));",
+									"        pm.test('Perfume has enriched profile fields', function () {",
+									"            pm.expect(p).to.have.property('line');",
+									"            pm.expect(p).to.have.property('description');",
+									"            pm.expect(p).to.have.property('notes');",
+									"            pm.expect(p.notes).to.have.property('top');",
+									"            pm.expect(p.notes).to.have.property('middle');",
+									"            pm.expect(p.notes).to.have.property('base');",
+									"            pm.expect(p).to.have.property('accords');",
+									"            pm.expect(p.accords).to.be.an('array');",
+									"            pm.expect(p).to.have.property('season');",
+									"            pm.expect(p.season).to.have.property('Spring');",
+									"            pm.expect(p).to.have.property('occasion');",
+									"            pm.expect(p.occasion).to.have.property('Daily');",
+									"            pm.expect(p).to.have.property('rating');",
+									"            pm.expect(p).to.have.property('reviewCount');",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"url": {
@@ -553,11 +593,37 @@
 								"perfume",
 								"all"
 							]
-						}
+						},
+						"description": "**200** + array of `PerfumeResponseDTO`. Saves the first perfume `id` into `perfume_id`. Tests assert the new profile fields (`notes`, `accords`, `season`, `occasion`, `rating`, `reviewCount`). Requires Bearer (any role)."
 					}
 				},
 				{
 					"name": "Create Perfume (ADMIN/SELLER only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    if (json && json.id != null) {",
+									"        pm.collectionVariables.set('perfume_id', String(json.id));",
+									"    }",
+									"    pm.test('Created perfume has profile fields', function () {",
+									"        pm.expect(json.id).to.be.a('number');",
+									"        pm.expect(json.line).to.eql('Les Nocturnes');",
+									"        pm.expect(json.notes.top).to.include('Bergamot');",
+									"        pm.expect(json.accords).to.include('Powdery');",
+									"        pm.expect(json.season.Autumn).to.eql(0.95);",
+									"        pm.expect(json.rating).to.eql(4.6);",
+									"        pm.expect(json.reviewCount).to.eql(142);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -568,7 +634,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Sauvage\",\n    \"brand\": \"Dior\",\n    \"releaseYear\": 2015,\n    \"imageUrl\": \"https://example.com/sauvage.jpg\",\n    \"gender\": \"Male\",\n    \"sillage\": \"Strong\",\n    \"confidence\": \"High\"\n}"
+							"raw": "{\n    \"name\": \"Iris Noir\",\n    \"brand\": \"Maison Verveine\",\n    \"line\": \"Les Nocturnes\",\n    \"description\": \"A meditation on iris root rendered through smoke and damp earth. Powdery at first lift, then dries to a leathery hush — equal parts library and chapel.\",\n    \"releaseYear\": 2019,\n    \"imageUrl\": \"https://example.com/iris-noir.jpg\",\n    \"gender\": \"unisex\",\n    \"sillage\": \"Moderate\",\n    \"confidence\": \"high\",\n    \"notes\": {\n        \"top\": [\"Bergamot\", \"Pink Pepper\"],\n        \"middle\": [\"Iris Pallida\", \"Violet Leaf\", \"Suede\"],\n        \"base\": [\"Vetiver\", \"Smoked Cedar\", \"Ambrette\"]\n    },\n    \"accords\": [\"Powdery\", \"Woody\", \"Smoky\", \"Leather\"],\n    \"season\": {\n        \"Spring\": 0.45,\n        \"Summer\": 0.2,\n        \"Autumn\": 0.95,\n        \"Winter\": 0.8\n    },\n    \"occasion\": {\n        \"Daily\": 0.55,\n        \"Office\": 0.7,\n        \"Evening\": 0.95,\n        \"Special\": 0.85\n    },\n    \"rating\": 4.6,\n    \"reviewCount\": 142\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/perfume",
@@ -578,11 +644,30 @@
 							"path": [
 								"perfume"
 							]
-						}
+						},
+						"description": "**201 Created** + `PerfumeResponseDTO`; `Location: /perfume/{id}`. `name` and `brand` are required. Example body mirrors the full perfume profile (notes, accords, season, occasion, rating). Requires Bearer as **ADMIN** or **SELLER**."
 					}
 				},
 				{
 					"name": "Modify Perfume (ADMIN/SELLER only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Updated perfume reflects changes', function () {",
+									"        pm.expect(json.name).to.eql('Iris Noir Intense');",
+									"        pm.expect(json.rating).to.eql(4.8);",
+									"        pm.expect(json.occasion.Evening).to.eql(0.98);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -593,18 +678,19 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Sauvage EDP\",\n    \"brand\": \"Dior\"\n}"
+							"raw": "{\n    \"name\": \"Iris Noir Intense\",\n    \"brand\": \"Maison Verveine\",\n    \"line\": \"Les Nocturnes\",\n    \"description\": \"A deeper, smokier take on Iris Noir with amplified leather and cedar in the dry-down.\",\n    \"releaseYear\": 2021,\n    \"imageUrl\": \"https://example.com/iris-noir-intense.jpg\",\n    \"gender\": \"unisex\",\n    \"sillage\": \"Strong\",\n    \"confidence\": \"high\",\n    \"notes\": {\n        \"top\": [\"Bergamot\", \"Pink Pepper\", \"Incense\"],\n        \"middle\": [\"Iris Pallida\", \"Violet Leaf\", \"Suede\"],\n        \"base\": [\"Vetiver\", \"Smoked Cedar\", \"Ambrette\", \"Leather\"]\n    },\n    \"accords\": [\"Powdery\", \"Woody\", \"Smoky\", \"Leather\"],\n    \"season\": {\n        \"Spring\": 0.4,\n        \"Summer\": 0.15,\n        \"Autumn\": 0.98,\n        \"Winter\": 0.9\n    },\n    \"occasion\": {\n        \"Daily\": 0.45,\n        \"Office\": 0.6,\n        \"Evening\": 0.98,\n        \"Special\": 0.92\n    },\n    \"rating\": 4.8,\n    \"reviewCount\": 187\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/perfume/1",
+							"raw": "{{base_url}}/perfume/{{perfume_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"perfume",
-								"1"
+								"{{perfume_id}}"
 							]
-						}
+						},
+						"description": "**200** + updated `PerfumeResponseDTO`. Partial updates are supported — send only the fields you want to change. Uses `perfume_id` (set by **Get All Perfumes** or **Create Perfume**). Requires Bearer as **ADMIN** or **SELLER**."
 					}
 				},
 				{
@@ -612,15 +698,16 @@
 					"request": {
 						"method": "DELETE",
 						"url": {
-							"raw": "{{base_url}}/perfume/1",
+							"raw": "{{base_url}}/perfume/{{perfume_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"perfume",
-								"1"
+								"{{perfume_id}}"
 							]
-						}
+						},
+						"description": "**200** + confirmation message. Uses `perfume_id`. Requires Bearer as **ADMIN** or **SELLER**."
 					}
 				}
 			]
