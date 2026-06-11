@@ -140,36 +140,65 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     @Transactional
     public OrderResponseDTO updateStatus(Long id, OrderStatusUpdateDTO dto) {
-        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
+        Order order = orderRepository.findByIdWithBuyerAndItems(id).orElseThrow(OrderNotFoundException::new);
+        OrderStatus previousStatus = order.getStatus();
+        OrderStatus newStatus;
         try {
-            OrderStatus newStatus = OrderStatus.valueOf(dto.getStatus().toUpperCase());
-            order.setStatus(newStatus);
+            newStatus = OrderStatus.valueOf(dto.getStatus().toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
             throw new InvalidOrderStatusException();
         }
+
+        if (previousStatus != newStatus) {
+            if (newStatus == OrderStatus.CANCELLED) {
+                restoreStockForOrder(order);
+            } else if (previousStatus == OrderStatus.CANCELLED) {
+                reserveStockForOrder(order);
+            }
+        }
+
+        order.setStatus(newStatus);
         return OrderMapper.toResponseDto(orderRepository.save(order));
     }
 
     @Override
     @Transactional
     public OrderResponseDTO cancelOrder(Long id, User currentUser) {
-        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
+        Order order = orderRepository.findByIdWithBuyerAndItems(id).orElseThrow(OrderNotFoundException::new);
         assertCanAccess(order, currentUser);
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new InvalidOrderStatusException();
         }
 
-        if (order.getOrderItems() != null) {
-            for (OrderItem item : order.getOrderItems()) {
-                if (item.getSample() != null) {
-                    sampleRepository.incrementStock(item.getSample().getId(), item.getQuantity());
+        restoreStockForOrder(order);
+        order.setStatus(OrderStatus.CANCELLED);
+        return OrderMapper.toResponseDto(orderRepository.save(order));
+    }
+
+    private void restoreStockForOrder(Order order) {
+        if (order.getOrderItems() == null) {
+            return;
+        }
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getSample() != null) {
+                sampleRepository.incrementStock(item.getSample().getId(), item.getQuantity());
+            }
+        }
+    }
+
+    private void reserveStockForOrder(Order order) {
+        if (order.getOrderItems() == null) {
+            return;
+        }
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getSample() != null) {
+                int updated = sampleRepository.decrementStock(item.getSample().getId(), item.getQuantity());
+                if (updated == 0) {
+                    throw new InsufficientStockException();
                 }
             }
         }
-
-        order.setStatus(OrderStatus.CANCELLED);
-        return OrderMapper.toResponseDto(orderRepository.save(order));
     }
 
     private void assertCanAccess(Order order, User currentUser) {
