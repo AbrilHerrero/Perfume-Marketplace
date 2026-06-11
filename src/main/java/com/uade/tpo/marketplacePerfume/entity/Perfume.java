@@ -2,6 +2,9 @@ package com.uade.tpo.marketplacePerfume.entity;
 
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +34,11 @@ public class Perfume {
     @Column(nullable = false)
     private String brand;
 
+    private String line;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "release_year")
     private int releaseYear;
 
@@ -43,6 +51,23 @@ public class Perfume {
 
     private String confidence;
 
-    @OneToMany (mappedBy = "perfume")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private PerfumeNotes notes;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> accords;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    private SeasonProfile season;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    private OccasionProfile occasion;
+
+    private Double rating;
+
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
+    @OneToMany(mappedBy = "perfume")
     private List<Sample> samples;
 }

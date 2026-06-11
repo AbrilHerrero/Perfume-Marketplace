@@ -27,6 +27,7 @@ public class PerfumeSeeder implements CommandLineRunner {
     private final PerfumeRepository perfumeRepository;
     private final FragellaApiAdapter fragellaApiClient;
     private final DataSource dataSource;
+    private final PerfumeSeedEnricher perfumeSeedEnricher;
 
     private static final List<String> BRANDS = List.of(
             "Dior", "Chanel", "Yves Saint Laurent", "Tom Ford",
@@ -37,10 +38,12 @@ public class PerfumeSeeder implements CommandLineRunner {
 
     public PerfumeSeeder(PerfumeRepository perfumeRepository,
                          FragellaApiAdapter fragellaApiClient,
-                         DataSource dataSource) {
+                         DataSource dataSource,
+                         PerfumeSeedEnricher perfumeSeedEnricher) {
         this.perfumeRepository = perfumeRepository;
         this.fragellaApiClient = fragellaApiClient;
         this.dataSource = dataSource;
+        this.perfumeSeedEnricher = perfumeSeedEnricher;
     }
 
     @Override
@@ -69,6 +72,7 @@ public class PerfumeSeeder implements CommandLineRunner {
         try {
             ResourceDatabasePopulator populator = new ResourceDatabasePopulator(seedFile);
             populator.execute(dataSource);
+            enrichSeededPerfumes();
             log.info("Seeded perfume database from file '{}'. Total perfumes: {}",
                      SEED_FILE, perfumeRepository.count());
             return true;
@@ -88,6 +92,7 @@ public class PerfumeSeeder implements CommandLineRunner {
 
                 for (FragellaFragranceResponse apiResponse : fragrances) {
                     Perfume perfume = PerfumeMapper.fromApiResponse(apiResponse);
+                    perfumeSeedEnricher.enrichIfNeeded(perfume);
                     perfumeRepository.save(perfume);
                     totalSaved++;
                 }
@@ -97,5 +102,20 @@ public class PerfumeSeeder implements CommandLineRunner {
             }
         }
         log.info("Seeding complete. Total perfumes saved: {}", totalSaved);
+    }
+
+    private void enrichSeededPerfumes() {
+        List<Perfume> perfumes = perfumeRepository.findAll();
+        int enriched = 0;
+
+        for (Perfume perfume : perfumes) {
+            if (perfume.getDescription() == null) {
+                perfumeSeedEnricher.enrichIfNeeded(perfume);
+                perfumeRepository.save(perfume);
+                enriched++;
+            }
+        }
+
+        log.info("Enriched {} perfumes with detailed profile data.", enriched);
     }
 }

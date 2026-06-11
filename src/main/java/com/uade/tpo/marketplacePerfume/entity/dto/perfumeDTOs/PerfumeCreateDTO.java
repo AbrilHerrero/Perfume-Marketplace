@@ -1,5 +1,11 @@
 package com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs;
 
+import java.util.List;
+
+import com.uade.tpo.marketplacePerfume.entity.OccasionProfile;
+import com.uade.tpo.marketplacePerfume.entity.PerfumeNotes;
+import com.uade.tpo.marketplacePerfume.entity.SeasonProfile;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -12,9 +18,17 @@ public class PerfumeCreateDTO {
     @NotBlank
     private String brand;
 
+    private String line;
+    private String description;
     private Integer releaseYear;
     private String imageUrl;
     private String gender;
     private String sillage;
     private String confidence;
+    private PerfumeNotes notes;
+    private List<String> accords;
+    private SeasonProfile season;
+    private OccasionProfile occasion;
+    private Double rating;
+    private Integer reviewCount;
 }
