@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -19,6 +20,7 @@ import com.uade.tpo.marketplacePerfume.mapper.PerfumeMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
 
 @Component
+@Order(1)
 public class PerfumeSeeder implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(PerfumeSeeder.class);
