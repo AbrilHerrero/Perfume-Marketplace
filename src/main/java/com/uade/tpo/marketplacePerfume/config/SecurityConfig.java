@@ -27,11 +27,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/perfume/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/perfume/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(HttpMethod.PUT, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(HttpMethod.DELETE, "/perfume/**").hasAnyRole("ADMIN", "SELLER")
-                        .requestMatchers(HttpMethod.GET, "/sample/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/sample/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/sample/**").hasAnyRole("SELLER")
                         .requestMatchers(HttpMethod.PUT, "/sample/**").hasAnyRole("SELLER")
                         .requestMatchers(HttpMethod.PATCH, "/sample/**").hasAnyRole("SELLER")
