@@ -3,7 +3,9 @@ package com.uade.tpo.marketplacePerfume.service.cart;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -13,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplacePerfume.entity.Cart;
 import com.uade.tpo.marketplacePerfume.entity.CartItem;
+import com.uade.tpo.marketplacePerfume.entity.Coupon;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.cart.ApplyCouponResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
@@ -25,6 +29,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemInsufficientS
 import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemInvalidQuantityException;
 import com.uade.tpo.marketplacePerfume.exceptions.cartItem.CartItemNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.cartItem.EmptyCartException;
+import com.uade.tpo.marketplacePerfume.exceptions.coupon.CouponNotApplicableException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.CartItemMapper;
 import com.uade.tpo.marketplacePerfume.mapper.CartMapper;
@@ -32,6 +37,7 @@ import com.uade.tpo.marketplacePerfume.repository.CartItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.CartRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
+import com.uade.tpo.marketplacePerfume.service.coupon.ICouponService;
 import com.uade.tpo.marketplacePerfume.service.order.IOrderService;
 import com.uade.tpo.marketplacePerfume.service.payment.IPaymentService;
 import com.uade.tpo.marketplacePerfume.service.shipment.IShipmentService;
@@ -59,6 +65,9 @@ public class CartServiceImpl implements ICartService {
 
     @Autowired
     private IShipmentService shipmentService;
+
+    @Autowired
+    private ICouponService couponService;
 
     @Override
     @Transactional(readOnly = true)
@@ -133,6 +142,42 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ApplyCouponResponse applyCoupon(User user, String couponCode) {
+        Cart cart = cartRepository.findByBuyer_IdWithItems(user.getId())
+                .orElseThrow(EmptyCartException::new);
+
+        if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            throw new EmptyCartException();
+        }
+
+        Coupon coupon = couponService.validateForRedemption(couponCode.trim(), user);
+
+        Map<Long, BigDecimal> subtotalsBySeller = subtotalBySeller(cart.getCartItems());
+        BigDecimal cartSubtotal = subtotalsBySeller.values().stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal sellerSubtotal = subtotalsBySeller.getOrDefault(
+                coupon.getSeller().getId(), BigDecimal.ZERO);
+
+        if (sellerSubtotal.signum() == 0) {
+            throw new CouponNotApplicableException();
+        }
+
+        BigDecimal discountAmount = couponService.computeDiscount(coupon, sellerSubtotal);
+
+        ApplyCouponResponse response = new ApplyCouponResponse();
+        response.setCode(coupon.getCode());
+        response.setDiscountType(coupon.getDiscountType());
+        response.setDiscountValue(coupon.getDiscountValue());
+        response.setSellerId(coupon.getSeller().getId());
+        response.setCartSubtotal(cartSubtotal);
+        response.setSellerSubtotal(sellerSubtotal);
+        response.setDiscountAmount(discountAmount);
+        response.setTotalAfterDiscount(cartSubtotal.subtract(discountAmount));
+        return response;
+    }
+
+    @Override
     @Transactional
     public OrderResponseDTO checkout(User user, String couponCode) {
         Cart cart = cartRepository.findByBuyer_Id(user.getId())
@@ -163,6 +208,23 @@ public class CartServiceImpl implements ICartService {
         shipmentService.create(order.getId(), user);
 
         return order;
+    }
+
+    private Map<Long, BigDecimal> subtotalBySeller(List<CartItem> cartItems) {
+        Map<Long, BigDecimal> subtotals = new HashMap<>();
+        if (cartItems == null) {
+            return subtotals;
+        }
+
+        for (CartItem item : cartItems) {
+            Sample sample = item.getSample();
+            if (sample == null || sample.getPrice() == null || sample.getSeller() == null) {
+                continue;
+            }
+            BigDecimal lineTotal = sample.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            subtotals.merge(sample.getSeller().getId(), lineTotal, BigDecimal::add);
+        }
+        return subtotals;
     }
 
     private Cart getOrCreateCart(User user, LocalDateTime now) {
