@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.marketplacePerfume.entity.OrderStatus;
 import com.uade.tpo.marketplacePerfume.entity.Review;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
@@ -19,7 +20,9 @@ import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewIncompleteRequest
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewInvalidRatingException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotOwnedException;
+import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewPurchaseRequiredException;
 import com.uade.tpo.marketplacePerfume.mapper.ReviewMapper;
+import com.uade.tpo.marketplacePerfume.repository.OrderItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.ReviewRepository;
 import com.uade.tpo.marketplacePerfume.service.sample.ISampleService;
 
@@ -33,6 +36,9 @@ public class ReviewServiceImpl implements IReviewService {
 
     @Autowired
     private ISampleService sampleService;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     @Override
     public ReviewListResponseDTO getReviewsBySampleId(Long sampleId) {
@@ -60,6 +66,8 @@ public class ReviewServiceImpl implements IReviewService {
         validateCreateRequest(dto);
 
         Sample sample = sampleService.getSampleById(dto.getSampleId());
+
+        assertBuyerPurchasedSample(buyer.getId(), sample.getId());
 
         if (reviewRepository.existsBySample_IdAndBuyer_Id(sample.getId(), buyer.getId())) {
             throw new ReviewAlreadyExistsException();
@@ -138,6 +146,14 @@ public class ReviewServiceImpl implements IReviewService {
     private void validateCommentLength(String comment) {
         if (comment != null && comment.trim().length() > MAX_COMMENT_LENGTH) {
             throw new ReviewCommentTooLongException();
+        }
+    }
+
+    private void assertBuyerPurchasedSample(Long buyerId, Long sampleId) {
+        boolean purchased = orderItemRepository.existsByOrder_Buyer_IdAndSample_IdAndOrder_StatusNot(
+                buyerId, sampleId, OrderStatus.CANCELLED);
+        if (!purchased) {
+            throw new ReviewPurchaseRequiredException();
         }
     }
 
