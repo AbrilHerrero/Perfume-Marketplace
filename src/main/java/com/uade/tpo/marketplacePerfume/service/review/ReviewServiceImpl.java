@@ -1,7 +1,6 @@
 package com.uade.tpo.marketplacePerfume.service.review;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplacePerfume.entity.OrderStatus;
 import com.uade.tpo.marketplacePerfume.entity.Review;
-import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
@@ -89,7 +87,7 @@ public class ReviewServiceImpl implements IReviewService {
 
         try {
             Review saved = reviewRepository.save(review);
-            refreshSampleRating(sample.getId());
+            addReviewToSampleRating(sample.getId(), dto.getRating());
             return ReviewMapper.toResponseDto(saved);
         } catch (DataIntegrityViolationException e) {
             throw new ReviewAlreadyExistsException();
@@ -106,11 +104,12 @@ public class ReviewServiceImpl implements IReviewService {
             throw new ReviewNotOwnedException();
         }
 
+        int previousRating = existing.getRating();
         ReviewMapper.applyFullUpdate(dto, existing);
         existing.setUpdatedAt(LocalDateTime.now());
 
         Review saved = reviewRepository.save(existing);
-        refreshSampleRating(existing.getSample().getId());
+        updateSampleRatingForReviewChange(existing.getSample().getId(), previousRating, dto.getRating());
         return ReviewMapper.toResponseDto(saved);
     }
 
@@ -123,8 +122,9 @@ public class ReviewServiceImpl implements IReviewService {
         }
 
         Long sampleId = review.getSample().getId();
+        int reviewRating = review.getRating();
         reviewRepository.delete(review);
-        refreshSampleRating(sampleId);
+        removeReviewFromSampleRating(sampleId, reviewRating);
     }
 
     private Review findByIdOrThrow(Long id) {
@@ -170,27 +170,62 @@ public class ReviewServiceImpl implements IReviewService {
         }
     }
 
-    private void refreshSampleRating(Long sampleId) {
+    private void addReviewToSampleRating(Long sampleId, int reviewRating) {
         Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
-        List<Review> reviews = reviewRepository.findBySample_Id(sampleId);
+        int count = sample.getReviewCount() != null ? sample.getReviewCount() : 0;
+        Double rating = sample.getRating();
 
-        long ratingSum = 0L;
-        int ratedCount = 0;
-        for (Review review : reviews) {
-            if (review.getRating() != null) {
-                ratingSum += review.getRating();
-                ratedCount++;
-            }
+        if (count == 0 || rating == null) {
+            sample.setRating((double) reviewRating);
+            sample.setReviewCount(1);
+        } else {
+            int newCount = count + 1;
+            double newRating = (rating * count + reviewRating) / newCount;
+            sample.setRating(roundToOneDecimal(newRating));
+            sample.setReviewCount(newCount);
+        }
+        sampleRepository.save(sample);
+    }
+
+    private void updateSampleRatingForReviewChange(Long sampleId, int oldRating, int newRating) {
+        if (oldRating == newRating) {
+            return;
         }
 
-        if (ratedCount == 0) {
+        Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
+        int count = sample.getReviewCount() != null ? sample.getReviewCount() : 0;
+        Double rating = sample.getRating();
+        if (count == 0 || rating == null) {
+            return;
+        }
+
+        double newRatingValue = (rating * count - oldRating + newRating) / count;
+        sample.setRating(roundToOneDecimal(newRatingValue));
+        sampleRepository.save(sample);
+    }
+
+    private void removeReviewFromSampleRating(Long sampleId, int reviewRating) {
+        Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
+        int count = sample.getReviewCount() != null ? sample.getReviewCount() : 0;
+        Double rating = sample.getRating();
+        if (count == 0 || rating == null) {
+            return;
+        }
+
+        if (count == 1) {
             sample.setRating(null);
             sample.setReviewCount(0);
         } else {
-            sample.setRating(Math.round((ratingSum * 10.0) / ratedCount) / 10.0);
-            sample.setReviewCount(ratedCount);
+            int newCount = count - 1;
+            double newRating = (rating * count - reviewRating) / newCount;
+            sample.setRating(roundToOneDecimal(newRating));
+            sample.setReviewCount(newCount);
         }
         sampleRepository.save(sample);
+    }
+
+    private double roundToOneDecimal(double value) {
+        return Math.round(value * 10.0) / 10.0;
     }
 
 }
