@@ -58,6 +58,8 @@ public class SecurityConfig {
                                 .hasAnyRole("ADMIN", "BUYER")
                         .requestMatchers(HttpMethod.PATCH, "/payments/*/method")
                                 .hasAnyRole("ADMIN", "BUYER")
+                        .requestMatchers(HttpMethod.POST, "/payments/*/pay")
+                                .hasAnyRole("ADMIN", "BUYER")
                         .requestMatchers(HttpMethod.GET, "/payment-methods/**").hasRole("BUYER")
                         .requestMatchers(HttpMethod.POST, "/payment-methods/**").hasRole("BUYER")
                         .requestMatchers(HttpMethod.DELETE, "/payment-methods/**").hasRole("BUYER")

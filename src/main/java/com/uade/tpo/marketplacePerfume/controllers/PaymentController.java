@@ -6,11 +6,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.payment.ConfirmPaymentRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.payment.PaymentResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.payment.UpdatePaymentMethodRequest;
 import com.uade.tpo.marketplacePerfume.service.payment.IPaymentService;
@@ -44,5 +46,13 @@ public class PaymentController {
             @Valid @RequestBody UpdatePaymentMethodRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(paymentService.updateMethod(id, request, currentUser));
+    }
+
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<PaymentResponse> pay(
+            @PathVariable Long id,
+            @Valid @RequestBody ConfirmPaymentRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(paymentService.pay(id, request, currentUser));
     }
 }
