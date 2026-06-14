@@ -5,7 +5,9 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,20 +15,30 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.uade.tpo.marketplacePerfume.entity.Address;
 import com.uade.tpo.marketplacePerfume.entity.Coupon;
 import com.uade.tpo.marketplacePerfume.entity.CouponRedemption;
 import com.uade.tpo.marketplacePerfume.entity.DiscountType;
 import com.uade.tpo.marketplacePerfume.entity.Order;
 import com.uade.tpo.marketplacePerfume.entity.OrderItem;
 import com.uade.tpo.marketplacePerfume.entity.OrderStatus;
+import com.uade.tpo.marketplacePerfume.entity.Payment;
+import com.uade.tpo.marketplacePerfume.entity.PaymentStatus;
 import com.uade.tpo.marketplacePerfume.entity.Role;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
+import com.uade.tpo.marketplacePerfume.entity.SavedPaymentMethod;
+import com.uade.tpo.marketplacePerfume.entity.Shipment;
+import com.uade.tpo.marketplacePerfume.entity.ShipmentStatus;
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.repository.AddressRepository;
 import com.uade.tpo.marketplacePerfume.repository.CouponRedemptionRepository;
 import com.uade.tpo.marketplacePerfume.repository.CouponRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderRepository;
+import com.uade.tpo.marketplacePerfume.repository.PaymentRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
+import com.uade.tpo.marketplacePerfume.repository.SavedPaymentMethodRepository;
+import com.uade.tpo.marketplacePerfume.repository.ShipmentRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
 /**
@@ -52,7 +64,13 @@ public class SalesSeeder implements CommandLineRunner {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CouponRedemptionRepository couponRedemptionRepository;
+    private final AddressRepository addressRepository;
+    private final PaymentRepository paymentRepository;
+    private final ShipmentRepository shipmentRepository;
+    private final SavedPaymentMethodRepository savedPaymentMethodRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final Map<Long, Address> addressByBuyerId = new HashMap<>();
 
     public SalesSeeder(UserRepository userRepository,
                        SampleRepository sampleRepository,
@@ -60,6 +78,10 @@ public class SalesSeeder implements CommandLineRunner {
                        OrderRepository orderRepository,
                        OrderItemRepository orderItemRepository,
                        CouponRedemptionRepository couponRedemptionRepository,
+                       AddressRepository addressRepository,
+                       PaymentRepository paymentRepository,
+                       ShipmentRepository shipmentRepository,
+                       SavedPaymentMethodRepository savedPaymentMethodRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.sampleRepository = sampleRepository;
@@ -67,6 +89,10 @@ public class SalesSeeder implements CommandLineRunner {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.couponRedemptionRepository = couponRedemptionRepository;
+        this.addressRepository = addressRepository;
+        this.paymentRepository = paymentRepository;
+        this.shipmentRepository = shipmentRepository;
+        this.savedPaymentMethodRepository = savedPaymentMethodRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -83,7 +109,8 @@ public class SalesSeeder implements CommandLineRunner {
             return;
         }
 
-        log.info("Seeding coupons, buyers and orders...");
+        log.info("Seeding admin, coupons, buyers and orders...");
+        ensureAdmin();
         List<User> buyers = ensureBuyers();
 
         int couponsCreated = 0;
@@ -103,6 +130,20 @@ public class SalesSeeder implements CommandLineRunner {
                 buyers.size(), couponsCreated, ordersCreated);
     }
 
+    private void ensureAdmin() {
+        userRepository.findByEmail("admin@marketplace.com")
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .name("Admin")
+                        .surname("Marketplace")
+                        .email("admin@marketplace.com")
+                        .password(passwordEncoder.encode("admin123"))
+                        .telephone("1100000000")
+                        .registerDate(LocalDate.now())
+                        .active(true)
+                        .role(Role.ADMIN)
+                        .build()));
+    }
+
     private List<User> ensureBuyers() {
         List<User> buyers = new ArrayList<>();
         for (BuyerSeed seed : BUYER_SEEDS) {
@@ -118,8 +159,44 @@ public class SalesSeeder implements CommandLineRunner {
                             .role(Role.BUYER)
                             .build()));
             buyers.add(buyer);
+            addressByBuyerId.put(buyer.getId(), ensureAddress(buyer));
+            ensureSavedCard(buyer);
         }
         return buyers;
+    }
+
+    private Address ensureAddress(User buyer) {
+        return addressRepository.findAllByBuyer_IdAndActiveTrueOrderByIdAsc(buyer.getId()).stream()
+                .findFirst()
+                .orElseGet(() -> addressRepository.save(Address.builder()
+                        .street("Av. Siempreviva")
+                        .streetNumber("742")
+                        .city("CABA")
+                        .state("CABA")
+                        .postalCode("C1000AAA")
+                        .country("Argentina")
+                        .recipientName(buyer.getName() + " " + buyer.getSurname())
+                        .label("Home")
+                        .defaultAddress(true)
+                        .active(true)
+                        .buyer(buyer)
+                        .build()));
+    }
+
+    private void ensureSavedCard(User buyer) {
+        if (!savedPaymentMethodRepository.findAllByBuyer_IdAndActiveTrueOrderByIdAsc(buyer.getId()).isEmpty()) {
+            return;
+        }
+        savedPaymentMethodRepository.save(SavedPaymentMethod.builder()
+                .brand("VISA")
+                .last4("4242")
+                .cardholderName(buyer.getName() + " " + buyer.getSurname())
+                .expiry("08/28")
+                .label("Personal")
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .buyer(buyer)
+                .build());
     }
 
     private List<Coupon> ensureCouponsForSeller(User seller) {
@@ -226,6 +303,16 @@ public class SalesSeeder implements CommandLineRunner {
         order.setTotal(subtotal.subtract(discount));
         orderRepository.save(order);
 
+        paymentRepository.save(Payment.builder()
+                .order(order)
+                .total(order.getTotal())
+                .methodName("Visa ····4242")
+                .status(paymentStatusFor(status))
+                .createdAt(createdAt)
+                .build());
+
+        shipmentRepository.save(buildShipment(order, buyer, status, createdAt));
+
         if (coupon != null) {
             couponRedemptionRepository.save(CouponRedemption.builder()
                     .coupon(coupon)
@@ -235,6 +322,32 @@ public class SalesSeeder implements CommandLineRunner {
                     .redeemedAt(createdAt)
                     .build());
         }
+    }
+
+    private PaymentStatus paymentStatusFor(OrderStatus status) {
+        return switch (status) {
+            case PAID, SHIPPED, DELIVERED -> PaymentStatus.COMPLETED;
+            case CANCELLED -> PaymentStatus.FAILED;
+            default -> PaymentStatus.PENDING;
+        };
+    }
+
+    private Shipment buildShipment(Order order, User buyer, OrderStatus status, LocalDateTime createdAt) {
+        Shipment.ShipmentBuilder builder = Shipment.builder()
+                .order(order)
+                .address(addressByBuyerId.get(buyer.getId()));
+
+        switch (status) {
+            case DELIVERED -> builder.status(ShipmentStatus.DELIVERED)
+                    .shippedAt(createdAt.plusDays(1))
+                    .deliveredAt(createdAt.plusDays(3))
+                    .trackingNumber("TRK" + order.getId());
+            case SHIPPED -> builder.status(ShipmentStatus.SHIPPED)
+                    .shippedAt(createdAt.plusDays(1))
+                    .trackingNumber("TRK" + order.getId());
+            default -> builder.status(ShipmentStatus.PENDING);
+        }
+        return builder.build();
     }
 
     private BigDecimal computeDiscount(Coupon coupon, BigDecimal subtotal) {
