@@ -55,6 +55,13 @@ public class AddressController {
         return ResponseEntity.ok(updated);
     }
 
+    @PutMapping("{addressId}/default")
+    public ResponseEntity<AddressResponse> setDefaultAddress(
+            @PathVariable Long addressId,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(addressService.setDefaultAddress(addressId, currentUser));
+    }
+
     @DeleteMapping("deleteAddress/{addressId}")
     public ResponseEntity<String> deleteAddress(
             @PathVariable Long addressId,

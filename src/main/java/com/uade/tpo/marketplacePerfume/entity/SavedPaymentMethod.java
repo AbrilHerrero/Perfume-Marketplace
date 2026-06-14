@@ -1,6 +1,6 @@
 package com.uade.tpo.marketplacePerfume.entity;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,42 +19,28 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
+public class SavedPaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String street;
+    private String brand;
 
-    private String streetNumber;
+    private String last4;
 
-    private String city;
+    private String cardholderName;
 
-    private String state;
-
-    private String postalCode;
-
-    private String country;
-
-    private String apartment;
-
-    private String recipientName;
+    private String expiry;
 
     private String label;
-
-    @Builder.Default
-    @Column(name = "is_default", nullable = false, columnDefinition = "boolean default false")
-    private boolean defaultAddress = false;
 
     @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 
+    private LocalDateTime createdAt;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "buyer_id", referencedColumnName = "id")
     private User buyer;
-
-    @OneToMany(mappedBy = "address")
-    private List<Shipment> shipments;
-
 }

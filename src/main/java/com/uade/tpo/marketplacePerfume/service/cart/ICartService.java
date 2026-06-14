@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplacePerfume.service.cart;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.cart.ApplyCouponResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemAdd;
@@ -13,5 +14,6 @@ public interface ICartService {
     CartItemResponse updateCartItemQuantity(User user, Long cartItemId, Integer quantity);
     void removeCartItem(User user, Long cartItemId);
     void clearCart(User user);
+    ApplyCouponResponse applyCoupon(User user, String couponCode);
     OrderResponseDTO checkout(User user, String couponCode);
 }

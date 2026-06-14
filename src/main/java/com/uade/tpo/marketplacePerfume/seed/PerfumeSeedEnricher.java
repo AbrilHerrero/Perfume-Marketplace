@@ -65,8 +65,6 @@ public class PerfumeSeedEnricher {
         perfume.setAccords(List.of(ACCORD_SETS[profile]));
         perfume.setSeason(buildSeasonProfile(random, perfume.getGender()));
         perfume.setOccasion(buildOccasionProfile(random, perfume.getSillage()));
-        perfume.setRating(roundToOneDecimal(3.8 + random.nextDouble() * 1.1));
-        perfume.setReviewCount(50 + random.nextInt(450));
         perfume.setDescription(buildDescription(perfume));
     }
 

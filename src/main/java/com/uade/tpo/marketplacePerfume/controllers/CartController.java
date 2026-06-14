@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.cart.ApplyCouponRequest;
+import com.uade.tpo.marketplacePerfume.entity.dto.cart.ApplyCouponResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CheckoutRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.cartItem.CartItemResponse;
@@ -68,6 +70,13 @@ public class CartController {
     public ResponseEntity<Void> clearCart(@AuthenticationPrincipal User user) {
         cartService.clearCart(user);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/apply-coupon")
+    public ResponseEntity<ApplyCouponResponse> applyCoupon(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody ApplyCouponRequest body) {
+        return ResponseEntity.ok(cartService.applyCoupon(user, body.getCouponCode()));
     }
 
     @PostMapping("/checkout")

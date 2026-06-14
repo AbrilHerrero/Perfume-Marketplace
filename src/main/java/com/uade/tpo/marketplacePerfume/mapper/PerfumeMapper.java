@@ -44,8 +44,6 @@ public final class PerfumeMapper {
         dto.setAccords(entity.getAccords());
         dto.setSeason(entity.getSeason());
         dto.setOccasion(entity.getOccasion());
-        dto.setRating(entity.getRating());
-        dto.setReviewCount(entity.getReviewCount());
 
         return dto;
     }
@@ -69,8 +67,6 @@ public final class PerfumeMapper {
                 .accords(dto.getAccords())
                 .season(dto.getSeason())
                 .occasion(dto.getOccasion())
-                .rating(dto.getRating())
-                .reviewCount(dto.getReviewCount())
                 .build();
     }
 
@@ -88,8 +84,6 @@ public final class PerfumeMapper {
         if (dto.getAccords() != null) existing.setAccords(dto.getAccords());
         if (dto.getSeason() != null) existing.setSeason(dto.getSeason());
         if (dto.getOccasion() != null) existing.setOccasion(dto.getOccasion());
-        if (dto.getRating() != null) existing.setRating(dto.getRating());
-        if (dto.getReviewCount() != null) existing.setReviewCount(dto.getReviewCount());
     }
 
     public static List<PerfumeResponseDTO> toResponseDtoList(List<Perfume> entities) {
@@ -123,8 +117,6 @@ public final class PerfumeMapper {
                 .accords(formatAccords(api.getMainAccords()))
                 .season(mapSeasonRanking(api.getSeasonRanking()))
                 .occasion(mapOccasionRanking(api.getOccasionRanking()))
-                .rating(parseRating(api.getRating()))
-                .reviewCount(estimateReviewCount(api))
                 .build();
     }
 
@@ -273,15 +265,29 @@ public final class PerfumeMapper {
         };
     }
 
-    private static Integer estimateReviewCount(FragellaFragranceResponse api) {
-        double rating = parseRating(api.getRating());
-        String seed = api.getBrand() + "|" + api.getName();
-        int hash = Math.abs(seed.hashCode());
-        int base = 40 + (hash % 460);
-        if (rating >= 4.5) {
-            base += 80;
+    public static Double seedSampleRating(String brand, String name, int volumeMl) {
+        return roundToOneDecimal(parseRatingFromApi(null, brand, name, volumeMl));
+    }
+
+    public static Integer seedSampleReviewCount(String brand, String name, int volumeMl) {
+        int hash = Math.abs((brand + "|" + name + "|" + volumeMl).hashCode());
+        return hash % 6;
+    }
+
+    private static double parseRatingFromApi(String apiRating, String brand, String name, int volumeMl) {
+        if (apiRating != null && !apiRating.isBlank()) {
+            try {
+                return Double.parseDouble(apiRating.trim());
+            } catch (NumberFormatException ignored) {
+                // fall through to deterministic seed
+            }
         }
-        return base;
+        int hash = Math.abs((brand + "|" + name + "|" + volumeMl).hashCode());
+        return 3.8 + (hash % 11) * 0.1;
+    }
+
+    private static double roundToOneDecimal(double value) {
+        return Math.round(value * 10.0) / 10.0;
     }
 
     private static String capitalizeWords(String value) {
@@ -315,14 +321,6 @@ public final class PerfumeMapper {
             return year != null && !year.isBlank() ? Integer.parseInt(year.trim()) : 0;
         } catch (NumberFormatException e) {
             return 0;
-        }
-    }
-
-    private static double parseRating(String rating) {
-        try {
-            return rating != null && !rating.isBlank() ? Double.parseDouble(rating.trim()) : 4.0;
-        } catch (NumberFormatException e) {
-            return 4.0;
         }
     }
 }

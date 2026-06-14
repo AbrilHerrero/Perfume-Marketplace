@@ -30,4 +30,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     BigDecimal sumRevenueBySellerSince(@Param("sellerId") Long sellerId,
             @Param("statuses") Collection<OrderStatus> statuses,
             @Param("since") LocalDateTime since);
+
+    boolean existsByOrder_Buyer_IdAndSample_IdAndOrder_StatusNot(
+            Long buyerId, Long sampleId, OrderStatus status);
 }

@@ -22,10 +22,25 @@ public final class SampleMapper {
         dto.setDescription(entity.getDescription());
         dto.setImageUrl(entity.getImageUrl());
         dto.setActive(entity.isActive());
+        dto.setRating(entity.getRating());
+        dto.setReviewCount(entity.getReviewCount());
 
-        if (entity.getSeller() != null) dto.setSellerId(entity.getSeller().getId());
+        if (entity.getSeller() != null) {
+            dto.setSellerId(entity.getSeller().getId());
+            dto.setSellerName(formatSellerName(entity.getSeller()));
+        }
         if (entity.getPerfume() != null) dto.setPerfumeId(entity.getPerfume().getId());
         return dto;
+    }
+
+    private static String formatSellerName(com.uade.tpo.marketplacePerfume.entity.User seller) {
+        if (seller == null) return null;
+        String name = seller.getName() != null ? seller.getName().trim() : "";
+        String surname = seller.getSurname() != null ? seller.getSurname().trim() : "";
+        if (name.isEmpty() && surname.isEmpty()) return null;
+        if (surname.isEmpty()) return name;
+        if (name.isEmpty()) return surname;
+        return name + " " + surname;
     }
 
     public static Sample toEntityFromRequest(SampleRequestDTO dto) {
