@@ -21,9 +21,10 @@ public final class SampleMapper {
         dto.setVolumeMl(entity.getVolumeMl());
         dto.setDescription(entity.getDescription());
         dto.setImageUrl(entity.getImageUrl());
+        dto.setActive(entity.isActive());
         dto.setRating(entity.getRating());
         dto.setReviewCount(entity.getReviewCount());
-        
+
         if (entity.getSeller() != null) {
             dto.setSellerId(entity.getSeller().getId());
             dto.setSellerName(formatSellerName(entity.getSeller()));

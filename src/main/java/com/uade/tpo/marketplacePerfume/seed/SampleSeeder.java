@@ -17,7 +17,6 @@ import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.Role;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
-import com.uade.tpo.marketplacePerfume.mapper.PerfumeMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
@@ -116,8 +115,9 @@ public class SampleSeeder implements CommandLineRunner {
                         .stock(DEFAULT_STOCK)
                         .description(buildDescription(perfume, volumeMl))
                         .imageUrl(resolveImageUrl(perfume))
-                        .rating(PerfumeMapper.seedSampleRating(perfume.getBrand(), perfume.getName(), volumeMl))
-                        .reviewCount(PerfumeMapper.seedSampleReviewCount(perfume.getBrand(), perfume.getName(), volumeMl))
+                        // rating/reviewCount are derived from real reviews by ReviewSeeder
+                        .rating(null)
+                        .reviewCount(0)
                         .active(true)
                         .createdAt(LocalDateTime.now())
                         .build();

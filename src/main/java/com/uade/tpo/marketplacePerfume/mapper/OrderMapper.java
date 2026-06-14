@@ -46,6 +46,59 @@ public final class OrderMapper {
         return dtos;
     }
 
+    /**
+     * Maps an order for a seller's sales view: keeps only the items sold by this
+     * seller and totals just those lines, so cross-seller items and the buyer's
+     * order-wide discount are not exposed.
+     */
+    public static OrderResponseDTO toResponseDtoForSeller(Order entity, Long sellerId) {
+        if (entity == null) {
+            return null;
+        }
+
+        OrderResponseDTO dto = new OrderResponseDTO();
+        dto.setId(entity.getId());
+        if (entity.getBuyer() != null) {
+            dto.setBuyerId(entity.getBuyer().getId());
+            dto.setBuyerEmail(entity.getBuyer().getEmail());
+        }
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCouponCode(entity.getCouponCode());
+        dto.setStatus(entity.getStatus() != null ? entity.getStatus().name() : null);
+
+        List<OrderItem> sellerItems = new ArrayList<>();
+        if (entity.getOrderItems() != null) {
+            for (OrderItem item : entity.getOrderItems()) {
+                Sample sample = item.getSample();
+                if (sample != null && sample.getSeller() != null
+                        && sellerId.equals(sample.getSeller().getId())) {
+                    sellerItems.add(item);
+                }
+            }
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderItem item : sellerItems) {
+            if (item.getUnitPrice() != null) {
+                total = total.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+            }
+        }
+        dto.setTotal(total);
+        dto.setItems(toItemResponseDtoList(sellerItems));
+        return dto;
+    }
+
+    public static List<OrderResponseDTO> toResponseDtoListForSeller(List<Order> entities, Long sellerId) {
+        List<OrderResponseDTO> dtos = new ArrayList<>();
+        if (entities == null) {
+            return dtos;
+        }
+        for (Order entity : entities) {
+            dtos.add(toResponseDtoForSeller(entity, sellerId));
+        }
+        return dtos;
+    }
+
     public static OrderItemResponseDTO toItemResponseDto(OrderItem entity) {
         if (entity == null) {
             return null;

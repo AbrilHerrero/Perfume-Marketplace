@@ -43,6 +43,11 @@ public class SampleServiceImpl implements ISampleService {
     }
 
     @Override
+    public List<SampleResponseDTO> getMySamples(User seller) {
+        return SampleMapper.toResponseDtoList(sampleRepository.findBySeller_Id(seller.getId()));
+    }
+
+    @Override
     public List<SampleResponseDTO> getSamplesBySellerId(Long sellerId) {
         return SampleMapper.toResponseDtoList(sampleRepository.findBySeller_IdAndActiveTrue(sellerId));
     }
@@ -85,10 +90,7 @@ public class SampleServiceImpl implements ISampleService {
     public SampleResponseDTO updateSample(Long id, SampleRequestDTO dto, User sellerPrincipal) {
         validateSampleRequestComplete(dto);
 
-        Sample existing = findActiveByIdOrThrow(id);
-        if (existing.getSeller() == null || !existing.getSeller().getId().equals(sellerPrincipal.getId())) {
-            throw new SampleNotOwnedForUpdateException();
-        }
+        Sample existing = findOwnedByIdOrThrow(id, sellerPrincipal);
 
         SampleMapper.applyFullUpdate(dto, existing);
 
@@ -101,11 +103,15 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public SampleResponseDTO updateSampleStock(Long id, Integer newStock, User sellerPrincipal) {
         validateNewStock(newStock);
-        Sample existing = findActiveByIdOrThrow(id);
-        if (existing.getSeller() == null || !existing.getSeller().getId().equals(sellerPrincipal.getId())) {
-            throw new SampleNotOwnedForUpdateException();
-        }
+        Sample existing = findOwnedByIdOrThrow(id, sellerPrincipal);
         existing.setStock(newStock);
+        return SampleMapper.toResponseDto(sampleRepository.save(existing));
+    }
+
+    @Override
+    public SampleResponseDTO setSampleActive(Long id, boolean active, User sellerPrincipal) {
+        Sample existing = findOwnedByIdOrThrow(id, sellerPrincipal);
+        existing.setActive(active);
         return SampleMapper.toResponseDto(sampleRepository.save(existing));
     }
 
@@ -137,6 +143,14 @@ public class SampleServiceImpl implements ISampleService {
         if (incomplete) {
             throw new SampleIncompleteRequestException();
         }
+    }
+
+    private Sample findOwnedByIdOrThrow(Long id, User sellerPrincipal) {
+        Sample sample = sampleRepository.findById(id).orElseThrow(SampleNotFoundException::new);
+        if (sample.getSeller() == null || !sample.getSeller().getId().equals(sellerPrincipal.getId())) {
+            throw new SampleNotOwnedForUpdateException();
+        }
+        return sample;
     }
 
     private Sample findActiveByIdOrThrow(Long id) {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleActiveUpdateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.Sample.StockUpdateDTO;
@@ -33,6 +34,11 @@ public class SampleController {
     @GetMapping("/all")
     public ResponseEntity<List<SampleResponseDTO>> getAll() {
         return ResponseEntity.ok(sampleService.getAllSamples());
+    }
+
+    @GetMapping("/mine")
+    public ResponseEntity<List<SampleResponseDTO>> getMine(@AuthenticationPrincipal User seller) {
+        return ResponseEntity.ok(sampleService.getMySamples(seller));
     }
 
     @GetMapping("/seller/{sellerId}")
@@ -80,6 +86,14 @@ public class SampleController {
             @Valid @RequestBody StockUpdateDTO stockDto,
             @AuthenticationPrincipal User seller) {
         return ResponseEntity.ok(sampleService.updateSampleStock(id, stockDto.getStock(), seller));
+    }
+
+    @PatchMapping("/{id}/active")
+    public ResponseEntity<SampleResponseDTO> updateActive(
+            @PathVariable Long id,
+            @Valid @RequestBody SampleActiveUpdateDTO activeDto,
+            @AuthenticationPrincipal User seller) {
+        return ResponseEntity.ok(sampleService.setSampleActive(id, activeDto.getActive(), seller));
     }
 
     @DeleteMapping("/{id}")

@@ -14,7 +14,9 @@ public interface ISampleService {
     SampleResponseDTO createSample(SampleRequestDTO dto, User seller);
     SampleResponseDTO updateSample(Long id, SampleRequestDTO dto, User seller);
     SampleResponseDTO updateSampleStock(Long id, Integer newStock, User sellerPrincipal);
+    SampleResponseDTO setSampleActive(Long id, boolean active, User sellerPrincipal);
     void deleteSample(Long id, User principal);
+    List<SampleResponseDTO> getMySamples(User seller);
     List<SampleResponseDTO> getSamplesBySellerId(Long sellerId);
     List<SampleResponseDTO> getSamplesByPerfumeId(Long perfumeId);
 }

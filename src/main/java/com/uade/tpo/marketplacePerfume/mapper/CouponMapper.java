@@ -19,6 +19,9 @@ public final class CouponMapper {
         dto.setCode(entity.getCode());
         dto.setDiscountType(entity.getDiscountType());
         dto.setDiscountValue(entity.getDiscountValue());
+        dto.setMinOrder(entity.getMinOrder());
+        dto.setMaxUses(entity.getMaxUses());
+        dto.setUsed(entity.getRedemptions() != null ? entity.getRedemptions().size() : 0);
         dto.setValidFrom(entity.getValidFrom());
         dto.setValidUntil(entity.getValidUntil());
         dto.setActive(entity.isActive());
@@ -33,6 +36,8 @@ public final class CouponMapper {
                 .code(dto.getCode())
                 .discountType(dto.getDiscountType())
                 .discountValue(dto.getDiscountValue())
+                .minOrder(dto.getMinOrder())
+                .maxUses(dto.getMaxUses())
                 .validFrom(dto.getValidFrom())
                 .validUntil(dto.getValidUntil())
                 .active(true)
@@ -43,6 +48,8 @@ public final class CouponMapper {
         if (dto == null) return;
         if (dto.getDiscountType() != null) existing.setDiscountType(dto.getDiscountType());
         if (dto.getDiscountValue() != null) existing.setDiscountValue(dto.getDiscountValue());
+        if (dto.getMinOrder() != null) existing.setMinOrder(dto.getMinOrder());
+        if (dto.getMaxUses() != null) existing.setMaxUses(dto.getMaxUses());
         if (dto.getValidFrom() != null) existing.setValidFrom(dto.getValidFrom());
         if (dto.getValidUntil() != null) existing.setValidUntil(dto.getValidUntil());
         if (dto.getActive() != null) existing.setActive(dto.getActive());

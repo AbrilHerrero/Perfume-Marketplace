@@ -1439,6 +1439,24 @@
 					}
 				},
 				{
+					"name": "Get seller orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/order/seller",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"seller"
+							]
+						},
+						"description": "`GET /order/seller`. **SELLER** only. Returns the seller's sales: every order that contains one of their samples, with **only their items** and a total computed from just those lines (cross-seller items and the buyer's order-wide discount are not exposed). **200** + array of `OrderResponseDTO`, newest first."
+					}
+				},
+				{
 					"name": "Cancel Order",
 					"request": {
 						"method": "PUT",
@@ -1823,6 +1841,34 @@
 							]
 						},
 						"description": "`PATCH /payments/{id}/method` (`PaymentController#updateMethod`). Body: `{ \"methodName\": \"...\" }` (non-blank). Sets the payment method chosen by the buyer after `Checkout` (payment is created with `methodName = null`). Only allowed while the payment is **PENDING** — `409` `PaymentNotPendingException` once it transitions to `COMPLETED` / `FAILED` / `REFUNDED`. **200** + updated `PaymentResponse`. **400** on blank body. **403** for non-owners; **404** if the payment id doesn't exist."
+					}
+				},
+				{
+					"name": "Pay order (confirm card)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardNumber\": \"4242424242424242\",\n    \"expiry\": \"08/30\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/{{payment_id}}/pay",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"{{payment_id}}",
+								"pay"
+							]
+						},
+						"description": "`POST /payments/{id}/pay`. **BUYER**/**ADMIN**. Simple card check: `cardNumber` must be 13–19 digits (or a 4-digit saved-card reference) and `expiry` (MM/YY) must not be in the past. On success the payment becomes **COMPLETED** and the order moves to **PAID**. **400** `PaymentInvalidCardNumberException` / `PaymentCardExpiredException` on bad input; **409** `PaymentNotPendingException` if already paid."
 					}
 				}
 			]
