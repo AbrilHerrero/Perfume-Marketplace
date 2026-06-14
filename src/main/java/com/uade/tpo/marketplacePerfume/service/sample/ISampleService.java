@@ -9,6 +9,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 
 public interface ISampleService {
     List<SampleResponseDTO> getAllSamples();
+    List<SampleResponseDTO> getAllSamplesForAdmin();
     SampleResponseDTO getSampleByIdDTO(Long id);
     Sample getSampleById(Long id);
     SampleResponseDTO createSample(SampleRequestDTO dto, User seller);

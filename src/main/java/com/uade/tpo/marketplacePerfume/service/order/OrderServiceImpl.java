@@ -54,8 +54,9 @@ public class OrderServiceImpl implements IOrderService {
             List.of(OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.DELIVERED);
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDTO> getAllOrders() {
-        return OrderMapper.toResponseDtoList(orderRepository.findAll());
+        return OrderMapper.toResponseDtoList(orderRepository.findAllWithBuyerAndItems());
     }
 
     @Override

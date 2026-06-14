@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
+import com.uade.tpo.marketplacePerfume.entity.dto.stats.AdminStatsResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.user.UserProfileResponse;
+import com.uade.tpo.marketplacePerfume.service.stats.IStatsService;
 import com.uade.tpo.marketplacePerfume.service.user.IUserService;
 
 @RestController
@@ -22,9 +24,17 @@ public class AdminController {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private IStatsService statsService;
+
     @GetMapping("hi")
     public String hi(@AuthenticationPrincipal User user) {
         return "Hi, " + user.getName();
+    }
+
+    @GetMapping("stats")
+    public ResponseEntity<AdminStatsResponseDTO> getStats() {
+        return ResponseEntity.ok(statsService.getAdminStats());
     }
     @GetMapping("users")
     public ResponseEntity<List<UserProfileResponse>> getUsers() {

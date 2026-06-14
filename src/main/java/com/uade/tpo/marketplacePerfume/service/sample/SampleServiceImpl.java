@@ -43,6 +43,11 @@ public class SampleServiceImpl implements ISampleService {
     }
 
     @Override
+    public List<SampleResponseDTO> getAllSamplesForAdmin() {
+        return SampleMapper.toResponseDtoList(sampleRepository.findAll());
+    }
+
+    @Override
     public List<SampleResponseDTO> getMySamples(User seller) {
         return SampleMapper.toResponseDtoList(sampleRepository.findBySeller_Id(seller.getId()));
     }
@@ -109,8 +114,8 @@ public class SampleServiceImpl implements ISampleService {
     }
 
     @Override
-    public SampleResponseDTO setSampleActive(Long id, boolean active, User sellerPrincipal) {
-        Sample existing = findOwnedByIdOrThrow(id, sellerPrincipal);
+    public SampleResponseDTO setSampleActive(Long id, boolean active, User principal) {
+        Sample existing = findManageableByIdOrThrow(id, principal);
         existing.setActive(active);
         return SampleMapper.toResponseDto(sampleRepository.save(existing));
     }
@@ -151,6 +156,14 @@ public class SampleServiceImpl implements ISampleService {
             throw new SampleNotOwnedForUpdateException();
         }
         return sample;
+    }
+
+    /** ADMINs may manage any sample; sellers only the ones they own. */
+    private Sample findManageableByIdOrThrow(Long id, User principal) {
+        if (principal.getRole() == Role.ADMIN) {
+            return sampleRepository.findById(id).orElseThrow(SampleNotFoundException::new);
+        }
+        return findOwnedByIdOrThrow(id, principal);
     }
 
     private Sample findActiveByIdOrThrow(Long id) {
