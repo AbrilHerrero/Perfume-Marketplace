@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplacePerfume.service.review;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplacePerfume.entity.OrderStatus;
 import com.uade.tpo.marketplacePerfume.entity.Review;
+import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
@@ -21,9 +23,11 @@ import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewInvalidRatingExce
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotOwnedException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewPurchaseRequiredException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.ReviewMapper;
 import com.uade.tpo.marketplacePerfume.repository.OrderItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.ReviewRepository;
+import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
 import com.uade.tpo.marketplacePerfume.service.sample.ISampleService;
 
 @Service
@@ -39,6 +43,9 @@ public class ReviewServiceImpl implements IReviewService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private SampleRepository sampleRepository;
 
     @Override
     public ReviewListResponseDTO getReviewsBySampleId(Long sampleId) {
@@ -81,7 +88,9 @@ public class ReviewServiceImpl implements IReviewService {
         review.setUpdatedAt(now);
 
         try {
-            return ReviewMapper.toResponseDto(reviewRepository.save(review));
+            Review saved = reviewRepository.save(review);
+            refreshSampleRating(sample.getId());
+            return ReviewMapper.toResponseDto(saved);
         } catch (DataIntegrityViolationException e) {
             throw new ReviewAlreadyExistsException();
         }
@@ -100,7 +109,9 @@ public class ReviewServiceImpl implements IReviewService {
         ReviewMapper.applyFullUpdate(dto, existing);
         existing.setUpdatedAt(LocalDateTime.now());
 
-        return ReviewMapper.toResponseDto(reviewRepository.save(existing));
+        Review saved = reviewRepository.save(existing);
+        refreshSampleRating(existing.getSample().getId());
+        return ReviewMapper.toResponseDto(saved);
     }
 
     @Override
@@ -111,7 +122,9 @@ public class ReviewServiceImpl implements IReviewService {
             throw new ReviewNotOwnedException();
         }
 
+        Long sampleId = review.getSample().getId();
         reviewRepository.delete(review);
+        refreshSampleRating(sampleId);
     }
 
     private Review findByIdOrThrow(Long id) {
@@ -155,6 +168,29 @@ public class ReviewServiceImpl implements IReviewService {
         if (!purchased) {
             throw new ReviewPurchaseRequiredException();
         }
+    }
+
+    private void refreshSampleRating(Long sampleId) {
+        Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
+        List<Review> reviews = reviewRepository.findBySample_Id(sampleId);
+
+        long ratingSum = 0L;
+        int ratedCount = 0;
+        for (Review review : reviews) {
+            if (review.getRating() != null) {
+                ratingSum += review.getRating();
+                ratedCount++;
+            }
+        }
+
+        if (ratedCount == 0) {
+            sample.setRating(null);
+            sample.setReviewCount(0);
+        } else {
+            sample.setRating(Math.round((ratingSum * 10.0) / ratedCount) / 10.0);
+            sample.setReviewCount(ratedCount);
+        }
+        sampleRepository.save(sample);
     }
 
 }

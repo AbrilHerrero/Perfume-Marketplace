@@ -29,6 +29,4 @@ public class PerfumeCreateDTO {
     private List<String> accords;
     private SeasonProfile season;
     private OccasionProfile occasion;
-    private Double rating;
-    private Integer reviewCount;
 }
