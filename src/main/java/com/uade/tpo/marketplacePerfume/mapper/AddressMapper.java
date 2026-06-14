@@ -18,6 +18,8 @@ public final class AddressMapper {
                 .postalCode(dto.getPostalCode())
                 .country(dto.getCountry())
                 .apartment(dto.getApartment())
+                .recipientName(dto.getRecipientName())
+                .label(dto.getLabel())
                 .buyer(buyer)
                 .active(true)
                 .build();
@@ -31,6 +33,8 @@ public final class AddressMapper {
         address.setPostalCode(dto.getPostalCode());
         address.setCountry(dto.getCountry());
         address.setApartment(dto.getApartment());
+        address.setRecipientName(dto.getRecipientName());
+        address.setLabel(dto.getLabel());
     }
 
     public static AddressResponse toResponse(Address address) {
@@ -44,6 +48,9 @@ public final class AddressMapper {
         response.setPostalCode(address.getPostalCode());
         response.setCountry(address.getCountry());
         response.setApartment(address.getApartment());
+        response.setRecipientName(address.getRecipientName());
+        response.setLabel(address.getLabel());
+        response.setDefaultAddress(address.isDefaultAddress());
         return response;
     }
 }

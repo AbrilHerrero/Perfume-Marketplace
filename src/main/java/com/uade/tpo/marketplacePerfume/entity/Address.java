@@ -39,6 +39,14 @@ public class Address {
 
     private String apartment;
 
+    private String recipientName;
+
+    private String label;
+
+    @Builder.Default
+    @Column(name = "is_default", nullable = false, columnDefinition = "boolean default false")
+    private boolean defaultAddress = false;
+
     @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;

@@ -11,4 +11,7 @@ public class CreateAddressRequest {
     private String postalCode;
     private String country;
     private String apartment;
+    private String recipientName;
+    private String label;
+    private boolean defaultAddress;
 }

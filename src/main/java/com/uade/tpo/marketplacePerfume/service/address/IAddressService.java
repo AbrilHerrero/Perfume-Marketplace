@@ -16,5 +16,7 @@ public interface IAddressService {
 
     AddressResponse modifyAddress(Long addressId, CreateAddressRequest request, User currentUser);
 
+    AddressResponse setDefaultAddress(Long addressId, User currentUser);
+
     void deleteAddress(Long addressId, User currentUser);
 }

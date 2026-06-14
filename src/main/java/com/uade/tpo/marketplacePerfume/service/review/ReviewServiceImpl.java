@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplacePerfume.service.review;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -87,7 +88,7 @@ public class ReviewServiceImpl implements IReviewService {
 
         try {
             Review saved = reviewRepository.save(review);
-            addReviewToSampleRating(sample.getId(), dto.getRating());
+            recalculateSampleRating(sample.getId());
             return ReviewMapper.toResponseDto(saved);
         } catch (DataIntegrityViolationException e) {
             throw new ReviewAlreadyExistsException();
@@ -104,12 +105,11 @@ public class ReviewServiceImpl implements IReviewService {
             throw new ReviewNotOwnedException();
         }
 
-        int previousRating = existing.getRating();
         ReviewMapper.applyFullUpdate(dto, existing);
         existing.setUpdatedAt(LocalDateTime.now());
 
         Review saved = reviewRepository.save(existing);
-        updateSampleRatingForReviewChange(existing.getSample().getId(), previousRating, dto.getRating());
+        recalculateSampleRating(existing.getSample().getId());
         return ReviewMapper.toResponseDto(saved);
     }
 
@@ -122,9 +122,8 @@ public class ReviewServiceImpl implements IReviewService {
         }
 
         Long sampleId = review.getSample().getId();
-        int reviewRating = review.getRating();
         reviewRepository.delete(review);
-        removeReviewFromSampleRating(sampleId, reviewRating);
+        recalculateSampleRating(sampleId);
     }
 
     private Review findByIdOrThrow(Long id) {
@@ -170,56 +169,18 @@ public class ReviewServiceImpl implements IReviewService {
         }
     }
 
-    private void addReviewToSampleRating(Long sampleId, int reviewRating) {
+    /** Sets the sample rating to the average of its reviews and the count to how many it has. */
+    private void recalculateSampleRating(Long sampleId) {
         Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
-        int count = sample.getReviewCount() != null ? sample.getReviewCount() : 0;
-        Double rating = sample.getRating();
+        List<Review> reviews = reviewRepository.findBySample_Id(sampleId);
 
-        if (count == 0 || rating == null) {
-            sample.setRating((double) reviewRating);
-            sample.setReviewCount(1);
-        } else {
-            int newCount = count + 1;
-            double newRating = (rating * count + reviewRating) / newCount;
-            sample.setRating(roundToOneDecimal(newRating));
-            sample.setReviewCount(newCount);
-        }
-        sampleRepository.save(sample);
-    }
-
-    private void updateSampleRatingForReviewChange(Long sampleId, int oldRating, int newRating) {
-        if (oldRating == newRating) {
-            return;
-        }
-
-        Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
-        int count = sample.getReviewCount() != null ? sample.getReviewCount() : 0;
-        Double rating = sample.getRating();
-        if (count == 0 || rating == null) {
-            return;
-        }
-
-        double newRatingValue = (rating * count - oldRating + newRating) / count;
-        sample.setRating(roundToOneDecimal(newRatingValue));
-        sampleRepository.save(sample);
-    }
-
-    private void removeReviewFromSampleRating(Long sampleId, int reviewRating) {
-        Sample sample = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
-        int count = sample.getReviewCount() != null ? sample.getReviewCount() : 0;
-        Double rating = sample.getRating();
-        if (count == 0 || rating == null) {
-            return;
-        }
-
-        if (count == 1) {
+        if (reviews.isEmpty()) {
             sample.setRating(null);
             sample.setReviewCount(0);
         } else {
-            int newCount = count - 1;
-            double newRating = (rating * count - reviewRating) / newCount;
-            sample.setRating(roundToOneDecimal(newRating));
-            sample.setReviewCount(newCount);
+            double average = reviews.stream().mapToInt(Review::getRating).average().orElse(0);
+            sample.setRating(roundToOneDecimal(average));
+            sample.setReviewCount(reviews.size());
         }
         sampleRepository.save(sample);
     }
