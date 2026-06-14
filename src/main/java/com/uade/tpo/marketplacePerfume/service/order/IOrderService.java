@@ -14,6 +14,8 @@ public interface IOrderService {
 
     SellerStatsResponseDTO getSellerStats(User seller);
 
+    List<OrderResponseDTO> getSellerOrders(User seller);
+
     List<OrderResponseDTO> getOrdersByBuyer(Long buyerId);
 
     OrderResponseDTO getOrderById(Long id, User currentUser);

@@ -71,6 +71,13 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getSellerOrders(User seller) {
+        return OrderMapper.toResponseDtoListForSeller(
+                orderRepository.findBySellerId(seller.getId()), seller.getId());
+    }
+
+    @Override
     public List<OrderResponseDTO> getOrdersByBuyer(Long buyerId) {
         return OrderMapper.toResponseDtoList(orderRepository.findByBuyerId(buyerId));
     }

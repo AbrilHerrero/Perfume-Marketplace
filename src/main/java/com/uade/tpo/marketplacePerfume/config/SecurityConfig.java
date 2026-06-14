@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/address/**").hasRole("BUYER")
                         .requestMatchers(HttpMethod.GET, "/order/all").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/order/seller-stats").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.GET, "/order/seller").hasRole("SELLER")
                         .requestMatchers(HttpMethod.PUT, "/order/*/status").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/order/*/cancel").authenticated()
                         .requestMatchers("/order/**").authenticated()

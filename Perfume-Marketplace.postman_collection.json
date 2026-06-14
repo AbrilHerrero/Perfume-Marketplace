@@ -1439,6 +1439,24 @@
 					}
 				},
 				{
+					"name": "Get seller orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/order/seller",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"seller"
+							]
+						},
+						"description": "`GET /order/seller`. **SELLER** only. Returns the seller's sales: every order that contains one of their samples, with **only their items** and a total computed from just those lines (cross-seller items and the buyer's order-wide discount are not exposed). **200** + array of `OrderResponseDTO`, newest first."
+					}
+				},
+				{
 					"name": "Cancel Order",
 					"request": {
 						"method": "PUT",
