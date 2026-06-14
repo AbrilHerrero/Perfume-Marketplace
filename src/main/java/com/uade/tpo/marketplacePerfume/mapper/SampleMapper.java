@@ -21,7 +21,8 @@ public final class SampleMapper {
         dto.setVolumeMl(entity.getVolumeMl());
         dto.setDescription(entity.getDescription());
         dto.setImageUrl(entity.getImageUrl());
-        
+        dto.setActive(entity.isActive());
+
         if (entity.getSeller() != null) dto.setSellerId(entity.getSeller().getId());
         if (entity.getPerfume() != null) dto.setPerfumeId(entity.getPerfume().getId());
         return dto;

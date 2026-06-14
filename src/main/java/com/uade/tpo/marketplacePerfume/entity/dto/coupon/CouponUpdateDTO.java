@@ -14,6 +14,10 @@ public class CouponUpdateDTO {
 
     private BigDecimal discountValue;
 
+    private BigDecimal minOrder;
+
+    private Integer maxUses;
+
     private LocalDateTime validFrom;
 
     private LocalDateTime validUntil;

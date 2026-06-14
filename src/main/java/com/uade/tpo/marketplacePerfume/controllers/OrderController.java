@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderStatusUpdateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.SellerStatsResponseDTO;
 import com.uade.tpo.marketplacePerfume.service.order.IOrderService;
 
 import jakarta.validation.Valid;
@@ -35,6 +36,11 @@ public class OrderController {
     @GetMapping("/me")
     public ResponseEntity<List<OrderResponseDTO>> getMyOrders(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(orderService.getOrdersByBuyer(currentUser.getId()));
+    }
+
+    @GetMapping("/seller-stats")
+    public ResponseEntity<SellerStatsResponseDTO> getSellerStats(@AuthenticationPrincipal User seller) {
+        return ResponseEntity.ok(orderService.getSellerStats(seller));
     }
 
     @GetMapping("{id}")

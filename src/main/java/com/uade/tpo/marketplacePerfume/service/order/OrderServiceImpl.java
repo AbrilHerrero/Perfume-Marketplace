@@ -22,6 +22,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderItemCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderStatusUpdateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.SellerStatsResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.coupon.CouponNotApplicableException;
 import com.uade.tpo.marketplacePerfume.exceptions.order.InsufficientStockException;
@@ -49,9 +50,24 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private ICouponService couponService;
 
+    private static final List<OrderStatus> SOLD_STATUSES =
+            List.of(OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.DELIVERED);
+
     @Override
     public List<OrderResponseDTO> getAllOrders() {
         return OrderMapper.toResponseDtoList(orderRepository.findAll());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SellerStatsResponseDTO getSellerStats(User seller) {
+        LocalDateTime since = LocalDateTime.now().minusDays(30);
+        long sold = orderItemRepository.sumQuantityBySellerSince(seller.getId(), SOLD_STATUSES, since);
+        BigDecimal revenue = orderItemRepository.sumRevenueBySellerSince(seller.getId(), SOLD_STATUSES, since);
+        return SellerStatsResponseDTO.builder()
+                .soldLast30Days(sold)
+                .revenueLast30Days(revenue != null ? revenue : BigDecimal.ZERO)
+                .build();
     }
 
     @Override

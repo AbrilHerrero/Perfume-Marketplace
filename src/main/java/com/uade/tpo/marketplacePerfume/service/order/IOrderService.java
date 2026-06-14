@@ -6,10 +6,13 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.OrderStatusUpdateDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.orderDTOs.SellerStatsResponseDTO;
 
 public interface IOrderService {
 
     List<OrderResponseDTO> getAllOrders();
+
+    SellerStatsResponseDTO getSellerStats(User seller);
 
     List<OrderResponseDTO> getOrdersByBuyer(Long buyerId);
 

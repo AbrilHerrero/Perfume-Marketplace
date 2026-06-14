@@ -14,6 +14,9 @@ public class CouponResponseDTO {
     private String code;
     private DiscountType discountType;
     private BigDecimal discountValue;
+    private BigDecimal minOrder;
+    private Integer maxUses;
+    private Integer used;
     private LocalDateTime validFrom;
     private LocalDateTime validUntil;
     private boolean active;
