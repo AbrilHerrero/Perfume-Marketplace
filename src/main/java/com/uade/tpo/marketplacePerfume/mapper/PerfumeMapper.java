@@ -271,7 +271,7 @@ public final class PerfumeMapper {
 
     public static Integer seedSampleReviewCount(String brand, String name, int volumeMl) {
         int hash = Math.abs((brand + "|" + name + "|" + volumeMl).hashCode());
-        return 50 + (hash % 450);
+        return hash % 6;
     }
 
     private static double parseRatingFromApi(String apiRating, String brand, String name, int volumeMl) {
