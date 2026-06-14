@@ -73,6 +73,10 @@
 		{
 			"key": "coupon_code",
 			"value": ""
+		},
+		{
+			"key": "payment_method_id",
+			"value": "1"
 		}
 	],
 	"item": [
@@ -112,7 +116,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Test Buyer\",\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1122334455\",\n    \"role\": \"BUYER\"\n}"
+							"raw": "{\n    \"name\": \"Test\",\n    \"surname\": \"Buyer\",\n    \"email\": \"buyer@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1122334455\",\n    \"role\": \"BUYER\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -158,7 +162,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Test Seller\",\n    \"email\": \"seller@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1155667788\",\n    \"role\": \"SELLER\"\n}"
+							"raw": "{\n    \"name\": \"Test\",\n    \"surname\": \"Seller\",\n    \"email\": \"seller@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1155667788\",\n    \"role\": \"SELLER\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -204,7 +208,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Test Admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1199887766\",\n    \"role\": \"ADMIN\"\n}"
+							"raw": "{\n    \"name\": \"Test\",\n    \"surname\": \"Admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"123456\",\n    \"telephone\": \"1199887766\",\n    \"role\": \"ADMIN\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -1129,6 +1133,33 @@
 					}
 				},
 				{
+					"name": "Apply coupon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"couponCode\": \"{{coupon_code}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cart/apply-coupon",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"apply-coupon"
+							]
+						},
+						"description": "`POST /cart/apply-coupon`. **BUYER** only. Previews a coupon against the current cart **without** placing the order. Body: `ApplyCouponRequest` (`couponCode`). **200** + `ApplyCouponResponse` (`code`, `discountType`, `discountValue`, `sellerId`, `cartSubtotal`, `sellerSubtotal`, `discountAmount`, `totalAfterDiscount`). The discount applies only to the items of the coupon's seller. **400** if the cart is empty, the coupon is invalid/expired, already used, or does not apply to any item; **404** if the coupon does not exist."
+					}
+				},
+				{
 					"name": "Checkout",
 					"request": {
 						"method": "POST",
@@ -1609,7 +1640,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"street\": \"Av. Corrientes\",\n    \"streetNumber\": \"1234\",\n    \"city\": \"CABA\",\n    \"state\": \"CABA\",\n    \"postalCode\": \"C1043AAZ\",\n    \"country\": \"Argentina\",\n    \"apartment\": \"3B\"\n}"
+							"raw": "{\n    \"street\": \"Av. Corrientes\",\n    \"streetNumber\": \"1234\",\n    \"city\": \"CABA\",\n    \"state\": \"CABA\",\n    \"postalCode\": \"C1043AAZ\",\n    \"country\": \"Argentina\",\n    \"apartment\": \"3B\",\n    \"recipientName\": \"Mira Reyes\",\n    \"label\": \"Home\",\n    \"defaultAddress\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/address/addAddress",
@@ -1621,7 +1652,7 @@
 								"addAddress"
 							]
 						},
-						"description": "`POST /address/addAddress`. Body: `CreateAddressRequest`. **201** + `AddressResponse` (`id`, `active`, …). You can add multiple addresses per user."
+						"description": "`POST /address/addAddress`. Body: `CreateAddressRequest` (optional `recipientName`, `label`, `defaultAddress`). **201** + `AddressResponse` (`id`, `active`, `recipientName`, `label`, `defaultAddress`, …). The first address is always made default; sending `defaultAddress: true` makes this one default and clears the others. You can add multiple addresses per user."
 					}
 				},
 				{
@@ -1672,7 +1703,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"street\": \"Av. Santa Fe\",\n    \"streetNumber\": \"5000\",\n    \"city\": \"CABA\",\n    \"state\": \"CABA\",\n    \"postalCode\": \"C1425BHN\",\n    \"country\": \"Argentina\",\n    \"apartment\": \"12A\"\n}"
+							"raw": "{\n    \"street\": \"Av. Santa Fe\",\n    \"streetNumber\": \"5000\",\n    \"city\": \"CABA\",\n    \"state\": \"CABA\",\n    \"postalCode\": \"C1425BHN\",\n    \"country\": \"Argentina\",\n    \"apartment\": \"12A\",\n    \"recipientName\": \"Mira Reyes\",\n    \"label\": \"Work\",\n    \"defaultAddress\": false\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/address/modifyAddress/{{address_id}}",
@@ -1685,7 +1716,26 @@
 								"{{address_id}}"
 							]
 						},
-						"description": "`PUT /address/modifyAddress/{addressId}`. Body: `CreateAddressRequest`. **200** + `AddressResponse`. **404** if the id does not exist, is not yours, or is already soft-deleted."
+						"description": "`PUT /address/modifyAddress/{addressId}`. Body: `CreateAddressRequest` (optional `recipientName`, `label`, `defaultAddress`). **200** + `AddressResponse`. Sending `defaultAddress: true` makes this address the default and clears the others. **404** if the id does not exist, is not yours, or is already soft-deleted."
+					}
+				},
+				{
+					"name": "Set default address",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/address/{{address_id}}/default",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"{{address_id}}",
+								"default"
+							]
+						},
+						"description": "`PUT /address/{addressId}/default`. Marks this address as the buyer's default and clears the flag on every other address. **200** + the updated `AddressResponse`. **404** (`AddressNotFoundException`) if the id does not exist, is not yours, or is inactive."
 					}
 				},
 				{
@@ -1773,6 +1823,73 @@
 							]
 						},
 						"description": "`PATCH /payments/{id}/method` (`PaymentController#updateMethod`). Body: `{ \"methodName\": \"...\" }` (non-blank). Sets the payment method chosen by the buyer after `Checkout` (payment is created with `methodName = null`). Only allowed while the payment is **PENDING** — `409` `PaymentNotPendingException` once it transitions to `COMPLETED` / `FAILED` / `REFUNDED`. **200** + updated `PaymentResponse`. **400** on blank body. **403** for non-owners; **404** if the payment id doesn't exist."
+					}
+				}
+			]
+		},
+		{
+			"name": "Payment methods",
+			"description": "Base **`/payment-methods`**. **BUYER** only, Bearer token required. Buyer's saved cards used to prefill checkout. **Delete** is a soft delete (`active=false`). Use collection variable **`{{payment_method_id}}`** (set it from **Create saved method** / **List saved methods** response `id`).",
+			"item": [
+				{
+					"name": "List saved methods",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payment-methods",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment-methods"
+							]
+						},
+						"description": "`GET /payment-methods`. **200** + JSON array of active `SavedPaymentMethodResponse` (`id`, `brand`, `last4`, `cardholderName`, `expiry`, `label`)."
+					}
+				},
+				{
+					"name": "Create saved method",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"brand\": \"VISA\",\n    \"last4\": \"4242\",\n    \"cardholderName\": \"Mira Reyes\",\n    \"expiry\": \"08/28\",\n    \"label\": \"Personal\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payment-methods",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment-methods"
+							]
+						},
+						"description": "`POST /payment-methods`. Body: `CreateSavedPaymentMethodRequest`. **201** + `SavedPaymentMethodResponse`."
+					}
+				},
+				{
+					"name": "Delete saved method",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payment-methods/{{payment_method_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment-methods",
+								"{{payment_method_id}}"
+							]
+						},
+						"description": "`DELETE /payment-methods/{id}`. Soft delete (`active=false`). **204 No Content**. **404** (`SavedPaymentMethodNotFoundException`) if the id does not exist or is not yours."
 					}
 				}
 			]

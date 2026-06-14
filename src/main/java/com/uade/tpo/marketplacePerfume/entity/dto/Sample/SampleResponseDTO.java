@@ -14,4 +14,7 @@ public class SampleResponseDTO {
     private String imageUrl;
     private Long perfumeId; 
     private Long sellerId;
+    private String sellerName;
+    private Double rating;
+    private Integer reviewCount;
 }

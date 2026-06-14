@@ -30,7 +30,16 @@ public class AddressServiceImpl implements IAddressService {
     public AddressResponse addAddress(CreateAddressRequest request, User currentUser) {
         validateFields(request);
         User user = getManagedUser(currentUser);
+        List<Address> existing = addressRepository.findAllByBuyer_IdAndActiveTrueOrderByIdAsc(user.getId());
         Address address = AddressMapper.toNewEntity(request, user);
+
+        // First address is always the default; otherwise honour the requested flag.
+        boolean makeDefault = request.isDefaultAddress() || existing.isEmpty();
+        if (makeDefault) {
+            clearOtherDefaults(user.getId(), null);
+        }
+        address.setDefaultAddress(makeDefault);
+
         Address saved = addressRepository.save(address);
         return AddressMapper.toResponse(saved);
     }
@@ -58,8 +67,22 @@ public class AddressServiceImpl implements IAddressService {
         Address address = addressRepository.findByIdAndBuyer_IdAndActiveTrue(addressId, user.getId())
                 .orElseThrow(AddressNotFoundException::new);
         AddressMapper.apply(request, address);
+        if (request.isDefaultAddress()) {
+            clearOtherDefaults(user.getId(), addressId);
+            address.setDefaultAddress(true);
+        }
         Address saved = addressRepository.save(address);
         return AddressMapper.toResponse(saved);
+    }
+
+    @Override
+    public AddressResponse setDefaultAddress(Long addressId, User currentUser) {
+        User user = getManagedUser(currentUser);
+        Address address = addressRepository.findByIdAndBuyer_IdAndActiveTrue(addressId, user.getId())
+                .orElseThrow(AddressNotFoundException::new);
+        clearOtherDefaults(user.getId(), addressId);
+        address.setDefaultAddress(true);
+        return AddressMapper.toResponse(addressRepository.save(address));
     }
 
     @Override
@@ -70,8 +93,29 @@ public class AddressServiceImpl implements IAddressService {
         if (!address.isActive()) {
             throw new AddressAlreadyInactiveException();
         }
+        boolean wasDefault = address.isDefaultAddress();
         address.setActive(false);
+        address.setDefaultAddress(false);
         addressRepository.save(address);
+
+        // Keep exactly one default: promote the oldest remaining address.
+        if (wasDefault) {
+            List<Address> remaining = addressRepository.findAllByBuyer_IdAndActiveTrueOrderByIdAsc(user.getId());
+            if (!remaining.isEmpty()) {
+                Address promoted = remaining.get(0);
+                promoted.setDefaultAddress(true);
+                addressRepository.save(promoted);
+            }
+        }
+    }
+
+    private void clearOtherDefaults(Long buyerId, Long keepAddressId) {
+        for (Address address : addressRepository.findAllByBuyer_IdAndActiveTrueOrderByIdAsc(buyerId)) {
+            if (address.isDefaultAddress() && !address.getId().equals(keepAddressId)) {
+                address.setDefaultAddress(false);
+                addressRepository.save(address);
+            }
+        }
     }
 
     private void validateFields(CreateAddressRequest request) {

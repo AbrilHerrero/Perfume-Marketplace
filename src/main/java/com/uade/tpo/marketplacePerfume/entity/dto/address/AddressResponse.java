@@ -13,4 +13,7 @@ public class AddressResponse {
     private String postalCode;
     private String country;
     private String apartment;
+    private String recipientName;
+    private String label;
+    private boolean defaultAddress;
 }

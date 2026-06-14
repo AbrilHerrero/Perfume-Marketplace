@@ -63,11 +63,6 @@ public class Perfume {
     @JdbcTypeCode(SqlTypes.JSON)
     private OccasionProfile occasion;
 
-    private Double rating;
-
-    @Column(name = "review_count")
-    private Integer reviewCount;
-
     @OneToMany(mappedBy = "perfume")
     private List<Sample> samples;
 }
