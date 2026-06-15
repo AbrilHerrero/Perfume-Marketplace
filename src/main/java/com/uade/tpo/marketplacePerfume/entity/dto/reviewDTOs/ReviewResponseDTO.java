@@ -13,4 +13,7 @@ public class ReviewResponseDTO {
     private String comment;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String sellerReply;
+    private String sellerReplyName;
+    private LocalDateTime sellerReplyAt;
 }

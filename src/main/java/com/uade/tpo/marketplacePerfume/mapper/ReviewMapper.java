@@ -21,8 +21,15 @@ public final class ReviewMapper {
         dto.setComment(entity.getComment());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
+        dto.setSellerReply(entity.getSellerReply());
+        dto.setSellerReplyAt(entity.getSellerReplyAt());
         if (entity.getBuyer() != null) dto.setBuyerId(entity.getBuyer().getId());
-        if (entity.getSample() != null) dto.setSampleId(entity.getSample().getId());
+        if (entity.getSample() != null) {
+            dto.setSampleId(entity.getSample().getId());
+            if (entity.getSellerReply() != null && entity.getSample().getSeller() != null) {
+                dto.setSellerReplyName(entity.getSample().getSeller().getName());
+            }
+        }
         return dto;
     }
 

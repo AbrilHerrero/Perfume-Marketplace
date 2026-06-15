@@ -12,6 +12,7 @@ import com.uade.tpo.marketplacePerfume.entity.Review;
 import com.uade.tpo.marketplacePerfume.entity.Sample;
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewReplyRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
@@ -21,6 +22,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewIncompleteRequest
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewInvalidRatingException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotOwnedException;
+import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewReplyNotOwnedException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewPurchaseRequiredException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.ReviewMapper;
@@ -111,6 +113,27 @@ public class ReviewServiceImpl implements IReviewService {
         Review saved = reviewRepository.save(existing);
         recalculateSampleRating(existing.getSample().getId());
         return ReviewMapper.toResponseDto(saved);
+    }
+
+    @Override
+    public ReviewResponseDTO replyToReview(Long id, ReviewReplyRequestDTO dto, User seller) {
+        Review review = findByIdOrThrow(id);
+
+        Sample sample = review.getSample();
+        if (sample == null || sample.getSeller() == null
+                || !sample.getSeller().getId().equals(seller.getId())) {
+            throw new ReviewReplyNotOwnedException();
+        }
+
+        String reply = dto == null ? null : dto.getReply();
+        if (reply == null || reply.trim().isEmpty()) {
+            throw new ReviewIncompleteRequestException();
+        }
+        validateCommentLength(reply);
+
+        review.setSellerReply(reply.trim());
+        review.setSellerReplyAt(LocalDateTime.now());
+        return ReviewMapper.toResponseDto(reviewRepository.save(review));
     }
 
     @Override
