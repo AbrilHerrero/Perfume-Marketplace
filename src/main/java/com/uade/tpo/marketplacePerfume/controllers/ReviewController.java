@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewReplyRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
@@ -62,6 +63,14 @@ public class ReviewController {
             @RequestBody ReviewUpdateRequestDTO dto,
             @AuthenticationPrincipal User buyer) {
         return ResponseEntity.ok(reviewService.updateReview(id, dto, buyer));
+    }
+
+    @PutMapping("/{id}/reply")
+    public ResponseEntity<ReviewResponseDTO> reply(
+            @PathVariable Long id,
+            @RequestBody ReviewReplyRequestDTO dto,
+            @AuthenticationPrincipal User seller) {
+        return ResponseEntity.ok(reviewService.replyToReview(id, dto, seller));
     }
 
     @DeleteMapping("/{id}")

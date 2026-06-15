@@ -36,6 +36,11 @@ public class SampleController {
         return ResponseEntity.ok(sampleService.getAllSamples());
     }
 
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<SampleResponseDTO>> getAllForAdmin() {
+        return ResponseEntity.ok(sampleService.getAllSamplesForAdmin());
+    }
+
     @GetMapping("/mine")
     public ResponseEntity<List<SampleResponseDTO>> getMine(@AuthenticationPrincipal User seller) {
         return ResponseEntity.ok(sampleService.getMySamples(seller));

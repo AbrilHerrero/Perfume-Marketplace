@@ -42,6 +42,11 @@ public class Review {
 
     private LocalDateTime updatedAt;
 
+    @Column(length = 1000)
+    private String sellerReply;
+
+    private LocalDateTime sellerReplyAt;
+
     @ManyToOne
     @JoinColumn (name = "buyer_id", referencedColumnName = "id")
     private User buyer;

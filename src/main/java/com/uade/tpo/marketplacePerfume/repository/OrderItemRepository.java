@@ -33,4 +33,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     boolean existsByOrder_Buyer_IdAndSample_IdAndOrder_StatusNot(
             Long buyerId, Long sampleId, OrderStatus status);
+
+    @Query("SELECT COALESCE(SUM(oi.quantity), 0) FROM OrderItem oi "
+            + "WHERE oi.order.status IN :statuses")
+    long sumQuantityByOrderStatuses(@Param("statuses") Collection<OrderStatus> statuses);
 }
