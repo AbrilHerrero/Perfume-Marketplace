@@ -141,7 +141,20 @@ public class PaymentServiceImpl implements IPaymentService {
                 && order.getBuyer().getId().equals(user.getId())) {
             return;
         }
+        if (user.getRole() == Role.SELLER && sellerOwnsOrder(order, user.getId())) {
+            return;
+        }
         throw new PaymentForbiddenException();
+    }
+
+    private boolean sellerOwnsOrder(Order order, Long sellerId) {
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+            return false;
+        }
+        return order.getOrderItems().stream()
+                .allMatch(oi -> oi.getSample() != null
+                        && oi.getSample().getSeller() != null
+                        && oi.getSample().getSeller().getId().equals(sellerId));
     }
 
     private void assertCanCreatePayment(User user, Order order) {
