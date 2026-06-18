@@ -1794,7 +1794,7 @@
 								"{{payment_id}}"
 							]
 						},
-						"description": "`GET /payments/{id}` (`PaymentController#getById`). Returns **200** + `PaymentResponse`. Accessible to **ADMIN** or the **BUYER** that owns the underlying order (`403` `PaymentForbiddenException` otherwise). `404` `PaymentNotFoundException` if the id doesn't exist."
+						"description": "`GET /payments/{id}` (`PaymentController#getById`). Returns **200** + `PaymentResponse`. Accessible to **ADMIN**, the **BUYER** that owns the underlying order, or a **SELLER** when every item in the order is theirs (`403` `PaymentForbiddenException` otherwise) — so the seller sales view can read each order's payment status. `404` `PaymentNotFoundException` if the id doesn't exist."
 					}
 				},
 				{
@@ -1812,8 +1812,39 @@
 								"{{order_id}}"
 							]
 						},
-						"description": "`GET /payments/order/{orderId}` (`PaymentController#getByOrderId`). Returns **200** + `PaymentResponse` for the payment linked to that order. Same access rules as **Get payment by id**. `404` if no payment exists for the order (should not happen after a successful checkout)."
-					}
+						"description": "`GET /payments/order/{orderId}` (`PaymentController#getByOrderId`). Returns **200** + `PaymentResponse` for the payment linked to that order. Same access rules as **Get payment by id** \u2014 including a **SELLER** that owns every item in the order.\n\n**Seller flow (view a sale\u2019s payment):** run **Authenticate (SELLER)** (stores `access_token`) \u2192 **Order \u2192 Get seller orders** to list the seller\u2019s sales \u2192 set `order_id` to one of those order ids \u2192 send this request. The saved example below shows the 200 a seller gets back. `404` if no payment exists for the order (should not happen after a successful checkout)."
+					},
+					"response": [
+						{
+							"name": "Seller views the payment for one of their sales (200)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/payments/order/{{order_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"payments",
+										"order",
+										"{{order_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 5,\n    \"orderId\": 5,\n    \"total\": 96.00,\n    \"methodName\": \"Visa \u00b7\u00b7\u00b7\u00b74242\",\n    \"status\": \"COMPLETED\",\n    \"createdAt\": \"2026-06-12T14:03:11\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Update payment method (BUYER)",
