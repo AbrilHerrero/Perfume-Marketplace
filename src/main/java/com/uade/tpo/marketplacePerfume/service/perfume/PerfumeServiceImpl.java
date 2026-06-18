@@ -9,6 +9,7 @@ import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
+import com.uade.tpo.marketplacePerfume.exceptions.perfume.PerfumeInvalidYearException;
 import com.uade.tpo.marketplacePerfume.exceptions.perfume.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.PerfumeMapper;
 import com.uade.tpo.marketplacePerfume.repository.PerfumeRepository;
@@ -35,6 +36,10 @@ public class PerfumeServiceImpl implements IPerfumeService {
 
     @Override
     public PerfumeResponseDTO addPerfume(PerfumeCreateDTO perfumeCreateDTO) {
+        Integer releaseYear = perfumeCreateDTO.getReleaseYear();
+        if (releaseYear != null && releaseYear < 0) {
+            throw new PerfumeInvalidYearException();
+        }
         Perfume perfume = PerfumeMapper.toEntityFromCreate(perfumeCreateDTO);
         Perfume saved = perfumeRepository.save(perfume);
         return PerfumeMapper.toResponseDto(saved);

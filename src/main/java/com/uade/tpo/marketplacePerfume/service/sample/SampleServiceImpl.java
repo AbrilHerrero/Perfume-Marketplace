@@ -1,5 +1,6 @@
 package com.uade.tpo.marketplacePerfume.service.sample;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.Sample.SampleResponseDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.perfume.PerfumeNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleAlreadyInactiveException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleIncompleteRequestException;
+import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleInvalidValueException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotOwnedForDeleteException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotOwnedForUpdateException;
@@ -78,6 +80,7 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public SampleResponseDTO createSample(SampleRequestDTO dto, User sellerPrincipal) {
         validateSampleRequestComplete(dto);
+        validateSampleValues(dto);
 
         Sample sample = SampleMapper.toEntityFromRequest(dto);
         sample.setCreatedAt(LocalDateTime.now());
@@ -94,6 +97,7 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public SampleResponseDTO updateSample(Long id, SampleRequestDTO dto, User sellerPrincipal) {
         validateSampleRequestComplete(dto);
+        validateSampleValues(dto);
 
         Sample existing = findOwnedByIdOrThrow(id, sellerPrincipal);
 
@@ -147,6 +151,19 @@ public class SampleServiceImpl implements ISampleService {
                 || dto.getImageUrl() == null || dto.getImageUrl().isBlank();
         if (incomplete) {
             throw new SampleIncompleteRequestException();
+        }
+    }
+
+    /**
+     * A decant must cost something, hold a real volume, and never carry negative
+     * stock. Runs after the completeness check, so the fields are known non-null.
+     */
+    private void validateSampleValues(SampleRequestDTO dto) {
+        boolean invalid = dto.getPrice().compareTo(BigDecimal.ZERO) <= 0
+                || dto.getVolumeMl() <= 0
+                || dto.getStock() < 0;
+        if (invalid) {
+            throw new SampleInvalidValueException();
         }
     }
 
