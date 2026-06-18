@@ -31,6 +31,18 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             @Param("statuses") Collection<OrderStatus> statuses,
             @Param("since") LocalDateTime since);
 
+    @Query("SELECT COALESCE(SUM(o.discountAmount), 0) FROM Order o "
+            + "WHERE o.status IN :statuses "
+            + "AND o.createdAt >= :since "
+            + "AND o.discountAmount IS NOT NULL "
+            + "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o "
+            + "AND oi.sample.seller.id = :sellerId) "
+            + "AND NOT EXISTS (SELECT 1 FROM OrderItem oi2 WHERE oi2.order = o "
+            + "AND oi2.sample.seller.id <> :sellerId)")
+    BigDecimal sumDiscountForFullyOwnedSellerOrders(@Param("sellerId") Long sellerId,
+            @Param("statuses") Collection<OrderStatus> statuses,
+            @Param("since") LocalDateTime since);
+
     boolean existsByOrder_Buyer_IdAndSample_IdAndOrder_StatusNot(
             Long buyerId, Long sampleId, OrderStatus status);
 

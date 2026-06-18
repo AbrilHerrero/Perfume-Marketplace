@@ -48,8 +48,11 @@ public final class OrderMapper {
 
     /**
      * Maps an order for a seller's sales view: keeps only the items sold by this
-     * seller and totals just those lines, so cross-seller items and the buyer's
-     * order-wide discount are not exposed.
+     * seller and totals just those lines. When the order is entirely the
+     * seller's, the coupon discount is attributed to them — the code is exposed
+     * and the total is net; in a mixed-seller order the order-wide coupon can't
+     * be attributed, so neither it nor the discount is exposed and the total
+     * stays the gross of the seller's own lines.
      */
     public static OrderResponseDTO toResponseDtoForSeller(Order entity, Long sellerId) {
         if (entity == null) {
@@ -63,27 +66,40 @@ public final class OrderMapper {
             dto.setBuyerEmail(entity.getBuyer().getEmail());
         }
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setCouponCode(entity.getCouponCode());
         dto.setStatus(entity.getStatus() != null ? entity.getStatus().name() : null);
 
         List<OrderItem> sellerItems = new ArrayList<>();
+        boolean ownsEveryItem = true;
         if (entity.getOrderItems() != null) {
             for (OrderItem item : entity.getOrderItems()) {
                 Sample sample = item.getSample();
                 if (sample != null && sample.getSeller() != null
                         && sellerId.equals(sample.getSeller().getId())) {
                     sellerItems.add(item);
+                } else {
+                    ownsEveryItem = false;
                 }
             }
         }
 
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal gross = BigDecimal.ZERO;
         for (OrderItem item : sellerItems) {
             if (item.getUnitPrice() != null) {
-                total = total.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                gross = gross.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
             }
         }
-        dto.setTotal(total);
+
+        // The order-wide coupon discount is only attributable to this seller when
+        // every line in the order is theirs; otherwise report the gross of their
+        // own lines and don't expose another seller's / order-wide coupon.
+        BigDecimal discount = entity.getDiscountAmount();
+        if (ownsEveryItem && discount != null && discount.signum() > 0) {
+            dto.setCouponCode(entity.getCouponCode());
+            dto.setDiscountAmount(discount);
+            dto.setTotal(gross.subtract(discount).max(BigDecimal.ZERO));
+        } else {
+            dto.setTotal(gross);
+        }
         dto.setItems(toItemResponseDtoList(sellerItems));
         return dto;
     }

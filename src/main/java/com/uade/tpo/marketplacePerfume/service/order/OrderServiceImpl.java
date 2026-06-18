@@ -64,10 +64,17 @@ public class OrderServiceImpl implements IOrderService {
     public SellerStatsResponseDTO getSellerStats(User seller) {
         LocalDateTime since = LocalDateTime.now().minusDays(30);
         long sold = orderItemRepository.sumQuantityBySellerSince(seller.getId(), SOLD_STATUSES, since);
-        BigDecimal revenue = orderItemRepository.sumRevenueBySellerSince(seller.getId(), SOLD_STATUSES, since);
+        BigDecimal gross = orderItemRepository.sumRevenueBySellerSince(seller.getId(), SOLD_STATUSES, since);
+        BigDecimal discount =
+                orderItemRepository.sumDiscountForFullyOwnedSellerOrders(seller.getId(), SOLD_STATUSES, since);
+        BigDecimal revenue = (gross != null ? gross : BigDecimal.ZERO)
+                .subtract(discount != null ? discount : BigDecimal.ZERO);
+        if (revenue.signum() < 0) {
+            revenue = BigDecimal.ZERO;
+        }
         return SellerStatsResponseDTO.builder()
                 .soldLast30Days(sold)
-                .revenueLast30Days(revenue != null ? revenue : BigDecimal.ZERO)
+                .revenueLast30Days(revenue)
                 .build();
     }
 
