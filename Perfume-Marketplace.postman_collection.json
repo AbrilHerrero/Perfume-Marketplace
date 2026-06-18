@@ -1794,7 +1794,7 @@
 								"{{payment_id}}"
 							]
 						},
-						"description": "`GET /payments/{id}` (`PaymentController#getById`). Returns **200** + `PaymentResponse`. Accessible to **ADMIN** or the **BUYER** that owns the underlying order (`403` `PaymentForbiddenException` otherwise). `404` `PaymentNotFoundException` if the id doesn't exist."
+						"description": "`GET /payments/{id}` (`PaymentController#getById`). Returns **200** + `PaymentResponse`. Accessible to **ADMIN**, the **BUYER** that owns the underlying order, or a **SELLER** when every item in the order is theirs (`403` `PaymentForbiddenException` otherwise) — so the seller sales view can read each order's payment status. `404` `PaymentNotFoundException` if the id doesn't exist."
 					}
 				},
 				{
