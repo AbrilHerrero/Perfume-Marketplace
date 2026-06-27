@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationRequest;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.AuthenticationResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.auth.RegisterRequest;
+import com.uade.tpo.marketplacePerfume.exceptions.auth.InvalidCredentialsException;
 import com.uade.tpo.marketplacePerfume.exceptions.user.UserDuplicateException;
 import com.uade.tpo.marketplacePerfume.repository.UserRepository;
 
@@ -51,13 +53,17 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()));
+        } catch (AuthenticationException ex) {
+            throw new InvalidCredentialsException();
+        }
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow(InvalidCredentialsException::new);
 
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
