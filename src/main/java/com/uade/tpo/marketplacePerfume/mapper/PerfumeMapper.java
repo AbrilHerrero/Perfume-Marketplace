@@ -1,20 +1,15 @@
 package com.uade.tpo.marketplacePerfume.mapper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.uade.tpo.marketplacePerfume.adapter.dto.FragellaFragranceResponse;
 import com.uade.tpo.marketplacePerfume.adapter.dto.FragellaFragranceResponse.NoteEntry;
 import com.uade.tpo.marketplacePerfume.adapter.dto.FragellaFragranceResponse.NotesDetail;
-import com.uade.tpo.marketplacePerfume.adapter.dto.FragellaFragranceResponse.RankingEntry;
-import com.uade.tpo.marketplacePerfume.entity.OccasionProfile;
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.PerfumeNotes;
-import com.uade.tpo.marketplacePerfume.entity.SeasonProfile;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeCreateDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeModifyDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO;
@@ -39,11 +34,8 @@ public final class PerfumeMapper {
         dto.setImageUrl(entity.getImageUrl());
         dto.setGender(entity.getGender());
         dto.setSillage(entity.getSillage());
-        dto.setConfidence(entity.getConfidence());
         dto.setNotes(entity.getNotes());
         dto.setAccords(entity.getAccords());
-        dto.setSeason(entity.getSeason());
-        dto.setOccasion(entity.getOccasion());
 
         return dto;
     }
@@ -62,11 +54,8 @@ public final class PerfumeMapper {
                 .imageUrl(dto.getImageUrl())
                 .gender(dto.getGender())
                 .sillage(dto.getSillage())
-                .confidence(dto.getConfidence())
                 .notes(dto.getNotes())
                 .accords(dto.getAccords())
-                .season(dto.getSeason())
-                .occasion(dto.getOccasion())
                 .build();
     }
 
@@ -79,11 +68,8 @@ public final class PerfumeMapper {
         if (dto.getImageUrl() != null) existing.setImageUrl(dto.getImageUrl());
         if (dto.getGender() != null) existing.setGender(dto.getGender());
         if (dto.getSillage() != null) existing.setSillage(dto.getSillage());
-        if (dto.getConfidence() != null) existing.setConfidence(dto.getConfidence());
         if (dto.getNotes() != null) existing.setNotes(dto.getNotes());
         if (dto.getAccords() != null) existing.setAccords(dto.getAccords());
-        if (dto.getSeason() != null) existing.setSeason(dto.getSeason());
-        if (dto.getOccasion() != null) existing.setOccasion(dto.getOccasion());
     }
 
     public static List<PerfumeResponseDTO> toResponseDtoList(List<Perfume> entities) {
@@ -112,11 +98,8 @@ public final class PerfumeMapper {
                 .imageUrl(api.getImageUrl())
                 .gender(api.getGender())
                 .sillage(api.getSillage())
-                .confidence(api.getConfidence())
                 .notes(mapNotes(api.getNotes()))
                 .accords(formatAccords(api.getMainAccords()))
-                .season(mapSeasonRanking(api.getSeasonRanking()))
-                .occasion(mapOccasionRanking(api.getOccasionRanking()))
                 .build();
     }
 
@@ -158,62 +141,6 @@ public final class PerfumeMapper {
                 })
                 .filter(accord -> accord != null)
                 .collect(Collectors.toList());
-    }
-
-    private static SeasonProfile mapSeasonRanking(List<RankingEntry> ranking) {
-        Map<String, Double> normalized = normalizeRanking(ranking);
-        return SeasonProfile.builder()
-                .spring(normalized.getOrDefault("spring", 0.5))
-                .summer(normalized.getOrDefault("summer", 0.5))
-                .autumn(normalized.getOrDefault("autumn",
-                        normalized.getOrDefault("fall", 0.5)))
-                .winter(normalized.getOrDefault("winter", 0.5))
-                .build();
-    }
-
-    private static OccasionProfile mapOccasionRanking(List<RankingEntry> ranking) {
-        Map<String, Double> normalized = normalizeRanking(ranking);
-        return OccasionProfile.builder()
-                .daily(firstPresent(normalized, "casual", "daily"))
-                .office(firstPresent(normalized, "professional", "office"))
-                .evening(firstPresent(normalized, "night out", "evening", "night"))
-                .special(firstPresent(normalized, "special", "formal", "black tie"))
-                .build();
-    }
-
-    private static double firstPresent(Map<String, Double> values, String... keys) {
-        for (String key : keys) {
-            if (values.containsKey(key)) {
-                return values.get(key);
-            }
-        }
-        return 0.5;
-    }
-
-    private static Map<String, Double> normalizeRanking(List<RankingEntry> ranking) {
-        Map<String, Double> result = new HashMap<>();
-        if (ranking == null || ranking.isEmpty()) {
-            return result;
-        }
-
-        double maxScore = ranking.stream()
-                .mapToDouble(RankingEntry::getScore)
-                .max()
-                .orElse(1.0);
-
-        if (maxScore <= 0) {
-            maxScore = 1.0;
-        }
-
-        for (RankingEntry entry : ranking) {
-            if (entry.getName() == null) {
-                continue;
-            }
-            String key = entry.getName().trim().toLowerCase(Locale.ROOT);
-            result.put(key, roundToTwoDecimals(entry.getScore() / maxScore));
-        }
-
-        return result;
     }
 
     public static String extractLine(String brand, String name) {
@@ -310,10 +237,6 @@ public final class PerfumeMapper {
             }
         }
         return builder.toString();
-    }
-
-    private static double roundToTwoDecimals(double value) {
-        return Math.round(value * 100.0) / 100.0;
     }
 
     private static int parseYear(String year) {

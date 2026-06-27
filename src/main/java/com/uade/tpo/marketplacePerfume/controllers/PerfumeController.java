@@ -33,6 +33,11 @@ public class PerfumeController {
         return ResponseEntity.ok(perfumeService.getPerfumes());
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<PerfumeResponseDTO> getPerfume(@PathVariable Long id) {
+        return ResponseEntity.ok(perfumeService.getPerfume(id));
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<String> deletePerfume(@PathVariable Long id) {
         return ResponseEntity.ok(perfumeService.deletePerfume(id));
@@ -45,7 +50,7 @@ public class PerfumeController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<PerfumeResponseDTO> modifyPerfume(@PathVariable Long id, @RequestBody PerfumeModifyDTO perfumeModifyDTO) {
+    public ResponseEntity<PerfumeResponseDTO> modifyPerfume(@PathVariable Long id, @Valid @RequestBody PerfumeModifyDTO perfumeModifyDTO) {
         return ResponseEntity.ok(perfumeService.modifyPerfume(id, perfumeModifyDTO));
     }
 }
