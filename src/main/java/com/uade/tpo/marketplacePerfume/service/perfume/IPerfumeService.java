@@ -8,6 +8,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs.PerfumeResponseDTO
 
 public interface IPerfumeService {
     List<PerfumeResponseDTO> getPerfumes();
+    PerfumeResponseDTO getPerfume(Long id);
     String deletePerfume(Long id);
     PerfumeResponseDTO addPerfume(PerfumeCreateDTO perfumeCreateDTO);
     PerfumeResponseDTO modifyPerfume(Long id, PerfumeModifyDTO perfumeModifyDTO);

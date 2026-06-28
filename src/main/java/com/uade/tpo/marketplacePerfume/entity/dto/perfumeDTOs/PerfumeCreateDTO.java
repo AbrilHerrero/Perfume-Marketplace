@@ -2,11 +2,13 @@ package com.uade.tpo.marketplacePerfume.entity.dto.perfumeDTOs;
 
 import java.util.List;
 
-import com.uade.tpo.marketplacePerfume.entity.OccasionProfile;
 import com.uade.tpo.marketplacePerfume.entity.PerfumeNotes;
-import com.uade.tpo.marketplacePerfume.entity.SeasonProfile;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -19,14 +21,27 @@ public class PerfumeCreateDTO {
     private String brand;
 
     private String line;
+
+    @NotBlank
     private String description;
+
+    @NotNull
+    @Min(1900)
     private Integer releaseYear;
+
+    @NotBlank
     private String imageUrl;
+
+    @NotBlank
     private String gender;
+
+    @NotBlank
     private String sillage;
-    private String confidence;
+
+    @NotNull
+    @Valid
     private PerfumeNotes notes;
+
+    @NotEmpty
     private List<String> accords;
-    private SeasonProfile season;
-    private OccasionProfile occasion;
 }

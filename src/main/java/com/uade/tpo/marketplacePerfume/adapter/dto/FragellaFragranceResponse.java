@@ -30,9 +30,6 @@ public class FragellaFragranceResponse {
     @JsonProperty("Sillage")
     private String sillage;
 
-    @JsonProperty("Confidence")
-    private String confidence;
-
     @JsonProperty("rating")
     private String rating;
 
@@ -47,19 +44,6 @@ public class FragellaFragranceResponse {
 
     @JsonProperty("Notes")
     private NotesDetail notes;
-
-    @JsonProperty("Season Ranking")
-    private List<RankingEntry> seasonRanking;
-
-    @JsonProperty("Occasion Ranking")
-    private List<RankingEntry> occasionRanking;
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class RankingEntry {
-        private String name;
-        private double score;
-    }
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)

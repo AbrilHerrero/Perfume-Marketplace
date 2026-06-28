@@ -7,10 +7,8 @@ import java.util.Random;
 
 import org.springframework.stereotype.Component;
 
-import com.uade.tpo.marketplacePerfume.entity.OccasionProfile;
 import com.uade.tpo.marketplacePerfume.entity.Perfume;
 import com.uade.tpo.marketplacePerfume.entity.PerfumeNotes;
-import com.uade.tpo.marketplacePerfume.entity.SeasonProfile;
 import com.uade.tpo.marketplacePerfume.mapper.PerfumeMapper;
 
 @Component
@@ -63,37 +61,7 @@ public class PerfumeSeedEnricher {
                 .base(pickNotes(BASE_NOTES[profile], random, 3))
                 .build());
         perfume.setAccords(List.of(ACCORD_SETS[profile]));
-        perfume.setSeason(buildSeasonProfile(random, perfume.getGender()));
-        perfume.setOccasion(buildOccasionProfile(random, perfume.getSillage()));
         perfume.setDescription(buildDescription(perfume));
-    }
-
-    private SeasonProfile buildSeasonProfile(Random random, String gender) {
-        boolean isFresh = gender != null
-                && (gender.equalsIgnoreCase("men") || gender.equalsIgnoreCase("unisex"));
-
-        double spring = roundToTwoDecimals(0.35 + random.nextDouble() * 0.55);
-        double summer = roundToTwoDecimals(isFresh ? 0.55 + random.nextDouble() * 0.35 : 0.15 + random.nextDouble() * 0.45);
-        double autumn = roundToTwoDecimals(0.45 + random.nextDouble() * 0.5);
-        double winter = roundToTwoDecimals(isFresh ? 0.25 + random.nextDouble() * 0.45 : 0.55 + random.nextDouble() * 0.4);
-
-        return SeasonProfile.builder()
-                .spring(spring)
-                .summer(summer)
-                .autumn(autumn)
-                .winter(winter)
-                .build();
-    }
-
-    private OccasionProfile buildOccasionProfile(Random random, String sillage) {
-        boolean isStrong = sillage != null && sillage.equalsIgnoreCase("strong");
-
-        return OccasionProfile.builder()
-                .daily(roundToTwoDecimals(0.4 + random.nextDouble() * 0.45))
-                .office(roundToTwoDecimals(isStrong ? 0.35 + random.nextDouble() * 0.35 : 0.55 + random.nextDouble() * 0.35))
-                .evening(roundToTwoDecimals(0.65 + random.nextDouble() * 0.3))
-                .special(roundToTwoDecimals(0.55 + random.nextDouble() * 0.4))
-                .build();
     }
 
     private String buildDescription(Perfume perfume) {
@@ -120,13 +88,5 @@ public class PerfumeSeedEnricher {
     private long seed(Perfume perfume) {
         String key = perfume.getId() + "|" + perfume.getBrand() + "|" + perfume.getName();
         return key.hashCode();
-    }
-
-    private double roundToTwoDecimals(double value) {
-        return Math.round(value * 100.0) / 100.0;
-    }
-
-    private double roundToOneDecimal(double value) {
-        return Math.round(value * 10.0) / 10.0;
     }
 }

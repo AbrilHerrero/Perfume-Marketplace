@@ -49,19 +49,11 @@ public class Perfume {
 
     private String sillage;
 
-    private String confidence;
-
     @JdbcTypeCode(SqlTypes.JSON)
     private PerfumeNotes notes;
 
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> accords;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    private SeasonProfile season;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    private OccasionProfile occasion;
 
     @OneToMany(mappedBy = "perfume")
     private List<Sample> samples;
