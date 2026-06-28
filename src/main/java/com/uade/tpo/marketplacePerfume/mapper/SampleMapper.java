@@ -29,7 +29,13 @@ public final class SampleMapper {
             dto.setSellerId(entity.getSeller().getId());
             dto.setSellerName(formatSellerName(entity.getSeller()));
         }
-        if (entity.getPerfume() != null) dto.setPerfumeId(entity.getPerfume().getId());
+        if (entity.getPerfume() != null) {
+            dto.setPerfumeId(entity.getPerfume().getId());
+            dto.setPerfumeName(entity.getPerfume().getName());
+            dto.setPerfumeBrand(entity.getPerfume().getBrand());
+            dto.setPerfumeImageUrl(entity.getPerfume().getImageUrl());
+            dto.setPerfumeAccords(entity.getPerfume().getAccords());
+        }
         return dto;
     }
 
