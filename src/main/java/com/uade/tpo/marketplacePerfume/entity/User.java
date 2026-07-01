@@ -45,6 +45,11 @@ public class User implements UserDetails {
 
     private String telephone;
 
+    // Profile photo stored as a base64 data URL; LONGTEXT since an encoded image
+    // far exceeds the default VARCHAR length.
+    @Column(columnDefinition = "LONGTEXT")
+    private String avatar;
+
     private LocalDate registerDate;
 
     private boolean active;
