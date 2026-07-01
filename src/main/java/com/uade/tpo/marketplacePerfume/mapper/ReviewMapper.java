@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.uade.tpo.marketplacePerfume.entity.Review;
+import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
@@ -23,7 +24,10 @@ public final class ReviewMapper {
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setSellerReply(entity.getSellerReply());
         dto.setSellerReplyAt(entity.getSellerReplyAt());
-        if (entity.getBuyer() != null) dto.setBuyerId(entity.getBuyer().getId());
+        if (entity.getBuyer() != null) {
+            dto.setBuyerId(entity.getBuyer().getId());
+            dto.setBuyerName(formatBuyerName(entity.getBuyer()));
+        }
         if (entity.getSample() != null) {
             dto.setSampleId(entity.getSample().getId());
             if (entity.getSellerReply() != null && entity.getSample().getSeller() != null) {
@@ -45,6 +49,16 @@ public final class ReviewMapper {
         if (dto == null) return;
         existing.setRating(dto.getRating());
         existing.setComment(normalizeComment(dto.getComment()));
+    }
+
+    private static String formatBuyerName(User buyer) {
+        if (buyer == null) return null;
+        String name = buyer.getName() != null ? buyer.getName().trim() : "";
+        String surname = buyer.getSurname() != null ? buyer.getSurname().trim() : "";
+        if (name.isEmpty() && surname.isEmpty()) return null;
+        if (surname.isEmpty()) return name;
+        if (name.isEmpty()) return surname;
+        return name + " " + surname;
     }
 
     private static String normalizeComment(String comment) {
