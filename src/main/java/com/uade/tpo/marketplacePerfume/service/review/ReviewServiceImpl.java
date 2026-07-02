@@ -55,21 +55,6 @@ public class ReviewServiceImpl implements IReviewService {
     }
 
     @Override
-    public ReviewListResponseDTO getReviewsByBuyerId(Long buyerId) {
-        return ReviewMapper.toListResponseDto(reviewRepository.findByBuyer_Id(buyerId));
-    }
-
-    @Override
-    public ReviewListResponseDTO getReviewsBySellerId(Long sellerId) {
-        return ReviewMapper.toListResponseDto(reviewRepository.findBySample_Seller_Id(sellerId));
-    }
-
-    @Override
-    public ReviewResponseDTO getReviewById(Long id) {
-        return ReviewMapper.toResponseDto(findByIdOrThrow(id));
-    }
-
-    @Override
     public ReviewResponseDTO createReview(ReviewRequestDTO dto, User buyer) {
         validateCreateRequest(dto);
 

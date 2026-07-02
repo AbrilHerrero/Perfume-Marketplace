@@ -8,10 +8,7 @@ import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
 
 public interface IReviewService {
-    ReviewResponseDTO getReviewById(Long id);
     ReviewListResponseDTO getReviewsBySampleId(Long sampleId);
-    ReviewListResponseDTO getReviewsByBuyerId(Long buyerId);
-    ReviewListResponseDTO getReviewsBySellerId(Long sellerId);
     ReviewResponseDTO createReview(ReviewRequestDTO dto, User buyer);
     ReviewResponseDTO updateReview(Long id, ReviewUpdateRequestDTO dto, User buyer);
     ReviewResponseDTO replyToReview(Long id, ReviewReplyRequestDTO dto, User seller);

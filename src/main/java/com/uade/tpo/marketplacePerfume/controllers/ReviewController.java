@@ -29,24 +29,9 @@ public class ReviewController {
     @Autowired
     private IReviewService reviewService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReviewResponseDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(reviewService.getReviewById(id));
-    }
-
     @GetMapping("/sample/{sampleId}")
     public ResponseEntity<ReviewListResponseDTO> getBySampleId(@PathVariable Long sampleId) {
         return ResponseEntity.ok(reviewService.getReviewsBySampleId(sampleId));
-    }
-
-    @GetMapping("/buyer/{buyerId}")
-    public ResponseEntity<ReviewListResponseDTO> getByBuyerId(@PathVariable Long buyerId) {
-        return ResponseEntity.ok(reviewService.getReviewsByBuyerId(buyerId));
-    }
-
-    @GetMapping("/seller/{sellerId}")
-    public ResponseEntity<ReviewListResponseDTO> getBySellerId(@PathVariable Long sellerId) {
-        return ResponseEntity.ok(reviewService.getReviewsBySellerId(sellerId));
     }
 
     @PostMapping

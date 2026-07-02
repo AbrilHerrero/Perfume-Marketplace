@@ -1291,23 +1291,6 @@
 					}
 				},
 				{
-					"name": "Get coupon by id (SELLER owner / ADMIN)",
-					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{base_url}}/coupons/{{coupon_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"coupons",
-								"{{coupon_id}}"
-							]
-						},
-						"description": "`GET /coupons/{id}`. **200** + single `CouponResponseDTO`. A seller may only read their own coupon (**403** `CouponNotOwned` otherwise); admin may read any. **404** `CouponNotFound` if the id does not exist."
-					}
-				},
-				{
 					"name": "Update coupon (SELLER owner)",
 					"request": {
 						"method": "PUT",
@@ -1335,23 +1318,6 @@
 					}
 				},
 				{
-					"name": "Delete coupon — soft delete (SELLER owner / ADMIN)",
-					"request": {
-						"method": "DELETE",
-						"url": {
-							"raw": "{{base_url}}/coupons/{{coupon_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"coupons",
-								"{{coupon_id}}"
-							]
-						},
-						"description": "`DELETE /coupons/{id}`. **200** + `Coupon successfully deleted`. **Soft delete**: sets `active = false`, so the coupon stops applying at checkout but the row (and its redemption history) is preserved. Seller may only delete their own coupon; admin may delete any (**403** `CouponNotOwned` otherwise). **404** `CouponNotFound` if the id does not exist."
-					}
-				},
-				{
 					"name": "My redemption history (SELLER)",
 					"request": {
 						"method": "GET",
@@ -1366,24 +1332,6 @@
 							]
 						},
 						"description": "`GET /coupons/history`. **200** + array of `CouponRedemptionResponseDTO` across **all** of the seller's coupons. Each entry: `id`, `couponId`, `couponCode`, `buyerId`, `buyerEmail`, `orderId`, `discountAmount`, `redeemedAt`. Empty array if no coupon of the seller has been used yet."
-					}
-				},
-				{
-					"name": "Coupon redemption history by id (SELLER owner)",
-					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{base_url}}/coupons/{{coupon_id}}/history",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"coupons",
-								"{{coupon_id}}",
-								"history"
-							]
-						},
-						"description": "`GET /coupons/{id}/history`. **200** + array of `CouponRedemptionResponseDTO` for a single coupon. Only the owner seller may read it (**403** `CouponNotOwned`); admin may read any. **404** `CouponNotFound` if the id does not exist."
 					}
 				}
 			]
@@ -1529,59 +1477,6 @@
 							]
 						},
 						"description": "`GET /review/sample/{sampleId}`. **200 OK** + `ReviewListResponseDTO` (`reviews`, `totalCount`, `averageRating`). When the sample has no reviews yet, `reviews` is `[]`, `totalCount` is `0`, and `averageRating` is `null`. **404** `SampleNotFoundException` if the sample does not exist or is inactive."
-					}
-				},
-				{
-					"name": "Get reviews by buyer id",
-					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{base_url}}/review/buyer/{{buyer_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"review",
-								"buyer",
-								"{{buyer_id}}"
-							]
-						},
-						"description": "`GET /review/buyer/{buyerId}`. **200 OK** + `ReviewListResponseDTO` with all reviews written by that buyer. Empty envelope (`reviews: []`, `totalCount: 0`, `averageRating: null`) if the buyer has no reviews."
-					}
-				},
-				{
-					"name": "Get reviews by seller id",
-					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{base_url}}/review/seller/{{seller_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"review",
-								"seller",
-								"{{seller_id}}"
-							]
-						},
-						"description": "`GET /review/seller/{sellerId}`. **200 OK** + `ReviewListResponseDTO` aggregating reviews across all samples that belong to the seller. Empty envelope if the seller has no reviewed samples."
-					}
-				},
-				{
-					"name": "Get review by id",
-					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{base_url}}/review/{{review_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"review",
-								"{{review_id}}"
-							]
-						},
-						"description": "`GET /review/{id}`. **200** + single `ReviewResponseDTO`. **404** if the review does not exist."
 					}
 				},
 				{
