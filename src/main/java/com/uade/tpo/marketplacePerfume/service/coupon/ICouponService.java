@@ -19,16 +19,10 @@ public interface ICouponService {
 
     List<CouponResponseDTO> getMyCoupons(User seller);
 
-    CouponResponseDTO getCouponById(Long id, User principal);
-
     CouponResponseDTO updateCoupon(Long id, CouponUpdateDTO dto, User principal);
-
-    void deleteCoupon(Long id, User principal);
 
     // Redemption history
     List<CouponRedemptionResponseDTO> getMyCouponHistory(User seller);
-
-    List<CouponRedemptionResponseDTO> getCouponHistory(Long couponId, User principal);
 
     // Used by the checkout flow
     Coupon validateForRedemption(String code, User buyer);

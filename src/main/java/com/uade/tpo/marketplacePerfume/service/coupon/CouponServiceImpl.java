@@ -71,14 +71,6 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public CouponResponseDTO getCouponById(Long id, User principal) {
-        Coupon coupon = couponRepository.findById(id).orElseThrow(CouponNotFoundException::new);
-        assertCanManage(coupon, principal);
-        return CouponMapper.toResponseDto(coupon);
-    }
-
-    @Override
     @Transactional
     public CouponResponseDTO updateCoupon(Long id, CouponUpdateDTO dto, User principal) {
         Coupon existing = couponRepository.findById(id).orElseThrow(CouponNotFoundException::new);
@@ -92,28 +84,10 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    @Transactional
-    public void deleteCoupon(Long id, User principal) {
-        Coupon coupon = couponRepository.findById(id).orElseThrow(CouponNotFoundException::new);
-        assertCanManage(coupon, principal);
-        coupon.setActive(false);
-        couponRepository.save(coupon);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<CouponRedemptionResponseDTO> getMyCouponHistory(User seller) {
         return CouponRedemptionMapper.toResponseDtoList(
                 couponRedemptionRepository.findByCoupon_Seller_Id(seller.getId()));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<CouponRedemptionResponseDTO> getCouponHistory(Long couponId, User principal) {
-        Coupon coupon = couponRepository.findById(couponId).orElseThrow(CouponNotFoundException::new);
-        assertCanManage(coupon, principal);
-        return CouponRedemptionMapper.toResponseDtoList(
-                couponRedemptionRepository.findByCoupon_Id(couponId));
     }
 
     @Override
