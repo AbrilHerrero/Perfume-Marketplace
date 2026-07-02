@@ -1438,6 +1438,24 @@
 					}
 				},
 				{
+					"name": "Get seller stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/order/seller-stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"seller-stats"
+							]
+						},
+						"description": "`GET /order/seller-stats`. **SELLER** only. Returns the summary figures shown on the seller dashboard: **200** + `SellerStatsResponseDTO` (`soldLast30Days` — units sold in the last 30 days across `PAID`/`SHIPPED`/`DELIVERED` orders, `revenueLast30Days` — same window, net of buyer discounts, `activeCoupons` — count of the seller's currently active coupons)."
+					}
+				},
+				{
 					"name": "Cancel Order",
 					"request": {
 						"method": "PUT",
