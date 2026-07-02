@@ -1,5 +1,7 @@
 package com.uade.tpo.marketplacePerfume.service.cart;
 
+import java.util.List;
+
 import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.ApplyCouponResponse;
 import com.uade.tpo.marketplacePerfume.entity.dto.cart.CartResponse;
@@ -15,5 +17,5 @@ public interface ICartService {
     void removeCartItem(User user, Long cartItemId);
     void clearCart(User user);
     ApplyCouponResponse applyCoupon(User user, String couponCode);
-    OrderResponseDTO checkout(User user, String couponCode);
+    List<OrderResponseDTO> checkout(User user, String couponCode);
 }

@@ -2,8 +2,10 @@ package com.uade.tpo.marketplacePerfume.service.cart;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -179,7 +181,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public OrderResponseDTO checkout(User user, String couponCode) {
+    public List<OrderResponseDTO> checkout(User user, String couponCode) {
         Cart cart = cartRepository.findByBuyer_Id(user.getId())
                 .orElseThrow(EmptyCartException::new);
 
@@ -187,27 +189,59 @@ public class CartServiceImpl implements ICartService {
             throw new EmptyCartException();
         }
 
-        List<OrderItemCreateDTO> items = cart.getCartItems().stream()
-                .map(cartItem -> {
-                    OrderItemCreateDTO itemDto = new OrderItemCreateDTO();
-                    itemDto.setSampleId(cartItem.getSample().getId());
-                    itemDto.setQuantity(cartItem.getQuantity());
-                    return itemDto;
-                })
-                .collect(Collectors.toList());
+        // A cart can hold items from several sellers, but each seller ships and
+        // tracks their own decants. So the checkout splits into one order per
+        // seller — each with its own payment and shipment — instead of a single
+        // mixed order that no seller could fully own. A LinkedHashMap keeps the
+        // orders in the sellers' first-seen order for a deterministic result.
+        Map<Long, List<CartItem>> itemsBySeller = new LinkedHashMap<>();
+        for (CartItem cartItem : cart.getCartItems()) {
+            Sample sample = cartItem.getSample();
+            if (sample == null || sample.getSeller() == null) {
+                throw new SampleNotFoundException();
+            }
+            itemsBySeller
+                    .computeIfAbsent(sample.getSeller().getId(), k -> new ArrayList<>())
+                    .add(cartItem);
+        }
 
-        OrderCreateDTO orderDto = new OrderCreateDTO();
-        orderDto.setItems(items);
-        orderDto.setCouponCode(couponCode);
+        // A coupon belongs to a single seller, so only that seller's order
+        // carries it; the rest check out at full price. Resolve (and validate)
+        // the owner up front so an invalid coupon — or one whose seller isn't in
+        // the cart — fails before any order is created.
+        Long couponSellerId = null;
+        if (couponCode != null && !couponCode.isBlank()) {
+            Coupon coupon = couponService.validateForRedemption(couponCode.trim(), user);
+            couponSellerId = coupon.getSeller().getId();
+            if (!itemsBySeller.containsKey(couponSellerId)) {
+                throw new CouponNotApplicableException();
+            }
+        }
 
-        OrderResponseDTO order = orderService.createOrder(orderDto, user);
+        List<OrderResponseDTO> orders = new ArrayList<>();
+        for (Map.Entry<Long, List<CartItem>> entry : itemsBySeller.entrySet()) {
+            List<OrderItemCreateDTO> items = entry.getValue().stream()
+                    .map(cartItem -> {
+                        OrderItemCreateDTO itemDto = new OrderItemCreateDTO();
+                        itemDto.setSampleId(cartItem.getSample().getId());
+                        itemDto.setQuantity(cartItem.getQuantity());
+                        return itemDto;
+                    })
+                    .collect(Collectors.toList());
+
+            OrderCreateDTO orderDto = new OrderCreateDTO();
+            orderDto.setItems(items);
+            orderDto.setCouponCode(entry.getKey().equals(couponSellerId) ? couponCode : null);
+
+            OrderResponseDTO order = orderService.createOrder(orderDto, user);
+            paymentService.create(order.getId(), user);
+            shipmentService.create(order.getId(), user);
+            orders.add(order);
+        }
 
         clearCart(user);
 
-        paymentService.create(order.getId(), user);
-        shipmentService.create(order.getId(), user);
-
-        return order;
+        return orders;
     }
 
     private Map<Long, BigDecimal> subtotalBySeller(List<CartItem> cartItems) {
