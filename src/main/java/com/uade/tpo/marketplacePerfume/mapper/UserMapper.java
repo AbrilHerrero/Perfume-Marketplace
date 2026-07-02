@@ -13,6 +13,7 @@ public final class UserMapper {
                 .surname(user.getSurname())
                 .email(user.getEmail())
                 .telephone(user.getTelephone())
+                .avatar(user.getAvatar())
                 .registerDate(user.getRegisterDate())
                 .active(user.isActive())
                 .role(user.getRole())

@@ -53,6 +53,9 @@ public class UserServiceImpl implements IUserService {
         if (StringUtils.hasText(request.getTelephone())) {
             user.setTelephone(request.getTelephone());
         }
+        if (StringUtils.hasText(request.getAvatar())) {
+            user.setAvatar(request.getAvatar());
+        }
 
         userRepository.save(user);
         return UserMapper.toProfileResponse(user);
