@@ -15,11 +15,13 @@ import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseD
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewReplyRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewAlreadyExistsException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewCommentTooLongException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewIncompleteRequestException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewInvalidRatingException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotFoundException;
+import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewNotOwnedException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewReplyNotOwnedException;
 import com.uade.tpo.marketplacePerfume.exceptions.review.ReviewPurchaseRequiredException;
 import com.uade.tpo.marketplacePerfume.exceptions.sample.SampleNotFoundException;
@@ -81,6 +83,24 @@ public class ReviewServiceImpl implements IReviewService {
     }
 
     @Override
+    public ReviewResponseDTO updateReview(Long id, ReviewUpdateRequestDTO dto, User buyer) {
+        validateUpdateRequest(dto);
+
+        Review existing = findByIdOrThrow(id);
+
+        if (!existing.getBuyer().getId().equals(buyer.getId())) {
+            throw new ReviewNotOwnedException();
+        }
+
+        ReviewMapper.applyFullUpdate(dto, existing);
+        existing.setUpdatedAt(LocalDateTime.now());
+
+        Review saved = reviewRepository.save(existing);
+        recalculateSampleRating(existing.getSample().getId());
+        return ReviewMapper.toResponseDto(saved);
+    }
+
+    @Override
     public ReviewResponseDTO replyToReview(Long id, ReviewReplyRequestDTO dto, User seller) {
         Review review = findByIdOrThrow(id);
 
@@ -101,12 +121,33 @@ public class ReviewServiceImpl implements IReviewService {
         return ReviewMapper.toResponseDto(reviewRepository.save(review));
     }
 
+    @Override
+    public void deleteReview(Long id, User buyer) {
+        Review review = findByIdOrThrow(id);
+
+        if (!review.getBuyer().getId().equals(buyer.getId())) {
+            throw new ReviewNotOwnedException();
+        }
+
+        Long sampleId = review.getSample().getId();
+        reviewRepository.delete(review);
+        recalculateSampleRating(sampleId);
+    }
+
     private Review findByIdOrThrow(Long id) {
         return reviewRepository.findById(id).orElseThrow(ReviewNotFoundException::new);
     }
 
     private void validateCreateRequest(ReviewRequestDTO dto) {
         if (dto == null || dto.getSampleId() == null) {
+            throw new ReviewIncompleteRequestException();
+        }
+        validateRating(dto.getRating());
+        validateCommentLength(dto.getComment());
+    }
+
+    private void validateUpdateRequest(ReviewUpdateRequestDTO dto) {
+        if (dto == null) {
             throw new ReviewIncompleteRequestException();
         }
         validateRating(dto.getRating());

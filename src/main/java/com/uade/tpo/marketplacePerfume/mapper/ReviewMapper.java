@@ -8,6 +8,7 @@ import com.uade.tpo.marketplacePerfume.entity.User;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewListResponseDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewRequestDTO;
 import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewResponseDTO;
+import com.uade.tpo.marketplacePerfume.entity.dto.reviewDTOs.ReviewUpdateRequestDTO;
 
 public final class ReviewMapper {
 
@@ -42,6 +43,12 @@ public final class ReviewMapper {
                 .rating(dto.getRating())
                 .comment(normalizeComment(dto.getComment()))
                 .build();
+    }
+
+    public static void applyFullUpdate(ReviewUpdateRequestDTO dto, Review existing) {
+        if (dto == null) return;
+        existing.setRating(dto.getRating());
+        existing.setComment(normalizeComment(dto.getComment()));
     }
 
     private static String formatBuyerName(User buyer) {
