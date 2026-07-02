@@ -1,8 +1,10 @@
 package com.uade.tpo.marketplacePerfume.controllers;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -79,11 +81,13 @@ public class CartController {
         return ResponseEntity.ok(cartService.applyCoupon(user, body.getCouponCode()));
     }
 
+    // A mixed-seller cart checks out as one order per seller, so this returns the
+    // list of orders created (each with its own payment + shipment).
     @PostMapping("/checkout")
-    public ResponseEntity<OrderResponseDTO> checkout(@AuthenticationPrincipal User user,
+    public ResponseEntity<List<OrderResponseDTO>> checkout(@AuthenticationPrincipal User user,
             @RequestBody(required = false) CheckoutRequest body) {
         String couponCode = body != null ? body.getCouponCode() : null;
-        OrderResponseDTO order = cartService.checkout(user, couponCode);
-        return ResponseEntity.created(URI.create("/order/" + order.getId())).body(order);
+        List<OrderResponseDTO> orders = cartService.checkout(user, couponCode);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orders);
     }
 }
