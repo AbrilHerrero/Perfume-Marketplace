@@ -6,6 +6,8 @@ This project is a **TPO (Trabajo Práctico Obligatorio)** developed for the subj
 
 The goal is to build an e-commerce platform focused on selling **perfume samples** — initially targeting 5ml and 10ml formats. The platform allows users to act either as sellers, listing their samples for sale, or as buyers, browsing and purchasing available products.
 
+This repository is the **REST API backend**. The **web frontend** that consumes it lives in the sibling repository [`Decantica`](../Decantica) (React + React Router, connected via Redux Toolkit + axios).
+
 ## Team
 
 | Name | Role |
@@ -18,9 +20,11 @@ The goal is to build an e-commerce platform focused on selling **perfume samples
 ## Tech Stack
 
 - **Java 21** with **Spring Boot 4** — REST API backend
-- **Spring Data JPA** — Database access layer
+- **Spring Security + JWT** (jjwt) — stateless authentication with `ADMIN` / `BUYER` / `SELLER` roles
+- **Spring Data JPA / Hibernate** — Database access layer
 - **MySQL 8.0** — Relational database
 - **Docker Compose** — Database containerization
+- **Fragella API** — seeds ~50 perfumes on first startup
 
 ## Data Entity-Relation (DER)
 
