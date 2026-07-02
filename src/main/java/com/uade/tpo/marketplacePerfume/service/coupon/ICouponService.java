@@ -36,4 +36,7 @@ public interface ICouponService {
     BigDecimal computeDiscount(Coupon coupon, BigDecimal sellerSubtotal);
 
     CouponRedemption recordRedemption(Coupon coupon, User buyer, Order order, BigDecimal discount);
+
+    // Seller dashboard stats
+    long countActiveCoupons(User seller);
 }

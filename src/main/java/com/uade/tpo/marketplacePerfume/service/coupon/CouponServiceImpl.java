@@ -196,4 +196,22 @@ public class CouponServiceImpl implements ICouponService {
             throw new CouponInvalidException();
         }
     }
+
+    // Counts the seller's coupons that currently read as "ACTIVE" in the coupons
+    // table: the active flag is on, they haven't expired and they aren't
+    // exhausted (as opposed to EXPIRED / EXHAUSTED / INACTIVE). Backs the
+    // "Active coupons" figure on the seller dashboard.
+    @Override
+    @Transactional(readOnly = true)
+    public long countActiveCoupons(User seller) {
+        LocalDateTime now = LocalDateTime.now();
+        return couponRepository.findBySeller_Id(seller.getId()).stream()
+                .filter(Coupon::isActive)
+                .filter(c -> c.getValidUntil() == null || !now.isAfter(c.getValidUntil()))
+                .filter(c -> {
+                    int used = c.getRedemptions() != null ? c.getRedemptions().size() : 0;
+                    return c.getMaxUses() == null || used < c.getMaxUses();
+                })
+                .count();
+    }
 }

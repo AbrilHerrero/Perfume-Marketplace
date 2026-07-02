@@ -75,6 +75,7 @@ public class OrderServiceImpl implements IOrderService {
         return SellerStatsResponseDTO.builder()
                 .soldLast30Days(sold)
                 .revenueLast30Days(revenue)
+                .activeCoupons(couponService.countActiveCoupons(seller))
                 .build();
     }
 

@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class SellerStatsResponseDTO {
     private long soldLast30Days;
     private BigDecimal revenueLast30Days;
+    private long activeCoupons;
 }
