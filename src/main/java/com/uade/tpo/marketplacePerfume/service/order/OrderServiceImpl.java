@@ -30,6 +30,7 @@ import com.uade.tpo.marketplacePerfume.exceptions.order.InvalidOrderStatusExcept
 import com.uade.tpo.marketplacePerfume.exceptions.order.OrderAccessDeniedException;
 import com.uade.tpo.marketplacePerfume.exceptions.order.OrderNotFoundException;
 import com.uade.tpo.marketplacePerfume.mapper.OrderMapper;
+import com.uade.tpo.marketplacePerfume.repository.CouponRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderItemRepository;
 import com.uade.tpo.marketplacePerfume.repository.OrderRepository;
 import com.uade.tpo.marketplacePerfume.repository.SampleRepository;
@@ -49,6 +50,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private ICouponService couponService;
+
+    @Autowired
+    private CouponRepository couponRepository;
 
     private static final List<OrderStatus> SOLD_STATUSES =
             List.of(OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.DELIVERED);
@@ -72,9 +76,11 @@ public class OrderServiceImpl implements IOrderService {
         if (revenue.signum() < 0) {
             revenue = BigDecimal.ZERO;
         }
+        long activeCoupons = couponRepository.countBySeller_IdAndActiveTrue(seller.getId());
         return SellerStatsResponseDTO.builder()
                 .soldLast30Days(sold)
                 .revenueLast30Days(revenue)
+                .activeCoupons(activeCoupons)
                 .build();
     }
 

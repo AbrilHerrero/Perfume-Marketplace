@@ -16,4 +16,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     boolean existsByCode(String code);
 
     List<Coupon> findBySeller_Id(Long sellerId);
+
+    long countBySeller_IdAndActiveTrue(Long sellerId);
 }
